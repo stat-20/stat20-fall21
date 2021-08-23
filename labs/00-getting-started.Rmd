@@ -1,0 +1,77 @@
+---
+title: "Lab 0: Getting Started with RStudio and RMarkdown"
+output: github_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(message = FALSE, eval = FALSE)
+library(tidyverse)
+library(oilabs)
+```
+
+
+```{r echo = FALSE, eval = FALSE}
+The goal of this first (short) lab is to get students used to the workflow of the weekly problem set and lab, both of which will be done in Rmds in RStudio and turned in via GradeScope. More specifically, they should be able to:
+  
+1. Find lab assignment on course website
+2. Sign in to rstudio.reed.edu
+3. Create a project
+4. Create a new Rmd and knit to pdf
+5. Modify the markdown and r code
+6. Re-knit the pdf and inspect
+7. Download pdf
+8. Upload pdf to gradescope
+```
+
+```{r echo = FALSE, eval = FALSE}
+Before class, write out the 8 goals above on the side board, plug your laptop into the project, and click AV mute to turn off the screen until you're ready (I think they have new controls for the projection system on a touch screen on the wall). As students come in, please pass around a sign-in sheet where they can fill in 1) their name 2) whether they have joined the Reed Statistics and Data Science workspace and 3) whether they have posted to the math-141 channel. They might have questions about the waitlist or which section they should be in. Just have them sign the paper and talk to me in lecture on Friday. Tell the students that they won't need their computers for the first part of class, so they can shut their laptops.
+
+Draw diagram A on the whiteboard. And point out:
+
+1. They should be able to connect to the rstudio server from anywhere.
+2. They can use it for more things besides this class, so to keep things organized, they'll be creating what's called a "project" for math-141.
+3. Because rstudio will be in the cloud, anytime they want to get files from their computer into rstudio or vice versa, they'll need to upload and download them.
+
+Next, you'll be demonstrating parts 1 - 4 while they watch. Please ask the to wait to follow along until you've gone through all 4. Pull down the screen, turn off the AV mute, bring up a browser, and navigate to github.com/intro-stats/141-course-materials/labs/00-getting-started.Rmd. Recommend that they keep the lab in a separate tab or window, then open up another browser window to log into the rstudio server. 
+
+Once you're in rstudio, create a project called math-141. Point out to them that it's important that they use certain conventions when naming files: don't use spaces (use dashes or underscores) and best to not use capitalization (for readability).
+
+Next, click the green plus in the upper left corner to create a new file > R Markdown. Switch to pdf output and change the title to "Lab 0 Getting Started". After the file is created, then click the save button, and title it "lab-00-getting-started". Knit the pdf, then carefully go through each component of the Rmd and show what it turned into in the pdf - the header, the markdown text, the title/subtitle, r code, the plot.
+
+At this point, ask that the students open up their laptops and go through those steps 1 - 4. Walk around and be sure that everyone gets to the stage of looking at a pdf before you continue. Once they're all set, write up the following 5 things on the board for them to do (you may want to abbreviate these things when writing).
+
+1. Add "author: Your Name" on a new line within the header
+2. Delete everything after the header
+3. As a new title ## My Homestate: homestate. (If you're from abroad, use Oregon)
+4. Copy and paste the first paragraph from that state's Wikipedia page into the Rmd and remove any weird formatting.
+5. Use the button at the top of the Rmd to insert a chunk and then copy the following code into it (swap ou)
+
+library(usmap)
+library(ggplot2)
+plot_usmap(include = "OR")
+
+Walk around and help, encouraging them to knit after every step to see how things change. Once everyone is onboard, have them download their pdf file, then upload it to gradescope.
+```
+
+The goal of this lab is very practical: learn where to find the labs (you have succeeded!), login to the RStudio server, create your first RMarkdown file, knit it, then modify it.
+
+Please make the following modifications to your lab file. Be sure to knit it after every step to see what changed.
+
+1. Add `author: Your Name` on a new line within the header.
+
+2. Delete everything after the header.
+
+3. Add a new title `## My Homestate: homestate` (if you're from abroad, use Oregon).
+
+4. Copy and paste the first paragraph from that state's Wikipedia page into the Rmd and remove any weird formatting.
+
+5. Use the button at the top of the Rmd to insert a chunk and then copy the following code into it (swap out the `"OR"` with the two letter abbreviation of your state).
+
+```{r eval = FALSE}
+library(usmap)
+library(ggplot2)
+plot_usmap(include = "OR")
+```
+
+Make one final knit, be sure you're happy with your report, then download it to your computer and upload it to [gradescope](http://www.gradescope.com).

@@ -1,0 +1,42 @@
+---
+title: "Descriptive and Inferential Statistics"
+output:
+  xaringan::moon_reader:
+    css: ["fc", "fc-fonts", "reed.css", "default"]
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(fig.width = 13, 
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+class: center, middle
+
+# What's going on here?
+
+---
+
+```{r out.width=750, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/shoebill-1.png")
+```
+
+
+---
+
+```{r out.width=750, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/shoebill-2.png")
+```
+
+
+---
+
+```{r out.width=750, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/shoebill-3.png")
+```
