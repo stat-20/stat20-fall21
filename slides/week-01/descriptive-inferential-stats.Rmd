@@ -1,8 +1,9 @@
 ---
-title: "Descriptive and Inferential Statistics"
+title: "Descriptive vs Inferential Statistics"
+author: "STAT 20 UC Berkeley"
 output:
   xaringan::moon_reader:
-    css: ["fc", "fc-fonts", "reed.css", "default"]
+    css: xaringan-themer.css
     lib_dir: libs
     nature:
       highlightStyle: atelier-forest-light
@@ -11,10 +12,16 @@ output:
       countIncrementalSlides: false
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(fig.width = 13, 
-                      message = FALSE, 
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE, 
+                      fig.align = "center",
+                      fig.retina = 3,
                       warning = FALSE)
+
+library(tidyverse)
+library(reticulate)
+library(xaringanthemer)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/xaringan-theme.R")
 ```
 
 class: center, middle
