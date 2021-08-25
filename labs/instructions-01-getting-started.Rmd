@@ -3,6 +3,10 @@ title: "Lab 1: Getting Started with RStudio and Markdown"
 output: pdf_document
 ---
 
+```{r echo = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
 The goals of this lab are very practical:
 
 1. learn where to find the labs (you have succeeded!)
@@ -25,11 +29,11 @@ Please make the following modifications to your lab file. Be sure to knit it aft
 
 5. Use the button at the top of the Rmd to insert a chunk and then copy the following code into it. Modify the `"CA"` to be the two letter abbreviation of your state and modify `"Alameda"` to be the name of your county. Leave the rest unchanged.
 
-```{r eval = FALSE}
+```{r message = FALSE}
 library(tigris)
 library(tidyverse)
 
-counties("CA") %>%
+counties("CA", progress_bar = FALSE) %>%
     filter(NAME == "Alameda") %>%
     ggplot() +
     geom_sf()
