@@ -1,0 +1,38 @@
+---
+title: "Lab 1: Getting Started with RStudio and Markdown"
+output: pdf_document
+---
+
+The goals of this lab are very practical:
+
+1. learn where to find the labs (you have succeeded!)
+2. login to the RStudio server (success again!)
+3. create your first empty RMarkdown file
+4. knit it
+5. then modify it
+6. knit again
+7. download pdf and submit to gradescope
+
+Please make the following modifications to your lab file. Be sure to knit it after every step to see what changed.
+
+1. Add `author: Your Name` on a new line within the header.
+
+2. Delete everything after the header.
+
+3. Add a new title `## My Home County: {homecounty, state}`. If you're from abroad, instead use `## Where I'd like to visit: {county, state}`.
+
+4. Copy and paste the first few paragraphs from that state's Wikipedia page (the bit before the "Contents" section) into the Rmd and remove any weird formatting.
+
+5. Use the button at the top of the Rmd to insert a chunk and then copy the following code into it. Modify the `"CA"` to be the two letter abbreviation of your state and modify `"Alameda"` to be the name of your county. Leave the rest unchanged.
+
+```{r eval = FALSE}
+library(tigris)
+library(tidyverse)
+
+counties("CA") %>%
+    filter(NAME == "Alameda") %>%
+    ggplot() +
+    geom_sf()
+```
+
+Make one final knit, be sure you're happy with your report, then download it to your computer and upload it to [gradescope](http://www.gradescope.com).
