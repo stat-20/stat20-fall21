@@ -19,7 +19,6 @@ knitr::opts_chunk$set(message = FALSE,
                       warning = FALSE)
 
 library(tidyverse)
-library(reticulate)
 library(xaringanthemer)
 source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/xaringan-theme.R")
 ```
@@ -47,3 +46,24 @@ knitr::include_graphics("figs/shoebill-2.png")
 ```{r out.width=750, echo = FALSE, fig.align='center'}
 knitr::include_graphics("figs/shoebill-3.png")
 ```
+
+---
+class: center, middle
+
+# Why we're here
+
+---
+class: center, middle
+
+# Why we're here
+
+## To learn how to *critique* and *construct* claims made using data
+
+
+---
+# Looking forward
+
+- Look for invite to Ed forum this evening
+- Attend lab section tomorrow - bring laptop!
+- Come to lecture Friday
+- First full assignments released Monday, due next Friday
