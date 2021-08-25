@@ -1,0 +1,216 @@
+---
+title: "Lab 3: Data Wrangling"
+output: github_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE, echo = FALSE,
+                      message = FALSE, error = FALSE, warning = FALSE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(oilabs)
+data(pnwflights)
+```
+
+The `oilabs` package has a data set called `pnwflights` which contains *all* of the flights that 
+left from Seattle-Tacoma International Airport and Portland International Airport from June 2016 to May 2017.
+We will generate simple graphical and numerical summaries of data on these flights and explore mainly delay times.
+As this is a large data set, you'll also get to practice the indispensable skills of data processing 
+and subsetting.
+
+```{r load-packages, message=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(oilabs)
+data(pnwflights)
+```
+
+To get a sense of what this data frame contains the codebook
+can be accessed by pulling up the help file:
+
+```{r echo = TRUE}
+?pnwflights
+```
+
+One of the variables refers to the carrier (i.e. airline) of the flight, which 
+is coded according to the following system.
+
+- `carrier`: Two letter carrier abbreviation.
+    + `AA`:      American Airlines Inc.
+    + `AS`:        Alaska Airlines Inc.
+    + `B6`:             JetBlue Airways
+    + `DL`:        Delta Air Lines Inc.
+    + `F9`:      Frontier Airlines Inc.
+    + `HA`:      Hawaiian Airlines Inc.
+    + `NK`:        Spirit Airlines Inc.
+    + `OO`:       SkyWest Airlines Inc.
+    + `UA`:       United Air Lines Inc.
+    + `VX`:              Virgin America
+    + `WN`:      Southwest Airlines Co.
+    
+
+
+1.  Describe the distribution of departure delays for all flights using a histogram and appropriate summary statistics. 
+
+```{r}
+ggplot(pnwflights, aes(x = dep_delay)) + 
+  geom_histogram(binwidth = 15) +
+  xlim(c(-50, 300))
+
+pnwflights %>%
+  summarise(med_delay = median(dep_delay, na.rm = T),
+            iqr_delay = IQR(dep_delay, na.rm = T))
+
+Encourage them to spiff up this plot by zooming in on the x-axis. The statistical summaries should be median and IQR since it's a skewed distribution. The shape they should describe as unimodal and right skewed.
+```
+
+
+2. Create a new data frame that includes flights headed to SFO in February, and save this data frame as
+`sfo_feb_flights`. How many flights meet these criteria?
+
+```{r}
+sfo_feb_flights <- pnwflights %>%
+  filter(dest == "SFO" & month == 2)
+nrow(sfo_feb_flights)
+
+There are 954 flights that meet this criteria. It's fine if they just read it off of the dimensions in the environment pane in RStudio, but encourage them to code it with something like `nrow()`.*\
+```
+
+3.  Returning to the full data frame, mutate it to include a new variable that contains the 
+average speed, `avg_speed` traveled by the plane for each flight (in mph).
+Create a scatterplot of average speed vs. distance and describe the relationship.
+**Hint:** Average speed can be calculated as distance divided by
+number of hours of travel, and note that `air_time` is given in minutes.
+
+```{r}
+pnwflights <- pnwflights %>%
+  mutate(avg_speed = distance/(air_time/60))
+
+ggplot(pnwflights, aes(x = distance, y = avg_speed)) + 
+  geom_point()
+
+As the distance of a flight increases, so too does the average speed. The increase is roughly quadradratic in shape and levels out at an average maximum around 500 mph. Good job if they add alpha transparency.
+```
+
+4.  What is the most common destination of the flights left from Portland? 
+Most distant destination? 
+
+```{r}
+# common destination
+pnwflights %>% 
+  filter(origin == "PDX") %>%
+  group_by(dest) %>% # can also use count()
+  summarise(n = n()) %>%
+  arrange(desc(n))
+
+# most distant dest
+pnwflights %>% 
+  filter(origin == "PDX") %>%
+  arrange(desc(distance))
+
+There are some variants on this code that are probably ok. Their answer should also provide full sentence answers, including saying the actual name of the airports (San Francisco and Lihue).
+```
+
+5.  Create a dataframe that contains the median and interquartile range for departure delays, grouped by carrier. Which carrier has the least variable departure delays?
+
+```{r}
+pnwflights %>%
+  group_by(carrier) %>%
+  summarise(med_delay = median(dep_delay, na.rm = TRUE), 
+            iqr_delay = IQR(dep_delay, na.rm = TRUE)) %>%
+  arrange(iqr_delay)
+
+Hawaiian Airlines has the least variable departure delays with an IQR of 7 minutes.
+```
+
+6. For flights leaving PDX, which month has the highest average departure delay? What about the highest median departure delay? Which of these measures is more reliable for deciding which month(s) to avoid flying if you really dislike delayed flights?
+
+```{r}
+pnwflights %>%
+  filter(origin == "PDX") %>%
+  group_by(month) %>%
+  summarize(mean_delay = mean(dep_delay, na.rm = TRUE),
+            med_delay = median(dep_delay, na.rm = TRUE))
+
+Answers should be in full sentences. Median is the more useful metric since delays are heavily right skewed. They might point out that the winter months do have much higher means, suggesting the presence of high outliers.
+```
+
+7. Each individual airplane can be uniquely identified by its tailnumber in the same way that people can be by their social security numbers. What is the tailnumber of the fastest plane that in the dataset? What type of plane is it (google it!)? Be sure to be clear how you're defining fastest.
+
+```{r}
+pnwflights %>%
+  mutate(speed = distance / air_time) %>%
+  group_by(tailnum) %>%
+  summarize(avg_speed = mean(speed),
+            cnt = n()) %>%
+  arrange(desc(cnt))
+
+
+There are several reasonable ways to define fastest, including fastest average time and fastest single flights. 
+```
+
+
+8. Which airplane flew the farthest during this year for which we have data? How many times around the planet does that translate to?
+
+```{r}
+pnwflights %>%
+  group_by(tailnum) %>%
+  summarize(total_dist = sum(distance)) %>%
+  arrange(desc(total_dist))
+
+835372/24901
+
+The plane with the tailnumber N434AS flew the farthest of any plane: more than 33 times around the planet.
+
+Students might have grabbed a different number for the denominator. It's fine if it's slightly different, but if it looks like it is in km, then its wrong because the numerator is in miles.
+```
+
+
+9.  Using the airport nearest your hometown, which day of the week and which airline seems best for 
+flying there from Portland? Be clear on how you're defining *best*. (note that there is no explicit weekday 
+column in this data set, but there is sufficient information to piece it together. The following line of code 
+can be added to your pipeline to create that new column. It uses functions in the `lubridate` package, so be 
+sure to load it in at the start of this exercise).
+
+```{r echo = TRUE}
+  mutate(day_of_week = wday(ymd(paste(year, month, day, set = "-")), label = T))
+```
+
+```{r}
+library(lubridate)
+pnwflights %>%
+  mutate(day_of_week = wday(ymd(paste(year, month, day, set = "-")), label = T)) %>%
+  filter(origin == "PDX", dest == "LAX") %>%
+  group_by(day_of_week, carrier) %>%
+  summarise(med_delay = median(dep_delay, na.rm = T)) %>%
+  arrange(med_delay)
+
+This is the answer for Los Angeles - answers will vary. They may also come up with a different notion of "best" (here I used median departure delay) and they may do the grouping differently: decide on best first for one category, then separately for the other category.
+```
+
+10.  The plot below displays the relationship between the mean arrival 
+delay and the mean distance traveled by every plane in the data set. 
+It also shows the total number of flights made by each plane by the 
+size of the plotted circle. Please form a single chain that will 
+create this plot, starting with the raw data set. You will also want 
+to exclude the edge cases from your analysis, so focus on the
+planes that have logged more than 20 flights and flown an average
+distance of less than 2000 miles. The points can be made transparent 
+by adding an argument to `geom_point()`: `alpha = .1`.
+
+```{r eval = TRUE}
+pnwflights %>%
+  group_by(tailnum) %>%
+  summarize(avg_delay = mean(arr_delay, na.rm = TRUE),
+            avg_dist = mean(distance, na.rm = TRUE),
+            n = n()) %>%
+  filter(n > 20,
+         avg_dist < 2000) %>%
+  ggplot(aes(x = avg_dist, y = avg_delay)) + 
+  geom_point(alpha = .1, aes(size = n)) +
+  labs(x = "average distance", 
+       y = "average delay",
+       size = "number of flights")
+```
