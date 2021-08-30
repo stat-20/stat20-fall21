@@ -1,0 +1,244 @@
+---
+title: 'Problem Set 2: Intro to Data'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE)
+```
+
+1.  **Marvel Cinematic Universe films.**
+The data frame below contains information on Marvel Cinematic Universe films through the Infinity saga (a movie storyline spanning from Ironman in 2008 to Endgame in 2019). 
+Box office totals are given in millions of US Dollars.
+
+    ```{r}
+    library(openintro)
+    library(tidyverse)
+    library(knitr)
+    library(kableExtra)
+    
+    mcu_films_scaled <- mcu_films %>%
+      mutate(
+        opening_weekend_us = round(opening_weekend_us / 1000000, 2),
+        gross_us = round(gross_us / 1000000, 2),
+        gross_world = round(gross_world / 1000000, 2),
+      ) %>%
+      rownames_to_column() %>%
+      rename(
+        ` ` = rowname,
+        Title = movie,
+        Hrs = length_hrs,
+        Mins = length_min,
+        `Release Date` = release_date,
+        `Opening Wknd US` = opening_weekend_us,
+        US = gross_us,
+        World = gross_world
+      )
+    
+    mcu_films_1_to_5 <- mcu_films_scaled %>%
+      slice(n = 1:5) %>%
+      mutate(across(everything(), as.character))
+    
+    mcu_films_n <- mcu_films_scaled %>%
+      slice(n = nrow(mcu_films)) %>%
+      mutate(across(everything(), as.character))
+    
+    mcu_films_filler <- mcu_films_scaled %>%
+      slice(n = 1) %>%
+      mutate(across(everything(), str_replace, ".*", "..."))
+    
+    mcu_films_1_to_5 %>%
+      bind_rows(mcu_films_filler) %>%
+      bind_rows(mcu_films_n) %>%
+      kbl(linesep = "", booktabs = TRUE, align = "clcccccc") %>%
+      kable_styling(bootstrap_options = c("striped", "condensed"), 
+                    latex_options = "HOLD_position") %>%
+      add_header_above(c(" " = 2, "Length" = 2, " " = 2, "Gross" = 2)) %>%
+      column_spec(2, width = "10em")
+    ```
+    
+    a. How many observations and how many variables does this data frame have? What is the observational unit (what each row corresponds to)?
+
+1. **Cherry Blossom Run.**
+The data frame below contains information on runners in the 2017 Cherry Blossom Run, which is an annual road race that takes place in Washington, DC.
+Most runners participate in a 10-mile run while a smaller fraction take part in a 5k run or walk.
+
+    ```{r}
+    library(openintro)
+    library(tidyverse)
+    library(knitr)
+    library(kableExtra)
+    
+    run17_to_print <- run17 %>%
+      rownames_to_column() %>%
+      rename_with(str_to_title) %>%
+      rename(
+        ` ` = Rowname,
+        Net = Net_sec,
+        Clock = Clock_sec,
+        Pace = Pace_sec,
+        `City / Country` = City
+      )
+    
+    run17_1_to_5 <- run17_to_print %>%
+      slice(n = 1:5) %>%
+      mutate(across(everything(), as.character))
+    
+    run17_n <- run17_to_print %>%
+      slice(n = nrow(run17)) %>%
+      mutate(across(everything(), as.character))
+    
+    run17_filler <- run17_to_print %>%
+      slice(n = 1) %>%
+      mutate(across(everything(), str_replace, ".*", "..."))
+    
+    run17_1_to_5 %>%
+      bind_rows(run17_filler) %>%
+      bind_rows(run17_n) %>%
+      kbl(linesep = "", booktabs = TRUE, align = "llllclcccl") %>%
+      kable_styling(bootstrap_options = c("striped", "condensed"), 
+                    latex_options = "HOLD_position") %>%
+      add_header_above(c(" " = 6, "Time" = 2, " " = 2))
+    ```
+
+    a. How many observations and how many variables does this data frame have? What is the observational unit?
+    
+    b. What type of data is captured by each of the variables in the data frame? Are there any that you find ambiguous?
+
+1. **UN Votes.** 
+The visualization below shows voting patterns in the United States, Canada, and Mexico in the United Nations General Assembly on a variety of issues. 
+Specifically, for a given year between 1946 and 2019, it displays the percentage of roll calls in which the country voted yes for each issue. 
+This visualization was constructed based on a dataset where each observation is a country/year pair.
+
+    ```{r fig.asp = 0.8}
+    # load packages ------------------------------------------------------------
+    library(tidyverse)
+    library(openintro)
+    library(unvotes)
+    library(lubridate)
+    library(scales)
+    # plot unvotes by issues ---------------------------------------------------
+    un_votes %>%
+      filter(country %in% c("United States", "Mexico", "Canada")) %>%
+      inner_join(un_roll_calls, by = "rcid") %>%
+      inner_join(un_roll_call_issues, by = "rcid") %>%
+      mutate(vote = fct_relevel(vote, "yes", "no", "abstain")) %>%
+      group_by(country, year = year(date), issue) %>%
+      summarize(
+        votes = n(),
+        percent_yes = mean(vote == "yes"), 
+        .groups = "drop_last"
+      ) %>%
+      filter(votes > 5) %>%  # only use records with more than 5 votes
+      ggplot(mapping = aes(x = year, y = percent_yes, color = country)) +
+        geom_point(alpha = 0.5) +
+        geom_smooth(method = "loess", se = FALSE) +
+        facet_wrap(~ issue, labeller = label_wrap_gen(width = 20)) +
+        labs(
+          y = "% Yes",
+          x = "Year",
+          color = "Country"
+        ) +
+        scale_color_openintro("three") +
+        scale_y_continuous(breaks = c(0, 0.5, 1), labels = label_percent(scale = 100)) +
+      theme(
+        legend.position = "bottom",
+        legend.direction = "horizontal"
+      )
+    ```
+
+    a.  List the variables used in creating this visualization.
+    
+    b.  What appears to be the observational unit?
+
+    c.  Indicate whether each variable in the study is numerical or categorical. If numerical, identify as continuous or discrete. If categorical, indicate if the variable is ordinal.
+    
+    
+1. ***Space launches.** 
+The following summary table shows the number of space launches in the US by the type of launching agency and the outcome of the launch (success or failure).^[The data used in this exercise comes from the [JSR Launch Vehicle Database, 2019 Feb 10 Edition](https://www.openintro.org/go?id=textbook-space-launches-data&referrer=ims0_html).]
+
+    ```{r}
+    library(knitr)
+    library(kableExtra)
+    library(tidyverse)
+    
+    launches_1957_1999 <- tribble(
+      ~agency,   ~Failure, ~Success,
+      "Private", 13,       295,
+      "State",   281,      3751,
+      "Startup", 0,        0
+    ) %>%
+      pivot_longer(cols = -agency, names_to = "outcome", values_to = "n") %>%
+      mutate(year = "1957-1999") %>%
+      uncount(n)
+    
+    launches_2000_2018 <- tribble(
+      ~agency,   ~Failure, ~Success,
+      "Private", 10,       562,
+      "State",   33,       711,
+      "Startup", 5,        65
+    ) %>%
+      pivot_longer(cols = -agency, names_to = "outcome", values_to = "n") %>%
+      mutate(year = "2000-2018") %>%
+      uncount(n)
+    
+    launches_1957_1999 %>%
+      bind_rows(launches_2000_2018) %>%
+      count(year, agency, outcome) %>%
+      pivot_wider(names_from = outcome, values_from = n) %>%
+      pivot_wider(names_from = year, values_from = c("Failure", "Success"), values_fill = 0) %>%
+      select(agency, `Failure_1957-1999`, `Success_1957-1999`, `Failure_2000-2018`, `Success_2000-2018`) %>%
+      kbl(linesep = "", booktabs = TRUE, col.names = c("", "Failure", "Success", "Failure", "Success")) %>%
+      kable_styling(bootstrap_options = c("striped", "condensed"), 
+                    latex_options = "HOLD_position",
+                    full_width = FALSE) %>%
+      add_header_above(c(" " = 1, "1957 - 1999" = 2, "2000-2018" = 2))
+    ```
+
+    a.  What variables were collected on each launch in order to create to the summary table above?
+
+    b.  State whether each variable is numerical or categorical. If numerical, state whether it is continuous or discrete. If categorical, state whether it is ordinal or not.
+
+    c.  Suppose we wanted to study how the success rate of launches vary between launching agencies and over time. In this analysis, which variable would be the response variable and which variable would be the explanatory variable?
+    
+    d. What kind of a graphic would you use to describe the success rate of launches broken down by agencies and time period? Describe how each variable would be mapped to an aesthetic cue of the graphic.
+    
+1. ***Views on immigration.** 
+Nine-hundred and ten (910) randomly sampled registered voters from Tampa, FL were asked if they thought workers who have illegally entered the US should be (i) allowed to keep their jobs and apply for US citizenship, (ii) allowed to keep their jobs as temporary guest workers but not allowed to apply for US citizenship, or (iii) lose their jobs and have to leave the country. 
+The results of the survey by political ideology are shown below.
+
+    ```{r}
+    library(tools)
+    library(openintro)
+    library(tidyverse)
+    #library(janitor)
+    library(knitr)
+    library(kableExtra)
+    
+    immigration %>%
+      count(political, response) %>%
+      mutate(political = toTitleCase(as.character(political))) %>%
+      pivot_wider(names_from = political, values_from = n) %>%
+      rename(Response = response) %>%
+      #adorn_totals(where = c("row", "col")) %>%
+      kbl(linesep = "", booktabs = TRUE) %>%
+      kable_styling(bootstrap_options = c("striped", "condensed"), 
+                    latex_options = "HOLD_position",
+                    full_width = FALSE)
+    ```
+
+    a.  What percent of these Tampa, FL voters identify themselves as conservatives?
+
+    b.  What percent of these Tampa, FL voters are in favor of the citizenship option?
+
+    c.  What percent of these Tampa, FL voters identify themselves as conservatives and are in favor of the citizenship option?
+
+    d.  What percent of these Tampa, FL voters who identify themselves as conservatives are also in favor of the citizenship option? What percent of moderates share this view? What percent of liberals share this view?
+
+    e.  Do political ideology and views on immigration appear to be associated? Explain your reasoning.
+    
+    f.  Conjecture other possible variables that might explain the potential relationship between these two variables.
