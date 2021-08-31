@@ -1,0 +1,8 @@
+---
+title: 'Lab 2A: Intro to R'
+author: "Your Name"
+date: "8/29/2021"
+output: pdf_document
+---
+
+**Collaborator**: Put the name of any collaborator(s) here
