@@ -1,0 +1,23 @@
+---
+title: 'Lab 2B: Grammar of Graphics'
+author: "Your Name"
+date: "9/1/2021"
+output: pdf_document
+---
+
+```{r message = FALSE, echo = FALSE}
+library(tidyverse)
+library(openintro)
+data(mcu_films)
+library(palmerpenguins)
+data(penguins)
+library(stat20data)
+data(arbuthnot)
+library(fivethirtyeight)
+knitr::opts_chunk$set(fig.height = 3, fig.width = 3)
+```
+
+
+**Collaborator**: Write the name of your collaborator(s) here.
+
+
