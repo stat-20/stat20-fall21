@@ -22,6 +22,7 @@ knitr::opts_chunk$set(message = FALSE,
 library(tidyverse)
 library(xaringanthemer)
 source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/xaringan-theme.R")
+#ggplot2::theme_set(theme_xaringan)
 ```
 class: center, middle
 
@@ -355,6 +356,69 @@ ggplot(penguins, aes(x = species)) +
 class: inverse, middle, center
 
 # Describing Numerical Data
+
+
+---
+
+# Palmer Penguins
+
+Observations were made on 344 penguins at Palmer Research Station, Antarctica including their **bill_length**.
+
+--
+
+.pull-left[
+```{r echo=FALSE, out.width="100%"}
+knitr::include_graphics("figs/culmen_depth.png")
+# Artwork by @allison_horst
+```
+]
+
+.pull-right[
+```{r}
+library(palmerpenguins)
+library(knitr)
+library(kableExtra)
+set.seed(30)
+penguins %>%
+  sample_frac() %>%
+  select(bill_length_mm) %>%
+  kable() %>%
+  kable_styling(latex_options = "striped")
+```
+]
+
+
+---
+
+# Visualizing numerical data
+
+```{r echo = FALSE, fig.width=11, fig.height=6.5}
+library(patchwork)
+p <- ggplot(penguins, aes(x = bill_length_mm))
+p1 <- p + 
+  geom_dotplot(binwidth = .1,
+               dotsize = 5,
+               alpha = .5) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme_xaringan() +
+  labs(title = "dot plot")
+p2 <- p +
+  geom_histogram(col = "white") +
+  theme_xaringan() +
+  labs(title = "histogram")
+p3 <- p +
+  geom_density(fill = "white") +
+  theme_xaringan() +
+  labs(title = "density plot")
+p4 <- p +
+  geom_boxplot() +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme_xaringan() +
+  labs(title = "box plot")
+
+(p1 + p3) / (p2 + p4)
+```
+
 
 ---
 

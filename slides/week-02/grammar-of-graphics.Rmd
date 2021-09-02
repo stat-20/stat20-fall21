@@ -1,0 +1,357 @@
+---
+title: "Grammar of Graphics"
+subtitle: "A theory of statistical graphics"
+author: "STAT 20 UC Berkeley"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = FALSE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(xaringanthemer)
+library(kableExtra)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/xaringan-theme.R")
+xaringanExtra::use_panelset()
+ggplot2::theme_set(ggplot2::theme_gray(base_size = 16))
+```
+
+class: middle, center
+
+<div style="max-width:854px"><div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://embed.ted.com/talks/hans_rosling_the_best_stats_you_ve_ever_seen" width="854" height="480" style="position:absolute;left:0;top:0;width:100%;height:100%" frameborder="0" scrolling="no" allowfullscreen></iframe></div></div>
+
+---
+## What "dimensions" did he use?
+
+--
+
+- x
+- y
+- size
+- color
+- animation
+
+---
+## What did the data look like?
+
+What was the unit of observation? What were the variables?
+
+--
+
+**Unit of observation**: a county in a given year
+
+**Variables**: fertility rate, life exp., continent, population, year
+
+```{r echo = FALSE, eval = FALSE}
+## don't use the gapminder package data. Remake to have the original vars: life expectancy and fertility rate
+library(gapminder)
+gapminder %>%
+  slice(1, 10) %>%
+  kable() %>%
+  kable_styling(latex_options = "striped")
+```
+
+---
+## What geometry is used to represent the observations?
+
+--
+
+- points
+
+---
+## Grammar of Graphics
+
+Wilkinson 1999: A statistical graphic is a **mapping** of **data** variables to **aesthetic** attributes of **geometric** objects.
+
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("figs/grammar-of-graphics.png")
+# source: http://bloggotype.blogspot.com/2016/08/holiday-notes2-grammar-of-graphics.html
+```
+
+
+---
+
+## Grammar of Graphics in R
+
+Wickham 2005: `ggplot2` package (inside `tidyverse`) proposes a general template:
+
+
+```{css, echo = FALSE}
+.huge .remark-code { /*Change made here*/
+  font-size: 150% !important;
+}
+```
+
+.huge[
+```
+ggplot(<data>) +
+    <geom>(<aes(mapping)>)
+```
+]
+---
+## Geometric objects
+
+--
+
+.pull-left[
+#### Shapes
+- Points
+- Bars
+- Lines
+- Histograms
+- Boxplots
+- Etc
+]
+
+--
+
+.pull-right[
+#### Geoms
+
+- `geom_point()`
+- `geom_bar()`
+- `geom_line()`
+- `geom_histogram()`
+- `geom_boxplot()`
+- `geom_XYZ()`
+]
+
+
+---
+## Aesthetic Attributes
+
+--
+
+Different `aes` available depending on geometry. For points:
+
+- x
+- y
+- alpha
+- colour
+- fill
+- group
+- shape
+- size
+- stroke
+
+
+---
+## Example: Palmer Penguins
+
+```{r penguinsdf, eval = FALSE, echo = TRUE}
+library(palmerpenguins)
+glimpse(penguins)
+```
+
+--
+
+```{r ref.label = "penguinsdf", echo = FALSE}
+
+```
+
+---
+class: middle, center
+
+## Question 1
+### What is the relationship between bill length and bill depth?
+
+---
+
+.panelset[
+.panel[.panel-name[Plot]
+```{r ref.label = "penguins-q1", echo = FALSE, warning = FALSE, out.width = "70%", fig.width = 8}
+```
+]
+.panel[.panel-name[Code]
+
+```{r penguins-q1, fig.show = "hide", echo = TRUE}
+ggplot(data = penguins, 
+       mapping = aes(x = bill_depth_mm, y = bill_length_mm)) +
+  geom_point()
+```
+]
+]
+
+---
+## Argument names
+
+You can omit the names of first two arguments when building plots with `ggplot()`.
+
+.pull-left[
+```{r named-args, eval = FALSE, echo = TRUE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point()
+```
+]
+.pull-right[
+```{r not-named-args, eval = FALSE, echo = TRUE}
+ggplot(penguins,
+       aes(x = bill_depth_mm,
+           y = bill_length_mm,
+           colour = species))
+  geom_point()
+```
+]
+
+Its also helpful to use line-breaks often to make your code readible.
+
+---
+class: middle, center
+
+## Question 2
+### What is the relationship between bill length, bill depth, and species?
+
+---
+
+Mapping `species` to `color`.
+
+```{r penguins-q2a, fig.show = "hide", echo = TRUE}
+ggplot(penguins, 
+       aes(x = bill_depth_mm, 
+           y = bill_length_mm,
+           color = species)) + #<<
+  geom_point()
+```
+
+--
+
+```{r ref.label = "penguins-q2a", echo = FALSE, warning = FALSE, fig.height=5}
+```
+
+---
+
+Mapping `species` to `shape`.
+
+```{r penguins-q2b, fig.show = "hide", echo = TRUE}
+ggplot(penguins, 
+       aes(x = bill_depth_mm, 
+           y = bill_length_mm,
+           shape = species)) + #<<
+  geom_point()
+```
+
+--
+
+```{r ref.label = "penguins-q2b", echo = FALSE, warning = FALSE, fig.height=5}
+```
+
+---
+
+Mapping `species` to `size`.
+
+```{r penguins-q2c, fig.show = "hide", echo = TRUE}
+ggplot(penguins, 
+       aes(x = bill_depth_mm, 
+           y = bill_length_mm,
+           size = species)) + #<<
+  geom_point()
+```
+
+--
+
+```{r ref.label = "penguins-q2c", echo = FALSE, warning = FALSE, fig.height=5}
+```
+
+---
+## Lessons learned
+
+--
+
+1. New variables must be mapped to aesthetics inside `aes()`
+
+--
+
+2. Not all aesthetics make sense for all variables
+
+--
+
+3. Not all aesthetics make sense for all geometries
+
+--
+
+4. Not al geometries make sense for all variables
+
+---
+
+Switching to a histogram geometry.
+
+```{r penguins-hist-wrong, echo = TRUE, error = TRUE, fig.height = 4}
+ggplot(penguins, 
+       aes(x = bill_depth_mm, 
+           y = bill_length_mm,
+           size = species)) +
+  geom_histogram() #<<
+```
+
+---
+
+An appropriate histogram.
+
+```{r penguins-hist-right, echo = TRUE, eval = TRUE, fig.height = 5}
+ggplot(penguins, aes(x = bill_length_mm)) +
+  geom_histogram()
+```
+
+---
+## Adding layers
+
+Plots can be polished by adding additional layers with `+`.
+
+---
+## From the lab...
+
+Plot the proportion of boys born over time.
+
+```{r echo = TRUE}
+library(stat20data)
+data(arbuthnot)
+arbuthnot <- arbuthnot %>%
+  mutate(total = boys + girls) %>%
+  mutate(p_boys = boys / total)
+
+```
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(arbuthnot, aes(x = year,
+                      y = p_boys)) +
+  geom_line()
+```
+
+---
+
+```{r echo = FALSE}
+ggplot(arbuthnot, aes(x = year,
+                      y = p_boys)) +
+  geom_line()
+```
+
+---
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(arbuthnot, aes(x = year,
+                      y = p_boys)) +
+  geom_line() +
+  ylim(0, 1) #<<
+```
+
+```{r echo = FALSE}
+ggplot(arbuthnot, aes(x = year,
+                      y = p_boys)) +
+  geom_line() +
+  ylim(0, 1) #<<
+```
