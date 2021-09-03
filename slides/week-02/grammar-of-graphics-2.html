@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Grammar of Graphics II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STAT 20 UC Berkeley" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Grammar of Graphics II
+## A theory of statistical graphics
+### STAT 20 UC Berkeley
+
+---
+
+
+
+
+## Grammar of Graphics
+
+Wilkinson 1999: A statistical graphic is a **mapping** of **data** variables to **aesthetic** attributes of **geometric** objects.
+
+&lt;img src="figs/grammar-of-graphics.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle, center
+
+## Coding out Loud
+
+???
+Credit for concept and code: Mine Cetinkaya-Rundel
+todo: write css class for citations
+
+---
+
+
+.mini[
+&gt; **Start with the `penguins` data frame**
+]
+
+.pull-left[
+
+```r
+*ggplot(data = penguins)
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; **map bill depth to the x-axis**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+*      mapping = aes(x = bill_depth_mm))
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; **and map bill length to the y-axis.**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+*                    y = bill_length_mm))
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; and map bill length to the y-axis. 
+&gt; **Represent each observation with a point**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm)) + 
+* geom_point()
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; and map bill length to the y-axis. 
+&gt; Represent each observation with a point
+&gt; **and map species to the colour of each point.**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+*                    colour = species)) +
+  geom_point()
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; and map bill length to the y-axis. 
+&gt; Represent each observation with a point
+&gt; and map species to the colour of each point.
+&gt; **Title the plot "Bill depth and length"**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+* labs(title = "Bill depth and length")
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; and map bill length to the y-axis. 
+&gt; Represent each observation with a point
+&gt; and map species to the colour of each point.
+&gt; Title the plot "Bill depth and length", 
+&gt; **add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins"**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+*      subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins")
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; and map bill length to the y-axis. 
+&gt; Represent each observation with a point
+&gt; and map species to the colour of each point.
+&gt; Title the plot "Bill depth and length", 
+&gt; add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins", 
+&gt; **label the x and y axes as "Bill depth (mm)" and "Bill length (mm)", respectively**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+*      x = "Bill depth (mm)", y = "Bill length (mm)")
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; and map bill length to the y-axis. 
+&gt; Represent each observation with a point
+&gt; and map species to the colour of each point.
+&gt; Title the plot "Bill depth and length", 
+&gt; add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins", 
+&gt; label the x and y axes as "Bill depth (mm)" and "Bill length (mm)", respectively,
+&gt; **label the legend "Species"**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Bill depth (mm)", y = "Bill length (mm)",
+*      colour = "Species")
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.mini[
+&gt; Start with the `penguins` data frame,
+&gt; map bill depth to the x-axis
+&gt; and map bill length to the y-axis. 
+&gt; Represent each observation with a point
+&gt; and map species to the colour of each point.
+&gt; Title the plot "Bill depth and length", 
+&gt; add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins", 
+&gt; label the x and y axes as "Bill depth (mm)" and "Bill length (mm)", respectively,
+&gt; label the legend "Species", 
+&gt; **and add a caption for the data source.**
+]
+
+.pull-left[
+
+```r
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Bill depth (mm)", y = "Bill length (mm)",
+       colour = "Species",
+*      caption = "Source: Palmer Station LTER / palmerpenguins package")
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+???
+Pause for general questions about the grammar of graphics and ggplot2.
+
+---
+class: center, middle
+
+## Graphics for Categorical Data
+
+---
+
+## UN Votes over time
+
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-12-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+Are these variables numerical? Categorical?
+
+???
+What are the variables? -&gt; the columns of the data frame that were mapped onto the aesthetics that we see here.
+
+---
+## A look at the raw data
+
+
+
+
+```r
+glimpse(un_vote)
+```
+
+```
+## Rows: 853,049
+## Columns: 4
+## $ date    &lt;date&gt; 1946-01-04, 1946-01-04, 1946-01-04, 1946-01-04, 1946-01-04, 1…
+## $ country &lt;chr&gt; "United States", "Canada", "Cuba", "Dominican Republic", "Mexi…
+## $ vote    &lt;fct&gt; no, no, yes, abstain, yes, no, yes, abstain, yes, abstain, abs…
+## $ issue   &lt;fct&gt; Human rights, Human rights, Human rights, Human rights, Human …
+```
+
+---
+##  Counts by Country
+
+
+```r
+un_vote %&gt;%
+* count(country)
+```
+
+--
+
+
+```
+## # A tibble: 197 × 2
+##    country               n
+##    &lt;chr&gt;             &lt;int&gt;
+##  1 Afghanistan        5289
+##  2 Albania            4206
+##  3 Algeria            5290
+##  4 Andorra            2532
+##  5 Angola             3963
+##  6 Antigua &amp; Barbuda  3590
+##  7 Argentina          5686
+##  8 Armenia            2593
+##  9 Australia          5737
+## 10 Austria            5514
+## # … with 187 more rows
+```
+
+---
+##  Counts by Country
+
+
+```r
+un_vote %&gt;%
+  count(country) %&gt;%
+* arrange(desc(n))
+```
+
+--
+
+
+```
+## # A tibble: 197 × 2
+##    country         n
+##    &lt;chr&gt;       &lt;int&gt;
+##  1 Denmark      5738
+##  2 Australia    5737
+##  3 Netherlands  5733
+##  4 Sweden       5733
+##  5 Canada       5732
+##  6 Norway       5725
+##  7 Belgium      5724
+##  8 India        5721
+##  9 New Zealand  5721
+## 10 Russia       5721
+## # … with 187 more rows
+```
+
+---
+##  Counts by Country
+
+
+```r
+un_vote %&gt;%
+  count(country) %&gt;%
+* arrange(n)
+```
+
+--
+
+
+```
+## # A tibble: 197 × 2
+##    country          n
+##    &lt;chr&gt;        &lt;int&gt;
+##  1 South Sudan    437
+##  2 Kiribati       574
+##  3 Taiwan         648
+##  4 Nauru         1200
+##  5 Tuvalu        1295
+##  6 Montenegro    1451
+##  7 Timor-Leste   1516
+##  8 Palau         1557
+##  9 Tonga         1563
+## 10 Turkmenistan  1739
+## # … with 187 more rows
+```
+
+---
+##  Counts by Country
+
+
+```r
+ggplot(un_vote, aes(x = country)) +
+  geom_bar()
+```
+
+--
+
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-18-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+##  Counts by Country
+
+Focus on North America: 🇨🇦 🇺🇸 🇲🇽
+
+--
+
+.pull-left[
+
+
+
+```r
+na_vote %&gt;%
+  count(country)
+```
+
+```
+## # A tibble: 3 × 2
+##   country           n
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 Canada         5732
+## 2 Mexico         5711
+## 3 United States  5718
+```
+
+]
+
+--
+
+.pull_right[
+
+```r
+ggplot(na_vote, aes(x = country)) +
+  geom_bar()
+```
+
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-21-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Counts by Country and Issue
+
+How can this be turned into a bar chart?
+
+--
+
+
+```r
+na_vote %&gt;%
+  count(country, issue)
+```
+
+```
+## # A tibble: 18 × 3
+##    country       issue                                    n
+##    &lt;chr&gt;         &lt;fct&gt;                                &lt;int&gt;
+##  1 Canada        Colonialism                            956
+##  2 Canada        Arms control and disarmament          1088
+##  3 Canada        Economic development                   762
+##  4 Canada        Human rights                          1013
+##  5 Canada        Palestinian conflict                  1060
+##  6 Canada        Nuclear weapons and nuclear material   853
+##  7 Mexico        Colonialism                            949
+##  8 Mexico        Arms control and disarmament          1089
+##  9 Mexico        Economic development                   758
+## 10 Mexico        Human rights                          1007
+## 11 Mexico        Palestinian conflict                  1055
+## 12 Mexico        Nuclear weapons and nuclear material   853
+## 13 United States Colonialism                            955
+## 14 United States Arms control and disarmament          1089
+## 15 United States Economic development                   759
+## 16 United States Human rights                          1008
+## 17 United States Palestinian conflict                  1057
+## 18 United States Nuclear weapons and nuclear material   850
+```
+
+---
+##  Counts by Country x Issue
+
+
+
+Create a bar for each combination of categories.
+
+--
+
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-24-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+**Question**: What does this tell us?
+
+--
+
+&gt; Of *all votes cast*, how many were for each county x issue combination?
+
+---
+## Counts of Issue by Country
+
+--
+
+.pull-left[
+
+```r
+ggplot(na_vote, 
+       aes(x = country,
+           fill = issue)) +
+  geom_bar()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+**Question**: What does this tell us?
+
+--
+
+&gt; Of *all votes cast by each country*, how many were on each issue?
+
+---
+## Counts of Country by Issue
+
+--
+
+.pull-left[
+
+```r
+ggplot(na_vote, 
+*      aes(x = issue,
+*          fill = country)) +
+  geom_bar()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+**Question**: What does this tell us?
+
+--
+
+&gt; Of *all votes cast on each issue*, how many were by each country?
+
+---
+## Proportions of Country by Issue
+
+--
+
+.pull-left[
+
+```r
+ggplot(na_vote, 
+       aes(x = issue,
+           fill = country)) +
+* geom_bar(position = "fill")
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+**Question**: What does this tell us?
+
+--
+
+&gt; Of *all votes cast on each issue*, what *proportion* were for by each country?
+
+---
+## Proportions of Country by Issue
+
+--
+
+.pull-left[
+
+```r
+ggplot(na_vote, 
+*      aes(x = country,
+*          fill = issue)) +
+  geom_bar(position = "fill")
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+**Question**: What does this tell us?
+
+--
+
+&gt; Of *all votes cast by each country*, what *proportion* were for on each issue?
+
+---
+## But wait, there's more
+
+These plots show little difference in the data (the counts, the proportions). What other variable might contain interesting variability?
+
+--
+
+
+
+
+```r
+glimpse(na_vote)
+```
+
+```
+## Rows: 17,161
+## Columns: 4
+## $ date    &lt;date&gt; 1946-01-04, 1946-01-04, 1946-01-04, 1946-01-05, 1946-01-05, 1…
+## $ country &lt;chr&gt; "United States", "Canada", "Mexico", "United States", "Canada"…
+## $ vote    &lt;fct&gt; no, no, yes, no, yes, yes, yes, yes, yes, yes, no, no, abstain…
+## $ issue   &lt;fct&gt; Human rights, Human rights, Human rights, Economic development…
+```
+
+--
+
+&gt; `vote`
+
+--
+
+**Question**: How do you visualize *three* categorical variables?
+
+---
+## Facets
+
+&lt;img src="figs/grammar-of-graphics.png" width="45%" style="display: block; margin: auto;" /&gt;
+
+*Facets* are multiple versions of the same plot, each using a different subset of the data determined by a categorical variable.
+
+--
+
+&lt;style type="text/css"&gt;
+.huge .remark-code { /*Change made here*/
+  font-size: 150% !important;
+}
+&lt;/style&gt;
+
+.huge[
+
+```r
+facet_wrap(vars())
+```
+
+```
+## &lt;ggproto object: Class FacetWrap, Facet, gg&gt;
+##     compute_layout: function
+##     draw_back: function
+##     draw_front: function
+##     draw_labels: function
+##     draw_panels: function
+##     finish_data: function
+##     init_scales: function
+##     map_data: function
+##     params: list
+##     setup_data: function
+##     setup_params: function
+##     shrink: TRUE
+##     train_scales: function
+##     vars: function
+##     super:  &lt;ggproto object: Class FacetWrap, Facet, gg&gt;
+```
+]
+
+---
+# Facets example
+
+&lt;img src="figs/ft-covid-excess-deaths.png" width="1084" style="display: block; margin: auto;" /&gt;
+
+---
+## Proportion of country by issue and vote
+
+.pull-left[
+
+```r
+ggplot(na_vote,
+       aes(x = issue,
+           fill = country)) +
+  geom_bar(position = "fill") +
+  facet_wrap(vars(vote))
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-35-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+## Proportion of vote by country and issue
+
+.pull-left[
+
+```r
+ggplot(na_vote,
+       aes(x = country,
+           fill = vote)) +
+  geom_bar(position = "fill") +
+  facet_wrap(vars(issue))
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-36-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+## Themes
+
+The design choices not related to the data - the colors used, the fonts, the spacing, the construction of each component - are encapsulated in the **theme**.
+
+--
+
+.pull-left[
+
+```r
+library(ggthemes)
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Bill depth (mm)", y = "Bill length (mm)",
+       colour = "Species",
+       caption = "Source: Palmer Station LTER / palmerpenguins package") +
+* theme_fivethirtyeight()
+```
+]
+.pull-right[
+&lt;img src="grammar-of-graphics-2_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"slideNumberFormat": "%current%",
+"highlightLines": true,
+"highlightSpans": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

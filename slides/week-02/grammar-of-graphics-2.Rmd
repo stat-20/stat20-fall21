@@ -1,0 +1,727 @@
+---
+title: "Grammar of Graphics II"
+subtitle: "A theory of statistical graphics"
+author: "STAT 20 UC Berkeley"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      slideNumberFormat: "%current%"
+      highlightLines: true
+      highlightSpans: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(xaringanthemer)
+library(kableExtra)
+library(emo)
+library(palmerpenguins)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/xaringan-theme.R")
+xaringanExtra::use_panelset()
+ggplot2::theme_set(ggplot2::theme_gray(base_size = 16))
+```
+
+## Grammar of Graphics
+
+Wilkinson 1999: A statistical graphic is a **mapping** of **data** variables to **aesthetic** attributes of **geometric** objects.
+
+```{r echo=FALSE, out.width="65%"}
+knitr::include_graphics("figs/grammar-of-graphics.png")
+# source: http://bloggotype.blogspot.com/2016/08/holiday-notes2-grammar-of-graphics.html
+```
+
+---
+
+class: middle, center
+
+## Coding out Loud
+
+???
+Credit for concept and code: Mine Cetinkaya-Rundel
+todo: write css class for citations
+
+---
+
+
+.mini[
+> **Start with the `penguins` data frame**
+]
+
+.pull-left[
+```{r penguins-0, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins) #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-0", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> **map bill depth to the x-axis**
+]
+
+.pull-left[
+```{r penguins-1, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm)) #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-1", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> **and map bill length to the y-axis.**
+]
+
+.pull-left[
+```{r penguins-2, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm)) #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-2", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> and map bill length to the y-axis. 
+> **Represent each observation with a point**
+]
+
+.pull-left[
+```{r penguins-3, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm)) + 
+  geom_point() #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-3", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> and map bill length to the y-axis. 
+> Represent each observation with a point
+> **and map species to the colour of each point.**
+]
+
+.pull-left[
+```{r penguins-4, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) + #<<
+  geom_point()
+```
+]
+.pull-right[
+```{r ref.label = "penguins-4", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> and map bill length to the y-axis. 
+> Represent each observation with a point
+> and map species to the colour of each point.
+> **Title the plot "Bill depth and length"**
+]
+
+.pull-left[
+```{r penguins-5, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length") #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-5", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> and map bill length to the y-axis. 
+> Represent each observation with a point
+> and map species to the colour of each point.
+> Title the plot "Bill depth and length", 
+> **add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins"**
+]
+
+.pull-left[
+```{r penguins-6, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins") #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-6", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> and map bill length to the y-axis. 
+> Represent each observation with a point
+> and map species to the colour of each point.
+> Title the plot "Bill depth and length", 
+> add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins", 
+> **label the x and y axes as "Bill depth (mm)" and "Bill length (mm)", respectively**
+]
+
+.pull-left[
+```{r penguins-7, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Bill depth (mm)", y = "Bill length (mm)") #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-7", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> and map bill length to the y-axis. 
+> Represent each observation with a point
+> and map species to the colour of each point.
+> Title the plot "Bill depth and length", 
+> add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins", 
+> label the x and y axes as "Bill depth (mm)" and "Bill length (mm)", respectively,
+> **label the legend "Species"**
+]
+
+.pull-left[
+```{r penguins-8, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Bill depth (mm)", y = "Bill length (mm)",
+       colour = "Species") #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-8", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+---
+
+.mini[
+> Start with the `penguins` data frame,
+> map bill depth to the x-axis
+> and map bill length to the y-axis. 
+> Represent each observation with a point
+> and map species to the colour of each point.
+> Title the plot "Bill depth and length", 
+> add the subtitle "Dimensions for Adelie, Chinstrap, and Gentoo Penguins", 
+> label the x and y axes as "Bill depth (mm)" and "Bill length (mm)", respectively,
+> label the legend "Species", 
+> **and add a caption for the data source.**
+]
+
+.pull-left[
+```{r penguins-9, fig.show = "hide", warning = FALSE}
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Bill depth (mm)", y = "Bill length (mm)",
+       colour = "Species",
+       caption = "Source: Palmer Station LTER / palmerpenguins package") #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-9", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
+```
+]
+
+???
+Pause for general questions about the grammar of graphics and ggplot2.
+
+---
+class: center, middle
+
+## Graphics for Categorical Data
+
+---
+
+## UN Votes over time
+
+```{r fig.width = 8, echo = FALSE}
+# load packages ------------------------------------------------------------
+library(tidyverse)
+library(openintro)
+library(unvotes)
+library(lubridate)
+library(scales)
+# plot unvotes by issues ---------------------------------------------------
+un_votes %>%
+  filter(country %in% c("United States", "Mexico", "Canada")) %>%
+  inner_join(un_roll_calls, by = "rcid") %>%
+  inner_join(un_roll_call_issues, by = "rcid") %>%
+  mutate(vote = fct_relevel(vote, "yes", "no", "abstain")) %>%
+  group_by(country, year = year(date), issue) %>%
+  summarize(
+    votes = n(),
+    percent_yes = mean(vote == "yes"), 
+    .groups = "drop_last"
+  ) %>%
+  filter(votes > 5) %>%  # only use records with more than 5 votes
+  ggplot(mapping = aes(x = year, y = percent_yes, color = country)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE) +
+  facet_wrap(~ issue, labeller = label_wrap_gen(width = 20)) +
+  labs(
+    y = "% Yes",
+    x = "Year",
+    color = "Country"
+  ) +
+  scale_color_openintro("three") +
+  scale_y_continuous(breaks = c(0, 0.5, 1), labels = label_percent(scale = 100)) +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "horizontal"
+  )
+```
+
+Are these variables numerical? Categorical?
+
+???
+What are the variables? -> the columns of the data frame that were mapped onto the aesthetics that we see here.
+
+---
+## A look at the raw data
+
+```{r echo = FALSE}
+un_vote <- un_votes %>%
+  left_join(un_roll_call_issues, by = c("rcid" = "rcid")) %>%
+  drop_na() %>%
+  left_join(un_roll_calls, by = c("rcid" = "rcid")) %>%
+  select(date, country, vote, issue)
+```
+
+```{r}
+glimpse(un_vote)
+```
+
+---
+##  Counts by Country
+
+```{r vote_cnt, eval = FALSE}
+un_vote %>%
+  count(country) #<<
+```
+
+--
+
+```{r ref.label="vote_cnt", echo = FALSE}
+```
+
+---
+##  Counts by Country
+
+```{r vote_cnt2, eval = FALSE}
+un_vote %>%
+  count(country) %>%
+  arrange(desc(n)) #<<
+```
+
+--
+
+```{r ref.label="vote_cnt2", echo = FALSE}
+```
+
+---
+##  Counts by Country
+
+```{r vote_cnt3, eval = FALSE}
+un_vote %>%
+  count(country) %>%
+  arrange(n) #<<
+```
+
+--
+
+```{r ref.label="vote_cnt3", echo = FALSE}
+```
+
+---
+##  Counts by Country
+
+```{r vote_bar1, eval = FALSE}
+ggplot(un_vote, aes(x = country)) +
+  geom_bar()
+```
+
+--
+
+```{r ref.label="vote_bar1", echo = FALSE, fig.height=4}
+```
+
+---
+##  Counts by Country
+
+Focus on North America: `r emo::ji("canada")` `r emo::ji("us")` `r emo::ji("mexico")`
+
+--
+
+.pull-left[
+```{r echo = FALSE}
+na_vote <- un_vote %>%
+  filter(country %in% c("United States", "Mexico", "Canada"))
+```
+
+```{r}
+na_vote %>%
+  count(country)
+```
+
+]
+
+--
+
+.pull_right[
+```{r fig.height = 3.5}
+ggplot(na_vote, aes(x = country)) +
+  geom_bar()
+```
+]
+
+---
+## Counts by Country and Issue
+
+How can this be turned into a bar chart?
+
+--
+
+```{r}
+na_vote %>%
+  count(country, issue)
+```
+
+---
+##  Counts by Country x Issue
+
+```{r echo = FALSE}
+na_vote <- na_vote %>%
+  unite("country_x_issue", 
+        country, 
+        issue, 
+        remove = FALSE)
+```
+
+Create a bar for each combination of categories.
+
+--
+
+```{r fig.height = 4, echo = FALSE}
+ggplot(na_vote, aes(x = country_x_issue)) +
+  geom_bar()
+```
+
+**Question**: What does this tell us?
+
+--
+
+> Of *all votes cast*, how many were for each county x issue combination?
+
+---
+## Counts of Issue by Country
+
+--
+
+.pull-left[
+```{r issue_by_country, eval = FALSE}
+ggplot(na_vote, 
+       aes(x = country,
+           fill = issue)) +
+  geom_bar()
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label="issue_by_country", echo = FALSE, fig.height = 4}
+```
+]
+
+**Question**: What does this tell us?
+
+--
+
+> Of *all votes cast by each country*, how many were on each issue?
+
+---
+## Counts of Country by Issue
+
+--
+
+.pull-left[
+```{r country_by_issue, eval = FALSE}
+ggplot(na_vote, 
+       aes(x = issue, #<<
+           fill = country)) + #<<
+  geom_bar()
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label="country_by_issue", echo = FALSE, fig.height = 4}
+```
+]
+
+**Question**: What does this tell us?
+
+--
+
+> Of *all votes cast on each issue*, how many were by each country?
+
+---
+## Proportions of Country by Issue
+
+--
+
+.pull-left[
+```{r country_by_issue_p, eval = FALSE}
+ggplot(na_vote, 
+       aes(x = issue,
+           fill = country)) +
+  geom_bar(position = "fill") #<<
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label="country_by_issue_p", echo = FALSE, fig.height = 4}
+```
+]
+
+**Question**: What does this tell us?
+
+--
+
+> Of *all votes cast on each issue*, what *proportion* were for by each country?
+
+---
+## Proportions of Country by Issue
+
+--
+
+.pull-left[
+```{r issue_by_country_p, eval = FALSE}
+ggplot(na_vote, 
+       aes(x = country, #<<
+           fill = issue)) + #<<
+  geom_bar(position = "fill")
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label="issue_by_country_p", echo = FALSE, fig.height = 4}
+```
+]
+
+**Question**: What does this tell us?
+
+--
+
+> Of *all votes cast by each country*, what *proportion* were for on each issue?
+
+---
+## But wait, there's more
+
+These plots show little difference in the data (the counts, the proportions). What other variable might contain interesting variability?
+
+--
+
+```{r echo = FALSE}
+na_vote <- na_vote %>%
+  select(-country_x_issue)
+```
+
+```{r}
+glimpse(na_vote)
+```
+
+--
+
+> `vote`
+
+--
+
+**Question**: How do you visualize *three* categorical variables?
+
+---
+## Facets
+
+```{r echo=FALSE, out.width="45%"}
+knitr::include_graphics("figs/grammar-of-graphics.png")
+# source: http://bloggotype.blogspot.com/2016/08/holiday-notes2-grammar-of-graphics.html
+```
+
+*Facets* are multiple versions of the same plot, each using a different subset of the data determined by a categorical variable.
+
+--
+
+```{css, echo = FALSE}
+.huge .remark-code { /*Change made here*/
+  font-size: 150% !important;
+}
+```
+
+.huge[
+```{r}
+facet_wrap(vars())
+```
+]
+
+---
+# Facets example
+
+```{r echo = FALSE, fig.align = "center"}
+knitr::include_graphics("figs/ft-covid-excess-deaths.png")
+#Source: [Financial Times](https://www.ft.com/content/a2901ce8-5eb7-4633-b89c-cbdf5b386938), 27 Aug 2021.
+```
+
+---
+## Proportion of country by issue and vote
+
+.pull-left[
+```{r facet1, eval = FALSE}
+ggplot(na_vote,
+       aes(x = issue,
+           fill = country)) +
+  geom_bar(position = "fill") +
+  facet_wrap(vars(vote))
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label = "facet1", echo = FALSE, fig.height=5}
+```
+
+]
+
+---
+## Proportion of vote by country and issue
+
+.pull-left[
+```{r facet2, eval = FALSE}
+ggplot(na_vote,
+       aes(x = country,
+           fill = vote)) +
+  geom_bar(position = "fill") +
+  facet_wrap(vars(issue))
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label = "facet2", echo = FALSE, fig.height=5}
+```
+
+]
+
+---
+## Themes
+
+The design choices not related to the data - the colors used, the fonts, the spacing, the construction of each component - are encapsulated in the **theme**.
+
+--
+
+.pull-left[
+```{r penguins-10, fig.show = "hide", warning = FALSE, message = FALSE}
+library(ggthemes)
+ggplot(data = penguins,
+       mapping = aes(x = bill_depth_mm,
+                     y = bill_length_mm,
+                     colour = species)) +
+  geom_point() +
+  labs(title = "Bill depth and length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Bill depth (mm)", y = "Bill length (mm)",
+       colour = "Species",
+       caption = "Source: Palmer Station LTER / palmerpenguins package") +
+  theme_fivethirtyeight() #<<
+```
+]
+.pull-right[
+```{r ref.label = "penguins-10", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8, message = FALSE}
+```
+]
