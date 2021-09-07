@@ -1,0 +1,46 @@
+---
+title: 'Lab 3: Boba F&ecirc;te'
+output: pdf_document
+header-includes:
+   - \usepackage{multicol}
+---
+
+### Group Members
+Write to the right of each role the first and last name of the group member filling that role (if there are groups of 4, two can serve as facilitators).
+
+- *Taster/Subject*: Undergoes the experiment, tastes tea, provides data.___________________
+- *Materials*: Handles the materials (tea et. al) for the experiment.______________________
+- *Facilitator(s)*: Carries out the experiment, keeps track of time, records data._______________
+
+### Claim
+
+In one sentence, write the claim you intend to test.
+
+\vspace{1cm}
+
+### Protocol
+
+Record below the step-by-step protocol that you will use to collect data to bear on the claim above. Be precise. You should be able to hand this off to another group and have them conduct your experiment.
+
+\newpage
+
+### Data
+
+In the space below, sketch out an empty data frame that identifies the important characteristics of your data. Create the data frame such that the number of rows reflect your sample size, $n$, and the number of columns represent the variables that you intend to collect. Label the columns with the names of those variables and note how you are defining your unit of observation.
+
+
+\vspace{10cm}
+
+### Exploratory Data Analysis
+
+Sketch a plot that you will use to use to determine how consistent your data are with your original claim. Please label the axes. Since you do not yet have data, create two sketch of what the plot *might* look like in two different scenarios. Below each plot, write out the ggplot2 code that will create that graphic.
+
+\setlength{\tabcolsep}{35pt}
+\begin{table*}[h]
+  \centering
+  \begin{tabular}{lr}
+\emph{Scenario 1: Data supports claim} & \emph{Scenario 2: Data does not support claim}
+  \end{tabular}
+\end{table*}
+
+
