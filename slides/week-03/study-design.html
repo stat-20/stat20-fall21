@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Study Design</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Data Collection for Inference" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+    <script src="libs/viz-1.8.2/viz.js"></script>
+    <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+    <script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+    <script src="libs/pymjs-1.3.2/pym.v1.js"></script>
+    <script src="libs/widgetframe-binding-0.3.1/widgetframe.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Study Design
+### Data Collection for Inference
+
+---
+
+
+
+
+---
+## Announcements
+
+--
+
+1. Problem Set 3 due Friday at 8 pm
+
+  - Evening Study Session 6:30 - 8:30 pm
+
+--
+
+1. Lab 3 due *Thursday* at 8 pm
+
+
+---
+## Lab 3 on Gradescope
+
+.pull-left[
+&lt;img src="figs/lab-3.png" width="80%" style="display: block; margin: auto auto auto 0;" /&gt;
+]
+
+.pull-right[
+1. Upload photos of front and back of handout (with data)
+2. Write your reflection directly into gradescope
+]
+
+---
+## Lab 3: Boba F&amp;ecirc;te
+
+.pull-left-narrow[
+&lt;img src="figs/boba-fett.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+.cite[
+image: https://www.humanforscale.com/
+]
+
+]
+
+.pull-right-wide[
+- Lab tomorrow meets *outside* on the West and South terraces of Evans Hall.
+- Mind the time.
+- Don't forget your handout!
+]
+
+---
+## Announcements
+
+1. Problem Set 3 due Friday at 8 pm
+  - Evening Study Session 6:30 - 8:30 pm
+
+1. Lab 3 due *Thursday* at 8 pm
+
+--
+
+1. Quiz 1
+  - ~ 20 minutes in a 24 hr period on Gradescope
+
+
+---
+## Quiz 1 Topics
+
+.pull-left[
+**Intro to Data**
+- Data frames
+- Taxonomy of Data
+- Key terms
+
+**Reproducibility**
+
+- 3 tenets
+- Our tools: R + Markdown
+]
+
+--
+
+.pull-right[
+**Describing Data**
+- Describing distributions verbally
+- Numerical summaries
+- Graphical summaries
+    - Grammar of Graphics
+    - `ggplot2`
+
+**Study Design**
+- Key terms
+- Sampling
+- Experimental Design
+]
+
+---
+class: middle, center
+
+## Our goal: teach you to critique and construct claims made using data.
+
+
+---
+## Announcements
+
+1. Problem Set 3 due Friday at 8 pm
+  - Evening Study Session 6:30 - 8:30 pm
+
+1. Lab 3 due *Thursday* at 8 pm
+
+1. Quiz 1
+  - ~ 20 min in 24 hr on Gradescope from 11 am 9/12 to 11 am 9/13
+  - Review quiz answers in class
+  - If unsatisfied with performance, you can take second quiz at end of the week. Same list of topics, different questions. Final grade on Quiz 1 will be max of the two scores.
+  - Quiz 1 redo: same format from 11 am 9/16 to 11 am 9/17
+  
+---
+class: middle, center, inverse
+
+# Welcome to Week 3
+
+---
+
+# The Lifecycle of an Empirical Claim
+
+<div id="htmlwidget-1c6324a734412a3b93c5" style="width:1100px;height:504px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1c6324a734412a3b93c5">{"x":{"diagram":"\ndigraph graph2 {\n\ngraph [layout = dot, rankdir = LR, bgcolor = \"#f3f3ee\"]\n\nnode [shape = oval]\na [label = \"Formulate a\nQuestion\"]\nb [label = \"Collect\nData\"]\nc [label = \"Analyze\nData\"]\nd [label = \"Construct\nClaim\"]\n\na -> b -> c -> d\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+
+???
+Empirical Meaning experimentation, observation, data
+
+It's indeed a lifecycle, it can go in many directions and iterate.
+
+---
+# Arbuthnot
+
+.pull-left-narrow[
+
+<div id="htmlwidget-f9f81396723b9ff3b845" style="width:179px;height:500px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f9f81396723b9ff3b845">{"x":{"url":"study-design_files/figure-html//widgets/widget_unnamed-chunk-4.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+
+]
+
+.pull-right-wide[
+### Formulate a Question
+
+What is the chance that a newborn baby is genetically male?
+]
+
+---
+# Arbuthnot
+
+.pull-left-narrow[
+
+<div id="htmlwidget-f3184335d0ebb5510bc2" style="width:179px;height:500px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f3184335d0ebb5510bc2">{"x":{"url":"study-design_files/figure-html//widgets/widget_unnamed-chunk-5.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+]
+
+.pull-right-wide[
+### Collect Data
+
+&lt;img src="figs/christening-records.png" width="704" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+# Arbuthnot
+
+.pull-left-narrow[
+<div id="htmlwidget-b3c8d8bb9691a51b6b10" style="width:179px;height:500px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b3c8d8bb9691a51b6b10">{"x":{"url":"study-design_files/figure-html//widgets/widget_unnamed-chunk-7.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+]
+
+.pull-right-wide[
+### Analyze Data
+
+&lt;img src="study-design_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+# Arbuthnot
+
+.pull-left-narrow[
+
+<div id="htmlwidget-5beb916a9e793ccce2be" style="width:179px;height:500px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5beb916a9e793ccce2be">{"x":{"url":"study-design_files/figure-html//widgets/widget_unnamed-chunk-9.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+]
+
+.pull-right-wide[
+### Construct Claim
+
+*Descriptive Claim*: In every year from 1629 - 1710, in the London parishes under study, the proportion of christenings that were male exceeded 50%.
+
+*Inferential Claim*: The proportion of births that are genetically male exceeds 50%.
+
+]
+
+---
+## Scope of Inference
+
+**population** - the set of observational units on which you wish to make an inference (size: `\(N\)`)
+
+--
+
+#### Scales of Data
+
+**sample** - a subset of the population on which you have data (size of the sample: `\(n\)`)
+
+--
+
+**anecdote** - very small sample of data collected haphazardly (usually `\(n = 1\)`)
+
+--
+
+**census** - sample = population (complex, expensive, and sometimes impossible to achieve)
+
+---
+
+&lt;img src="study-design_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+&gt; *Descriptive Claim*: In every year from 1629 - 1710, in the London parishes under study, the proportion of christenings that were male exceeded 50%.
+
+--
+
+- Scope of inference is limited to the **sample** of data
+- Focuses purely on the **statistics** of the sample: numerical summaries of the data (yearly observed proportions)
+
+---
+
+&lt;img src="study-design_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+&gt; *Inferential Claim*: The proportion of births that are genetically male exceeds 50%.
+
+--
+
+- Scope of inference is the **population** of all births, with no geographic, cultural, or temporal caveats
+- Uses the **statistics** of the sample to infer the nature of the **parameters** of the population: numerical characteristics of the population (the proportion of births than are genetically male)
+
+
+---
+## Scope of Inference
+
+When studying the relationships between multiple variables, some inferences are of **associations**, others assert a **causal link**. These often map to the nature of the data.
+--
+
+### Collection methods
+
+- **Observational Data**: passive recording of variables on a sample
+- **Experimental Data**: researchers actively assign treatments to observational units then record variables
+
+Both often involve the process of drawing a sample.
+
+---
+## Analogy: Sampling as Cooking
+
+--
+
+&lt;img src="figs/soup.png" width="220" style="display: block; margin: auto auto auto 0;" /&gt;
+
+--
+
+- To evaluate if the soup is good, you taste a spoonful - *sample.*
+
+--
+
+- If the spoonful is bland, you've made a *descriptive claim*.
+
+--
+
+- If you conclude the soup needs salt, you've made an *inference to a population*.
+
+--
+
+- For it to be valid, the spoonful must be *representative* of the soup.
+
+
+
+.cite[
+image: https://www.cooksillustrated.com/recipes/10242-turkey-barley-soup
+]
+
+---
+
+# Sampling considerations
+
+You're a senior Psychology major conducting a study that examines procrastination among Cal students.  How should you select a sample?
+
+--
+
+**A.** Post a link to your survey on social media.
+
+--
+
+**B.** Get a list of Cal student emails from the Registrar, take a simple random sample (SRS), and email that sample.
+
+--
+.task[
+With a neighbor, write one pro and one con to each approach, then vote for your preference at `pollev.com/andrewbray088`
+]
+
+---
+class: middle, center, inverse
+
+A Lesson from History
+
+---
+
+&lt;img src="figs/landon-fdr.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Landon v. FDR, 1936
+
+Literary Digest polled 10 million Americans, 2.4 million responded.
+
+--
+
+N = 128 million, n = 2.4 million
+
+--
+
+**Prediction**: 43% for FDR
+
+**Result**: 62% for FDR
+
+---
+
+## What went wrong?
+
+--
+
+Literary Digest surveyed
+
+- magazine subscribers
+- registered car owners
+- registered telephone owners
+
+--
+
+These groups have a much higher income on average than the typical
+american. In 1936 the Great Depression is still in full swing, so the 
+typical (poorer) american was more supportive of FDR.
+
+Their sampling method was **biased** (not representative).
+
+
+---
+class: middle, center, inverse
+
+Sampling Strategies
+
+---
+## Sampling Strategies
+--
+
+### Simple Random Sampling (SRS)
+Select from the population of size `\(N\)` a sample of size `\(n\)` where each observational unit is equally likely of being selected.
+
+--
+
+### Stratified Sampling
+Divide the population up into *strata*, then take a SRS within each stratum.
+
+---
+## Example: MLB Salaries
+
+Imagine we have access to the full population 160 baseball players (focus on Yankees, Padres, Mariners, and Dodgers), and record their team name and salary.
+
+--
+
+
+```
+##               team   salary
+## 1 New York Yankees 26.05429
+## 2 New York Yankees 24.05019
+## 3 New York Yankees 25.13195
+## 4 New York Yankees 25.30062
+## 5 New York Yankees 26.63801
+## 6 New York Yankees 25.88323
+```
+
+---
+## Population view
+--
+
+&lt;img src="study-design_files/figure-html/plot-strat-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+How can we estimate the **population mean salary** (with `\(N = 160\)`) using only a sample of size `\(n = 40\)`?
+
+--
+
+- Take a sample, compute the *sample mean*
+- But how should we take the sample?
+
+---
+## Simple Random Sample (SRS)
+
+**Population Mean**
+
+
+```r
+df %&gt;% 
+  summarize(mean(salary))
+```
+
+```
+##   mean(salary)
+## 1     19.68288
+```
+
+--
+
+**Sample Mean from an SRS**
+
+
+```r
+# SRS
+df %&gt;%
+  sample_n(40) %&gt;% 
+  summarize(mean(salary))
+```
+
+```
+##   mean(salary)
+## 1     20.28173
+```
+
+---
+## Stratified Sample
+
+--
+
+**Sample Mean from an Stratified Sample**
+
+
+```r
+df %&gt;% 
+  group_by(team) %&gt;% 
+  sample_n(10) %&gt;% 
+  ungroup() %&gt;%
+  summarize(mean(salary))
+```
+
+```
+## # A tibble: 1 × 1
+##   `mean(salary)`
+##            &lt;dbl&gt;
+## 1           19.6
+```
+
+---
+## Long-run performance
+
+To understand how these strategies perform in the long run, we have to imagine how good the parameter estimates will be over *many* possible samples.
+
+--
+
+
+```r
+df %&gt;%
+  sample_n(40) %&gt;% 
+  summarize(mean(salary))
+```
+
+```
+##   mean(salary)
+## 1      19.9387
+```
+
+--
+
+
+```r
+df %&gt;%
+  sample_n(40) %&gt;% 
+  summarize(mean(salary))
+```
+
+```
+##   mean(salary)
+## 1     19.38921
+```
+
+
+---
+## Long-run performance
+
+
+&lt;img src="study-design_files/figure-html/comp-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+## Sampling Strategies
+
+--
+
+**SRS**: Unbiased, easy, but can be highly variable.
+
+--
+
+**Stratified Sampling**: If you divide population into strata that are *similar* within and *different* between, your estimates will still be unbiased but have lower variability.
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"slideNumberConstructat": "%current%",
+"highlightLines": true,
+"highlightSpans": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
