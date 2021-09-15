@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Principles of Experimental Design</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+    <script src="libs/viz-1.8.2/viz.js"></script>
+    <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+    <script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Principles of Experimental Design
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+---
+## Announcements
+
+1. Quiz 1 redo: same format from 11 am 9/16 to 11 am 9/17
+
+--
+
+1. Looking forward:
+    - This week: Intro to Probability, in lab: data wrangling with `dplyr`.
+    - Next week: Distributions of Random Variables
+    - Week after next: Midterm I on Monday 9/27 (more details to follow)
+
+--
+
+1. Problem Set 4 and Lab 4 released tonight, due Friday at 8 pm
+
+--
+
+1. Evening Study Session: Thursday 6:30 - 8:30 pm
+
+---
+## Last Week: Boba F&amp;ecirc;te
+
+&lt;img src="figs/boba-fete-topdown.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, inverse
+# Goals for today:
+
+--
+
+## Collect the best ideas into 4 principles
+
+--
+
+## Get to _why_ these principles are important
+
+
+---
+## The essential question of our time
+
+.pull-left[
+&lt;img src="figs/asha-yifang.jpeg" width="100%" style="display: block; margin: auto auto auto 0;" /&gt;
+]
+
+.pull-right[
+_Which tea was better_?
+
+- Asha?
+- Yifang?
+
+Vote at `pollev.com/andrewbray088`.
+]
+
+---
+
+# The Lifecycle of an Empirical Claim
+
+<div id="htmlwidget-85f7c76788421b36573a" style="width:1100px;height:504px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-85f7c76788421b36573a">{"x":{"diagram":"\ndigraph graph2 {\n\ngraph [layout = dot, rankdir = LR, bgcolor = \"#f3f3ee\"]\n\nnode [shape = oval]\na [label = \"Formulate a\nQuestion\"]\nb [label = \"Collect\nData\"]\nc [label = \"Analyze\nData\"]\nd [label = \"Construct\nClaim\"]\n\na -> b -> c -> d\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+
+---
+class: center, middle, inverse
+
+# Lessons from our class
+
+---
+
+.pull-left[
+&lt;img src="figs/boba-duan-front.png" width="549" height="125%" style="display: block; margin: auto;" /&gt;
+]
+
+
+.pull-right[
+&lt;img src="figs/boba-duan-back.png" width="505" height="115%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.pull-left[
+&lt;img src="figs/boba-angela-front.png" width="694" height="125%" style="display: block; margin: auto;" /&gt;
+]
+
+
+.pull-right[
+&lt;img src="figs/boba-angela-back.png" width="649" height="115%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+&lt;img src="figs/boba-leo-front.png" width="657" height="125%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/boba-leo-back.png" width="587" height="115%" style="display: block; margin: auto;" /&gt;
+
+---
+# Principles of Experimental Design
+
+**Randomization**: Randomly assign subjects to treatments.
+
+**Control**: Compare treatment of interest to a control group that isolates the effect of interest.
+
+**Blinding**: When experimental units do not know whether they are in the control or treatment group
+
+**Replication**: Within a study, replicate by collecting a sufficiently large sample. Or replicate the entire study.
+
+
+---
+# Other key ideas
+
+**Placebo**: fake treatment, often used as the control group for medical studies
+
+**Placebo effect**: experimental units showing improvement simply because they believe they are receiving a special treatment
+
+**Blocking**: If there are variables that are known or suspected to affect the response variable, first group subjects into blocks based on these variables, and then randomize cases within each block to treatment groups.
+
+---
+class: center, middle
+
+# Does smoking cigarettes cause cancer?
+
+---
+## Example 1: Smoking and cancer
+
+&lt;img src="figs/fisher-nature.png" width="800" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Alternate paths from association to causation
+
+&lt;img src="figs/alternate-paths.png" width="1050" style="display: block; margin: auto;" /&gt;
+
+---
+# Example 2: Acupuncture and pain
+
+&lt;img src="figs/acupuncture.png" width="500" style="display: block; margin: auto;" /&gt;
+
+How do you test if acupuncture reduces pain?
+
+--
+
+"Sham acupuncture" is a good control.
+
+---
+
+&lt;img src="figs/corrs1.png" width="800" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+&lt;img src="figs/corrs2.png" width="800" style="display: block; margin: auto;" /&gt;
+
+
+---
+# If you learn one thing in this class...
+
+&lt;img src="figs/xkcd-correlation.png" width="800" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: center, middle
+
+## See you next class
+
+&lt;img src="figs/cat-causation.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+Correlation `\(\ne\)` Causation.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
