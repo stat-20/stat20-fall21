@@ -1,0 +1,52 @@
+---
+title: "Fundamentals of Probability"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(xaringanthemer)
+library(kableExtra)
+library(emo)
+library(palmerpenguins)
+library(nomnoml)
+library(DiagrammeR)
+library(DiagrammeRsvg)
+library(rsvg)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/xaringan-theme.R")
+xaringanExtra::use_panelset()
+```
+
+
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p1.png")
+```
+
+---
+
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p2.png")
+```
+
+---
+
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p3.png")
+```
+
