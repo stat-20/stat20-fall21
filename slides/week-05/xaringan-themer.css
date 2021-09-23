@@ -21,7 +21,7 @@
 @import url(https://fonts.googleapis.com/css?family=Commissioner&display=swap);
 @import url(https://fonts.googleapis.com/css?family=Bitter:300&display=swap);
 @import url(https://fonts.googleapis.com/css?family=Fira+Mono&display=swap);
-
+@import url(https://fonts.googleapis.com/css?family=Amatic+SC:Bold,700&display=swap);
 
 :root {
   /* Fonts */
@@ -296,4 +296,8 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   margin-top: 6px;
   border-left: solid 5px #F1DE67;
   background-color: #F1DE6750;
+}
+.adage {
+  font-size: 250%;
+  font-family: Amatic SC;
 }

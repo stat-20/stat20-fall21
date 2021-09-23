@@ -1,5 +1,6 @@
 ---
 title: "Random Variables"
+subtitle: "Expected Value and Variance"
 author: "Stat 20 UC Berkeley, Fall 2021"
 output:
   xaringan::moon_reader:
@@ -103,9 +104,16 @@ xaringanExtra::use_panelset()
 
 ---
 
+```{r echo = FALSE, fig.align='center', out.width="40%"}
+knitr::include_graphics("figs/roulette.gif")
+```
+
+
 ```{r echo = FALSE, fig.align='center', out.width="100%"}
 knitr::include_graphics("figs/p3.png")
 ```
+
+.cite[source: https://boardgamegeek.com/thread/1927319/wheel-fate]
 
 ---
 
@@ -123,6 +131,29 @@ knitr::include_graphics("figs/p5.png")
 
 ```{r echo = FALSE, fig.align='center', out.width="100%"}
 knitr::include_graphics("figs/p6.png")
+```
+
+---
+
+.pull-left[
+### Q3
+
+What is your expected winnings and their SD if you play 3 times?
+]
+
+.pull-right[
+### Q4
+What is your expected winnings and their SD if you triple your bet but play only once?
+]
+
+--
+
+.task[
+Work with your neighbor(s) to come up with your 4 answers and enter them at `pollev.com/andrewbray088`.
+]
+
+```{r echo = FALSE}
+countdown::countdown(minutes = 4, bottom = 0)
 ```
 
 ---
