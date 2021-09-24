@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Fundamental Distributions</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Fundamental Distributions
+## Bernoulli and Binomial
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+
+
+---
+class: middle, center, inverse
+
+# Announcements
+
+---
+
+.mini[22. The plot below displays the relationship between the mean arrival 
+delay and the mean distance traveled by every plane in the data set. 
+It also shows the total number of flights made by each plane by the 
+size of the plotted circle. Please form a single chain that will 
+create this plot, starting with the raw data set. You will also want 
+to exclude the edge cases from your analysis, so focus on the
+planes that have logged more than 20 flights and flown an average
+distance of less than 2000 miles.]
+
+--
+
+.pull-left[
+
+```r
+flights %&gt;%
+  group_by(tailnum) %&gt;%
+  summarize(avg_delay = mean(arr_delay, na.rm = TRUE),
+            avg_dist = mean(distance, na.rm = TRUE),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000) %&gt;%
+  ggplot(aes(x = avg_dist, y = avg_delay)) + 
+  geom_point(alpha = .1, aes(size = n)) +
+  labs(x = "average distance", 
+       y = "average delay",
+       size = "number of flights")
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+
+.mini[22. The plot below displays the relationship between the mean arrival 
+delay and the mean distance traveled by every plane in the data set. 
+It also shows the total number of flights made by each plane by the 
+size of the plotted circle. Please form a single chain that will 
+create this plot, starting with the raw data set. You will also want 
+to exclude the edge cases from your analysis, so focus on the
+planes that have logged more than 20 flights and flown an average
+distance of less than 2000 miles.]
+
+--
+
+.pull-left[
+
+```r
+flights %&gt;%
+* drop_na(arr_delay, distance) %&gt;%
+  group_by(tailnum) %&gt;%
+  summarize(avg_delay = mean(arr_delay),
+            avg_dist = mean(distance),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000) %&gt;%
+  ggplot(aes(x = avg_dist, y = avg_delay)) + 
+  geom_point(alpha = .1, aes(size = n)) +
+  labs(x = "average distance", 
+       y = "average delay",
+       size = "number of flights")
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-3-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Break the pipe
+
+.pull-left[
+
+```r
+flights %&gt;%
+  group_by(tailnum) %&gt;%
+* summarize(avg_delay = mean(arr_delay, na.rm = TRUE),
+*           avg_dist = mean(distance, na.rm = TRUE),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000)
+```
+
+```
+## # A tibble: 1,708 × 4
+##    tailnum avg_delay avg_dist     n
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;
+##  1 304NV       1.15      639.    27
+##  2 315NV       4.19      542.    26
+##  3 318NV      -9.72      580     25
+##  4 323NV      -8.83      639.    24
+##  5 N101DU    -10.6       649.    37
+##  6 N102DU     -2.57      643.    68
+##  7 N103DU      4.33      634.    52
+##  8 N103SY    -10.4       753.   125
+##  9 N104DU      0.788     624.    52
+## 10 N105DU     -8.55      636.    45
+## # … with 1,698 more rows
+```
+]
+
+--
+
+.pull-right[
+
+```r
+flights %&gt;%
+* drop_na(arr_delay, distance) %&gt;%
+  group_by(tailnum) %&gt;%
+  summarize(avg_delay = mean(arr_delay),
+            avg_dist = mean(distance),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000)
+```
+
+```
+## # A tibble: 1,680 × 4
+##    tailnum avg_delay avg_dist     n
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;
+##  1 304NV       1.15      639.    27
+##  2 315NV       4.19      542.    26
+##  3 318NV      -9.72      580     25
+##  4 323NV      -8.83      639.    24
+##  5 N101DU    -10.6       649.    37
+##  6 N102DU     -2.57      642.    67
+##  7 N103DU      4.33      634.    52
+##  8 N103SY    -10.4       768.   114
+##  9 N104DU      0.788     624.    52
+## 10 N105DU     -8.55      635.    44
+## # … with 1,670 more rows
+```
+]
+
+---
+### Any large ns?
+
+.pull-left[
+
+```r
+flights %&gt;%
+  group_by(tailnum) %&gt;%
+* summarize(avg_delay = mean(arr_delay, na.rm = TRUE),
+*           avg_dist = mean(distance, na.rm = TRUE),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000) %&gt;%
+  arrange(desc(n))
+```
+
+```
+## # A tibble: 1,708 × 4
+##    tailnum avg_delay avg_dist     n
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;
+##  1 &lt;NA&gt;       NaN       1026.  4454
+##  2 N184SY     -12.5      498.   293
+##  3 N400SY      -9.57     496.   288
+##  4 N192SY      -7.86     494.   286
+##  5 N179SY      -9.48     498.   283
+##  6 N191SY     -10.4      493.   266
+##  7 N402SY     -11.6      509.   258
+##  8 N174SY      -7.75     514.   256
+##  9 N183SY     -13.1      508.   256
+## 10 N187SY     -11.1      477.   255
+## # … with 1,698 more rows
+```
+]
+
+.pull-right[
+
+```r
+flights %&gt;%
+* drop_na(arr_delay, distance) %&gt;%
+  group_by(tailnum) %&gt;%
+  summarize(avg_delay = mean(arr_delay),
+            avg_dist = mean(distance),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000) %&gt;%
+  arrange(desc(n))
+```
+
+```
+## # A tibble: 1,680 × 4
+##    tailnum avg_delay avg_dist     n
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;
+##  1 N184SY     -12.5      499.   291
+##  2 N400SY      -9.57     496.   288
+##  3 N192SY      -7.86     495.   283
+##  4 N179SY      -9.48     496.   277
+##  5 N191SY     -10.4      495.   260
+##  6 N402SY     -11.6      506.   255
+##  7 N183SY     -13.1      510.   253
+##  8 N187SY     -11.1      477.   253
+##  9 N174SY      -7.75     514.   252
+## 10 N186SY     -11.1      538.   245
+## # … with 1,670 more rows
+```
+]
+
+---
+## Missing values
+
+### `drop_na(___, ___)`
+
+Drops the full _row_ for any observation with an `NA` in any of the specified variables.
+
+### `function(___, na.rm = TRUE)`
+
+When working on a single variable, drops any observations that are `NA` before calculating the function.
+
+---
+### Remove rows with a missing tailnum
+
+.pull-left[
+
+```r
+flights %&gt;%
+  drop_na(tailnum) %&gt;%
+  group_by(tailnum) %&gt;%
+* summarize(avg_delay = mean(arr_delay, na.rm = TRUE),
+*           avg_dist = mean(distance, na.rm = TRUE),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000) %&gt;%
+  arrange(desc(n))
+```
+
+```
+## # A tibble: 1,707 × 4
+##    tailnum avg_delay avg_dist     n
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;
+##  1 N184SY     -12.5      498.   293
+##  2 N400SY      -9.57     496.   288
+##  3 N192SY      -7.86     494.   286
+##  4 N179SY      -9.48     498.   283
+##  5 N191SY     -10.4      493.   266
+##  6 N402SY     -11.6      509.   258
+##  7 N174SY      -7.75     514.   256
+##  8 N183SY     -13.1      508.   256
+##  9 N187SY     -11.1      477.   255
+## 10 N186SY     -11.1      536.   250
+## # … with 1,697 more rows
+```
+]
+
+.pull-right[
+
+```r
+flights %&gt;%
+* drop_na(arr_delay, distance) %&gt;%
+  group_by(tailnum) %&gt;%
+  summarize(avg_delay = mean(arr_delay),
+            avg_dist = mean(distance),
+            n = n()) %&gt;%
+  filter(n &gt; 20,
+         avg_dist &lt; 2000) %&gt;%
+  arrange(desc(n))
+```
+
+```
+## # A tibble: 1,680 × 4
+##    tailnum avg_delay avg_dist     n
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;
+##  1 N184SY     -12.5      499.   291
+##  2 N400SY      -9.57     496.   288
+##  3 N192SY      -7.86     495.   283
+##  4 N179SY      -9.48     496.   277
+##  5 N191SY     -10.4      495.   260
+##  6 N402SY     -11.6      506.   255
+##  7 N183SY     -13.1      510.   253
+##  8 N187SY     -11.1      477.   253
+##  9 N174SY      -7.75     514.   252
+## 10 N186SY     -11.1      538.   245
+## # … with 1,670 more rows
+```
+]
+
+---
+class: middle, center
+
+# Moral of the story
+
+--
+
+.adage[Real data is complex.]
+
+--
+
+.adage[Move slowly, maintain skepticism.]
+
+--
+
+.adage[Break the pipe.]
+
+
+---
+class: middle, center, inverse
+
+# Fundamental Probability Distributions
+
+---
+## What is the simplest random variable?
+
+--
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; x &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; P(X = x) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; c &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+--
+
+&gt; This random variable is neither random nor variable 👎
+
+---
+## Example random process
+
+--
+
+Drop a ball onto a peg. If it bounces left, Let `\(X = 1\)`, otherwise let `\(X = 0\)`.
+
+--
+
+.pull-left-narrow[
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; x &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; P(X = x) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 - p &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; p &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;img src="figs/ping-pong-ball.jpeg" width="333" style="display: block; margin: auto;" /&gt;
+
+.cite[source: steamexperiments.com]
+
+]
+
+--
+
+.pull-right-wide[
+
+`\begin{align}
+\textrm{E}(X) &amp;= \sum_{i=1}^{k}x_iP(X = x_i) \\
+&amp;= 0 \cdot (1 - p) + 1 \cdot p \\
+&amp;= p = \mu
+\end{align}`
+
+]
+
+
+---
+## Example random process
+
+Drop a ball onto a peg. If it bounces left, Let `\(X = 1\)`, otherwise let `\(X = 0\)`.
+
+.pull-left-narrow[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; x &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; P(X = x) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 - p &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; p &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;img src="figs/ping-pong-ball.jpeg" width="333" style="display: block; margin: auto;" /&gt;
+
+.cite[source: steamexperiments.com]
+]
+
+.pull-right-wide[
+
+`\begin{align}
+\textrm{Var}(X) &amp;= \sum_{i=1}^{k}(x_i - \mu)^2 P(X = x_i) \\
+&amp;= (0-p)^2 \cdot (1 - p) + (1-p)^2 \cdot p \\
+&amp;= p^2(1-p) + (1 - 2p + p^2)p \\
+&amp;= p - p^2 = p(1 - p) = \sigma^2
+\end{align}`
+
+]
+
+
+---
+## The Bernoulli Distribution
+
+Describes a random variable with two outcomes, 0 and 1, where 1 is mapped to the outcome considered a "success", and the probability of a success is `\(p\)`.
+
+--
+
+.pull-left[
+$$
+X \sim \textrm{Bern}(p)
+$$
+
+_"X is distributed as a Bernoulli r.v. with probability of success p"_
+
+`\begin{align}
+\textrm{E}(X) &amp;= p \\
+\textrm{Var}(X) &amp;= p(1 - p) \\
+\textrm{SD}(X) &amp;= \sqrt{p(1 - p)} \\
+\end{align}`
+]
+
+--
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-16-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+## Examples of the Bernoulli
+
+--
+
+### A spin of the globe
+
+Let `\(X\)` be 1 if your index finger lands on water and 0 otherwise.
+
+--
+
+.pull-left[
+$$
+X \sim \textrm{Bern}(p = .71)
+$$
+
+_"X is distributed as a Bernoulli r.v. with probability of success .71"_
+
+`\begin{align}
+\textrm{E}(X) &amp;= .71 \\
+\textrm{Var}(X) &amp;= .71(1 - .71) = .206 \\
+\textrm{SD}(X) &amp;= \sqrt{.71(1 - .71)} = .454 \\
+\end{align}`
+]
+
+--
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-17-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+## Examples of the Bernoulli
+
+--
+
+### A fair coin flip
+
+Let `\(X\)` be 1 if a coin lands "heads" and 0 otherwise.
+
+--
+
+.pull-left[
+$$
+X \sim \textrm{Bern}(p = .5)
+$$
+
+_"X is distributed as a Bernoulli r.v. with probability of success .5"_
+
+`\begin{align}
+\textrm{E}(X) &amp;= .5 \\
+\textrm{Var}(X) &amp;= .5(1 - .5) = .25 \\
+\textrm{SD}(X) &amp;= \sqrt{.5(1 - .5)} = .5 \\
+\end{align}`
+]
+
+--
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-18-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+## Examples of the Bernoulli
+
+--
+
+### An unfair coin flip
+
+Let `\(X\)` be 1 if a coin lands "heads" and 0 otherwise.
+
+--
+
+.pull-left[
+$$
+X \sim \textrm{Bern}(p = .33)
+$$
+
+_"X is distributed as a Bernoulli r.v. with probability of success .33"_
+
+`\begin{align}
+\textrm{E}(X) &amp;= .33 \\
+\textrm{Var}(X) &amp;= .33(1 - .33) = .221 \\
+\textrm{SD}(X) &amp;= \sqrt{.33(1 - .33)} = .470 \\
+\end{align}`
+]
+
+--
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-19-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+## Reminder about RV Notation
+
+--
+
+- The random variable itself is given a capital letter: `\(X, Y, Z, W, \ldots\)`
+
+--
+
+- A particular value taken by that random variable is given a small lowercase letter: `\(x, y, z, w, \ldots\)`
+--
+
+.pull-left[
+
+`\begin{align}
+P(X = 1) &amp;= .33 \\
+P(X = 0) &amp;= .67
+\end{align}`
+]
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+--
+
+- To be a valid distribution, the sum of the probabilities of all of the outcomes in the sample space / bar chart should equal 1.
+
+
+---
+class: middle, center, inverse
+
+# What is the _next_ most simple form of randomness that we could express as a random variable?
+
+---
+
+&lt;iframe width="1120" height="730" src="https://www.youtube.com/embed/3m4bxse2JEQ?start=5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+
+---
+
+&lt;img src="figs/binomial-1.png" width="150%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/binomial-2.png" width="150%" style="display: block; margin: auto;" /&gt;
+
+---
+## The Binomial Distribution
+
+Describes a random variable that is the sum of `\(n\)` independent Bernoulli RVs, each with a success probability `\(p\)`.
+
+--
+
+.pull-left[
+$$
+Y \sim \textrm{Binom}(n, p)
+$$
+
+_"Y is distributed as a Binomial r.v. with n trails and probability of success p"_
+
+`\begin{align}
+P(Y = y) &amp;= {n \choose y} p^y (1 - p)^{n - y}
+\end{align}`
+]
+
+--
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+--
+
+&gt; What is `\(E(Y)\)`? What is `\(SD(Y)\)`?
+
+---
+## E and Var of the Binomial
+
+.task[
+Let `\(X \sim \textrm{Bern}(p)\)` and `\(Y = X_1 + X_2 + \ldots + X_n\)`.
+
+Find `\(E(Y)\)` and `\(SD(Y)\)`.
+
+Work with your neighbor(s) and enter your answers at `pollev.com/andrewbray088`.
+]
+
+--
+
+<div class="countdown" id="timer_614e4967" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+## E and Var of the Binomial
+
+#### Expected Value
+`\begin{align}
+E(Y) &amp;= E(X_1 + X_2 + \ldots + X_n) \\
+&amp;= E(X_1) + E(X_2) + \ldots + E(X_n) \\
+&amp;= nE(X) = np
+\end{align}`
+
+--
+
+#### Variance
+`\begin{align}
+Var(Y) &amp;= Var(X_1 + X_2 + \ldots + X_n) \\
+&amp;= Var(X_1) + Var(X_2) + \ldots + Var(X_n) \\
+&amp;= nVar(X) = np(1-p); \quad \quad SD(Y) = \sqrt{np(1-p)}
+\end{align}`
+
+---
+## Examples of the Binomial
+
+--
+
+### The sum of fair coin flips
+
+Let `\(Y\)` be the total number of heads in 4 flips of a fair coin.
+
+--
+
+.pull-left[
+$$
+Y \sim \textrm{Binom}(n = 4, p = .5)
+$$
+
+_"Y is distributed as a Binomial r.v. with 4 trials and probability of success .5"_
+
+`\begin{align}
+\textrm{E}(Y) &amp;= np = 4\cdot.5 = 2 \\
+\textrm{SD}(Y) &amp;= \sqrt{np(1-p)} \\
+&amp; = \sqrt{4 \cdot.5(1 - .5)} = 1 \\
+\end{align}`
+]
+
+--
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+## Examples of the Binomial
+
+--
+
+### The sum of unfair coin flips
+
+Let `\(Y\)` be the total number of heads in 4 flips of a coin that lands heads with probability .33.
+
+--
+
+.pull-left[
+$$
+Y \sim \textrm{Binom}(n = 4, p = .33)
+$$
+
+`\begin{align}
+\textrm{E}(Y) &amp;= np = 4\cdot.33 = 1.33 \\
+\textrm{SD}(Y) &amp;= \sqrt{np(1-p)} \\
+&amp; = \sqrt{4 \cdot.33(1 - .33)} = .94 \\
+\end{align}`
+]
+
+--
+
+.pull-right[
+
+&lt;img src="fundamental-distributions_files/figure-html/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+## Are these binomial?
+
+1. The total number of exams that get jammed in the scanner when we scan them Monday afternoon.
+
+--
+
+2. The total number of students that miss the exam due to illness.
+
+--
+
+3. The total number of questions you get correct on your midterm.
+
+--
+
+&gt; In order for a process to be perfectly described by the binomial distribution, the `\(n\)` fixed trials must be independent of one another and each with the same probability of success `\(p\)`.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
