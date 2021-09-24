@@ -29,7 +29,6 @@ library(emo)
 library(palmerpenguins)
 source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/xaringan-theme.R")
 xaringanExtra::use_panelset()
-ggplot2::theme_set(ggplot2::theme_gray(base_size = 16))
 ```
 
 ## Grammar of Graphics
@@ -47,12 +46,7 @@ class: middle, center
 
 ## Coding out Loud
 
-???
-Credit for concept and code: Mine Cetinkaya-Rundel
-todo: write css class for citations
-
 ---
-
 
 .mini[
 > **Start with the `penguins` data frame**
@@ -68,6 +62,10 @@ ggplot(data = penguins) #<<
 ```
 ]
 
+.cite[
+Credit: Mine &ccedil;etinkaya-Rundel
+]
+
 ---
 
 .mini[
@@ -81,6 +79,7 @@ ggplot(data = penguins,
        mapping = aes(x = bill_depth_mm)) #<<
 ```
 ]
+
 .pull-right[
 ```{r ref.label = "penguins-1", echo = FALSE, warning = FALSE, out.width = "100%", fig.width = 8}
 ```

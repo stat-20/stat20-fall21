@@ -191,12 +191,43 @@ class: center, middle
 
 # Does smoking cigarettes cause cancer?
 
----
-## Example 1: Smoking and cancer
 
-```{r out.width=800, echo = FALSE, fig.align='center'}
-knitr::include_graphics("figs/fisher-nature.png")
+---
+## Possible confounder: genetics
+
+.pull-left[
+```{r echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/fisher-1.png")
 ```
+]
+
+.pull-right[
+```{r echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/fisher-2.png")
+```
+
+R.A. Fisher
+_Nature_, 1958
+]
+
+---
+## The mounting evidence
+
+--
+
+- Randomized trials with mice and tobacco tar
+
+--
+
+- Regression models to "control for" possible confounders
+
+--
+
+- Identification of physical mechanism
+
+--
+
+- Twins studies
 
 
 ---
@@ -243,8 +274,6 @@ knitr::include_graphics("figs/xkcd-correlation.png")
 
 ---
 class: center, middle
-
-## See you next class
 
 ```{r echo = FALSE, fig.align='center', out.width="55%"}
 knitr::include_graphics("figs/cat-causation.png")

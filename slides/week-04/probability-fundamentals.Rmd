@@ -50,3 +50,31 @@ knitr::include_graphics("figs/p2.png")
 knitr::include_graphics("figs/p3.png")
 ```
 
+---
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p4.png")
+```
+
+---
+
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p5.png")
+```
+
+---
+
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p6.png")
+```
+
+---
+
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p7.png")
+```
+
+---
+
+```{r echo = FALSE, fig.align='center', out.width="100%"}
+knitr::include_graphics("figs/p8.png")
+```
