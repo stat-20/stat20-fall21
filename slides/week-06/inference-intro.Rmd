@@ -1,0 +1,85 @@
+---
+title: "Introduction to Inference"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+library(emo)
+library(palmerpenguins)
+library(stat20data)
+data(flights)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+```
+
+# Announcements
+
+- Midterm 1 Again 11 am Thurs - 11 am Fri
+
+--
+
+- Evening Study Session
+    - 5 - 7 pm Thurs Evans 3rd floor
+
+--
+
+- Lab 5 due _next_ Friday 8 pm
+    - Part I Thursday in lab
+    - Part II Tuesday in lab
+
+--
+
+- No problem set this week
+
+--
+
+- No lecture Friday
+
+
+---
+class: middle, center, inverse
+
+# Is Yawning Contagious?
+
+---
+
+<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;"> <iframe style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden" frameborder="0" type="text/html" src="https://www.dailymotion.com/embed/video/x6tryad" width="100%" height="100%" allowfullscreen > </iframe> </div>
+
+---
+
+## In pairs/trios
+
+.task[
+Please record answers to the 6 questions on the front of the handout (the side with **Is Yawning Contagious?** on the front).
+]
+
+```{r}
+countdown::countdown(3)
+```
+
+--
+
+.task[
+Please enter your answers at `pollev.com/andrewpbray088`
+]
+

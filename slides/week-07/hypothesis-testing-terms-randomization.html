@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Key Concepts in Hypothesis Testing</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Key Concepts in Hypothesis Testing
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+name: waiting
+
+## While you're waiting...
+
+.task[
+Which statement regarding the MythBusters experiment last week is true?
+]
+
+A. The number of yawners in the unseeded group that was observed (4) is precisely the sort of data we'd expect to observe if yawning _was not_ contagious.
+
+B. The number of yawners in the unseeded group that was observed (4) is precisely the sort of data we'd expect to observe if yawning _was_ contagious.
+
+Respond at `pollev.com/andrewbray088`.
+
+---
+class: center, middle, inverse
+
+# Goal:
+
+.adage[Learn to construct and critique claims made using data.]
+
+---
+
+## Case study: Gender Discrimination
+
+.pull-left[
+&lt;img src="figs/equal-pay.jpg" width="600" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[  
+  - 48 male supervisors given the same personnel file.
+  - Asked: promote or not.
+  - Files were identical except gender.
+  - Files were randomly assigned to the supervisors.
+  - Goal: are females unfairly discriminated against?
+]
+
+---
+## The Data
+
+Gender | promote | nopromote 
+-------|---------|-----------
+Male   |    21   |    3      
+Female |    14   |    10    
+
+--
+
+`$$P(promote\,|\,M) = 21/24 = 0.875 \\
+P(promote\,|\,F) = 14/24 = 0.583$$`
+
+--
+
+At a first glance, does there appear to be a relatonship between promotion and 
+gender?
+
+
+---
+.panelset[
+.panel[.panel-name[Question]
+.task[
+We saw a difference of almost 30% (29.2% to be exact) between the proportion of male and female files that are promoted. Based on this information, which of the below is true?
+]
+
+&lt;ol type="a"&gt;
+  &lt;li&gt;If we were to repeat the experiment we will definitely see that more female files get promoted. This was a fluke.&lt;/li&gt;
+  &lt;li&gt;Promotion is dependent on gender, males are more likely to be promoted, and hence there is gender discrimination against women in promotion decisions.&lt;/li&gt;
+  &lt;li&gt;The difference in the proportions of promoted male and female files is due to chance, this is not evidence of gender discrimination against women in promotion decisions.&lt;/li&gt;
+&lt;/ol&gt;
+
+.cite[pollev.com/andrewbray088]
+]
+
+.panel[.panel-name[Answers]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/55Mceu3tMbTsC8TYiYP6P?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+]
+
+---
+## Structure of Hypothesis Test
+
+There are two competing claims.
+
+.pull-left[
+**Null Hypothesis**, `\(H_0\)`: "There is nothing going on".
+
+- Promotion and gender are independent.
+- No gender discrimination.
+- Observed difference in proportions is simply due to chance.
+
+]
+
+--
+
+.pull-right[
+**Alternative Hypothesis**, `\(H_A\)`: "There is something going on.”
+
+- Promotion and gender are dependent.
+- There is gender discrimination.
+- Observed difference in proportions is not due to chance.
+
+]
+
+---
+
+## Trial as a Hypothesis test
+
+&lt;img src="figs/trial.png" width="350" style="display: block; margin: auto;" /&gt;
+  
+**H0**  : Defendant is innocent  vs.  **HA**  : Defendant is guilty
+
+- Present evidence / collect data.
+
+--
+- Judge the evidence - “Could these data plausibly have happened by chance if the null hypothesis were true?"
+
+--
+- If they were very unlikely to have occurred, then the evidence raises more than a reasonable doubt in our minds about the null hypothesis.
+
+
+---
+## If the evidence is weak
+
+- If the evidence is not strong enough to reject the assumption of innocence, the jury returns with a verdict of *not guilty*.
+    - The jury does not say that the defendant is innocent, just that there is not enough evidence to convict.
+--
+- Said statistically: *we fail to reject the null hypothesis*, or *the data is consistent with our model*.
+
+--
+
+We never *accept the null hypothesis*.
+
+&gt; Why not?
+
+
+---
+
+## Why don't we accept `\(H_0\)`?
+
+--
+
+The hypothesis test gives us:
+
+$$ P(\textrm{data}\,|\,\textrm{H}_0) $$
+
+--
+
+It doesn't give us:
+
+$$ P(\textrm{H}_0\,|\,\textrm{data}) $$
+
+---
+## Structure of a Hypothesis Test
+
+1. Start with a **null hypothesis** ( `\(H_0\)` ) that represents the status quo and an **alternative hypothesis** ( `\(H_A\)` ) that represents our research question, i.e. what we're testing for.
+
+--
+
+2. Calculate the observed **test statistic**: an encapsulation of the evidence.
+
+--
+
+3. Find the **null distribution** of the test statistic under the assumption that `\(H_0\)` is true, either via simulation (this week) or theoretical methods (later in the course).
+
+--
+
+4. If the test results suggest that the data is consistent with `\(H_0\)`, we stick with the `\(H_0\)`. If they are inconsistent, then we reject the `\(H_0\)` in favor of `\(H_A\)`.
+
+
+---
+## Gender discrimination: `\(H_0\)` test
+
+What is the *null hypothesis*?
+
+--
+- `\(H_0\)`: There is no gender discrimination
+- `\(H_0\)`: Gender and promotion are independent
+
+--
+
+What is the *alternative hypothesis*?
+
+--
+- `\(H_A\)`: There is gender discrimination
+- `\(H_A\)`: Gender and promotion are not independent
+
+--
+
+What is our *test statistic*?
+
+--
+- `\(d = \hat{p}_{M} - \hat{p}_{F}\)`
+
+
+---
+## Recall: the data
+
+Gender | promote | nopromote 
+-------|---------|-----------
+Male   |    21   |    3      
+Female |    14   |    10    
+
+
+We can compute our observed test statistic:
+
+`$$d_{obs} = \hat{p}_{M} - \hat{p}_{F} \\
+d_{obs} = 21/24 - 14/24 = .29$$`
+
+
+---
+## Creating a simulation
+
+&lt;img src="figs/gender-cards1.png" width="750" style="display: block; margin: auto;" /&gt;
+
+**Face cards**: note promoted  
+**Number cards**: promoted
+
+
+---
+## Constructing the Null Distribution
+
+1. Shuffle the deck and deal into two piles of twenty four.
+2. This mimics the process of each supervision being randomly assigned a male or female file.
+3. Compute the proportion that is promoted in each:
+
+`$$d = \hat{p}_{M} - \hat{p}_{F}$$`
+
+Repeat steps 1-3 and store each one.
+
+---
+
+&lt;img src="figs/gender-cards2.png" width="750" style="display: block; margin: auto;" /&gt;
+
+--
+
+&gt; Instead of shuffling cards, we'll shuffle data frames using R...
+
+---
+
+.panelset[
+
+.panel[.panel-name[Simulation using R]
+.pull-left[
+&lt;img src="hypothesis-testing-terms-randomization_files/figure-html/simgender-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+.task[
+**Question**: Do the results of the simulation you just ran provide convincing evidence of gender discrimination against women, i.e. dependence between gender and promotion decisions?
+]
+
+Respond at `pollev.com/andrewbray088`.
+]]
+
+.panel[.panel-name[Answers]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/0SwELhsNZQJk0OaUwzRrG?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+]
+
+&lt;!---
+
+Do the results of the simulation you just ran provide convincing evidence of gender discrimination against women, i.e. dependence between gender and promotion decisions?
+
+**A)** No, the data do not provide convincing evidence for the alternative hypothesis, therefore we can't reject the null hypothesis of independence between gender and promotion decisions. The observed difference between the two proportions was due to chance.
+
+**B)** Yes, the data provide convincing evidence for the alternative hypothesis of gender discrimination against women in promotion decisions. The observed difference between the two proportions was due to a real effect of gender.
+
+---&gt;
+
+---
+## Computing a p-value
+
+A **p-value** is the probability of observing the observed statistic or more extreme if `\(H_0\)` is true.
+
+**In a simulation setting**...a p-value is the _proportion_ of test statistics simulated assuming `\(H_0\)` is true that are more extreme than the observed test statistic.
+
+--
+
+.pull-left[
+&lt;img src="hypothesis-testing-terms-randomization_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+Of the 5000 simulated test statistics, 262 of them were more extreme than the observed value of 0.29.
+
+&gt; P-value: 0.0524.
+
+]
+
+---
+class: center, middle, inverse
+
+# Mythbusters
+## Is Yawning Contagious?
+
+---
+template: waiting
+
+---
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/NAD3aFeB8g5HD8lWDrzjs?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+
+&lt;img src="figs/yawning-form-hist.png" width="860" style="display: block; margin: auto;" /&gt;
+--
+.task[
+In pairs/trio, discuss the 5 question survey and respond at `pollev.com/andrewbray088`.
+]
+
+<div class="countdown" id="timer_615b44af" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+# No, Mythbusters data shows no evidence that yawning is contagious
+
+&lt;img src="figs/mythbusters-board.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+# But yes, yawning is contagious
+
+--
+
+&gt;Contagious yawning, however, seems to be isolated to just a few animals, including people, non-human primates and domesticated dogs. What's more is that contagious yawning doesn't really appear in human behavior until early childhood. Taken together, experts believe that contagious yawning may be a social communication tool specific to higher-order animals.
+
+&lt;img src="figs/dog-yawn.png" width="30%" style="display: block; margin: auto;" /&gt;
+
+.cite[https://www.houstonmethodist.org/blog/articles/2021/feb/why-do-we-yawn-and-are-yawns-really-contagious/]
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
