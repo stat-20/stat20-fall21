@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A Framework for Classical Inference</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# A Framework for Classical Inference
+## Testing with Permutation and Simulation
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+&lt;center&gt;
+&lt;iframe width="1008" height="567" src="https://www.youtube.com/embed/PjWKE-IJ4R8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+class: center, middle, inverse
+
+# Announcements
+
+
+---
+## Announcements
+
+- Reminder about grades: this class is not graded on a curve. Grade bins are fixed but may be adjusted downwards (90% for an A- may be revised to, e.g. , 85% A-).
+
+--
+
+- New due date
+
+
+---
+.pull-left[
+**Friday 8 pm**
+
+_Pros_
+- Labs are done before new material
+- Frees up your weekend
+- We can staff Thursday evening study session for help
+- 8 pm allows you a few hours after class to finish Friday.
+
+_Cons_
+- Requires you to read ahead or work right after class
+- Some students main time for out-of-class work is the weekend
+]
+
+--
+
+.pull-right[
+**Tuesday 8 am**
+
+_Pros_
+- Have weekend to finish up work
+- Labs are done before new labs
+
+_Cons_
+- Have less support Monday
+- More students working on the weekend
+]
+
+---
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/ISCmkOPzoe88OQne9mkBO?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+## Announcements
+
+- Reminder about grades: this class is not graded on a curve. Grade bins are fixed but may be adjusted downwards (90% for an A- may be revised to, e.g. , 85% A-).
+
+- New due date
+
+--
+
+- Lab Notes
+
+---
+class: center, middle, inverse
+
+# Hypothesis Testing via Permutation and Simulation
+
+---
+
+## Parameters and Statistics
+
+--
+
+**Parameter**: A numerical characteristic/property/summary of a _population_.
+
+--
+**Statistic**: A numerical characteristic/property/summary of a _sample_.
+
+--
+
+Compare the _parameters_ from the class population to the _statistics_ from Amanda's 8 am section regarding Midterm 1 Again.
+
+--
+
+.pull-left[
+In the class:
+- The mean grade was 90%: `\(\mu = 90\%\)`
+- The proportion of students who took it was 85%: `\(p = 85\%\)`
+]
+
+--
+
+.pull-right[
+In the 8 am section:
+- The mean grade was 94%: `\(\bar{x} = 94\%\)`
+- The proportion of students who took it was 88%: `\(\hat{p} = 88\%\)`
+]
+
+---
+
+## Example: Gender Discrimination
+
+.pull-left[
+&lt;img src="figs/equal-pay.jpg" width="600" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[  
+  - 48 male supervisors given the same personnel file.
+  - Asked: promote or not.
+  - Files were identical except gender.
+  - Files were randomly assigned to the supervisors.
+  - Goal: are females unfairly discriminated against?
+]
+
+---
+
+## Example: Gender Discrimination
+
+.pull-left[
+&lt;img src="figs/equal-pay.jpg" width="600" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[  
+`\(H_0: p_M - p_F = 0\)`
+
+`\(H_A: p_M - p_F \ne 0\)`
+
+`\(p_M - p_F\)` is a _parameter_.
+
+`\(\hat{p}_M - \hat{p}_F = .87 - .58 = .29\)` is a _statistic_.
+]
+
+---
+## Example: Seeded Yawning
+
+.pull-left[
+&lt;img src="figs/dog-yawn.png" width="600" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[  
+- 50 volunteers randomly assigned to either seeded or unseeded.
+- Monitored for yawn or not.
+- Goal: does being in the seeded group affect the chance that you'll yawn?
+]
+
+---
+## Example: Seeded Yawning
+
+.pull-left[
+&lt;img src="figs/dog-yawn.png" width="600" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[  
+`\(H_0: p_S - p_U = 0\)`
+
+`\(H_A: p_S - p_U \ne 0\)`
+
+`\(p_S - p_U\)` is a _parameter_.
+
+`\(\hat{p}_S - \hat{p}_U = .29 - .25 = .04\)` is a _statistic_.
+]
+
+---
+class: middle, center, inverse
+
+# A Framework for Classical Inference
+
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+---
+
+## Recall
+
+RVs `\(X\)` and `\(Y\)` are _independent_ if
+
+`$$P(Y\,|\,X) = P(Y)$$`
+
+--
+
+Let `\(Y\)` be whether a promotion decision and let `\(X\)` be the gender most often associated with the name on the file.
+
+--
+
+`$$Y \sim \textrm{Bin}(p)$$`
+
+--
+
+If `\(Y\)` is independent of `\(X\)`, then,
+
+
+`$$P(Y\,|\,X = M) = P(Y\,|\,X = F) = P(Y)$$`
+
+The distribution of `\(Y\)` should be the same across values of `\(X\)` and `\(p_M - p_F = 0\)`
+
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+--
+
+.pull-left[
+_Observed_
+
+```
+## # A tibble: 48 × 3
+##       id gender decision   
+##    &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;      
+##  1     1 female promote    
+##  2     2 male   promote    
+##  3     3 male   promote    
+##  4     4 female not promote
+##  5     5 male   promote    
+##  6     6 female promote    
+##  7     7 female promote    
+##  8     8 female not promote
+##  9     9 female not promote
+## 10    10 female not promote
+## # … with 38 more rows
+```
+]
+
+--
+
+.pull-right[
+_Permutation 1_
+
+```
+## # A tibble: 48 × 3
+##       id gender decision   
+##    &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;      
+##  1     1 female not promote
+##  2     2 male   promote    
+##  3     3 male   promote    
+##  4     4 female promote    
+##  5     5 male   promote    
+##  6     6 female promote    
+##  7     7 female promote    
+##  8     8 female promote    
+##  9     9 female promote    
+## 10    10 female promote    
+## # … with 38 more rows
+```
+]
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+.pull-left[
+_Observed_
+
+```
+## # A tibble: 48 × 3
+##       id gender decision   
+##    &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;      
+##  1     1 female promote    
+##  2     2 male   promote    
+##  3     3 male   promote    
+##  4     4 female not promote
+##  5     5 male   promote    
+##  6     6 female promote    
+##  7     7 female promote    
+##  8     8 female not promote
+##  9     9 female not promote
+## 10    10 female not promote
+## # … with 38 more rows
+```
+]
+
+.pull-right[
+_Permutation 2_
+
+```
+## # A tibble: 48 × 3
+##       id gender decision   
+##    &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;      
+##  1     1 female not promote
+##  2     2 male   promote    
+##  3     3 male   promote    
+##  4     4 female promote    
+##  5     5 male   not promote
+##  6     6 female promote    
+##  7     7 female promote    
+##  8     8 female promote    
+##  9     9 female not promote
+## 10    10 female promote    
+## # … with 38 more rows
+```
+]
+
+
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+.pull-left[
+_Observed_
+
+```
+## # A tibble: 48 × 3
+##       id gender decision   
+##    &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;      
+##  1     1 female promote    
+##  2     2 male   promote    
+##  3     3 male   promote    
+##  4     4 female not promote
+##  5     5 male   promote    
+##  6     6 female promote    
+##  7     7 female promote    
+##  8     8 female not promote
+##  9     9 female not promote
+## 10    10 female not promote
+## # … with 38 more rows
+```
+]
+
+.pull-right[
+_Permutation 3_
+
+```
+## # A tibble: 48 × 3
+##       id gender decision   
+##    &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;      
+##  1     1 female promote    
+##  2     2 male   promote    
+##  3     3 male   promote    
+##  4     4 female promote    
+##  5     5 male   not promote
+##  6     6 female promote    
+##  7     7 female promote    
+##  8     8 female not promote
+##  9     9 female promote    
+## 10    10 female promote    
+## # … with 38 more rows
+```
+]
+
+---
+
+## Null Distribution
+
+&lt;img src="hypothesis-testing-simulation_files/figure-html/unnamed-chunk-11-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Null Distribution
+
+&lt;img src="hypothesis-testing-simulation_files/figure-html/unnamed-chunk-12-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+**Two-tailed p-value**: The probability of observing the data or more extreme (in both direction). p-value = 0.0564.
+
+---
+
+## Null Distribution
+
+&lt;img src="hypothesis-testing-simulation_files/figure-html/unnamed-chunk-13-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+**One-tailed p-value**: The probability of observing the data or more extreme (in one direction). p-value = 0.0282.
+&gt; Be wary of...
+
+---
+class: middle, center, inverse
+
+# A Different Kind of Null
+
+---
+
+## Millenials and same-sex marriage
+
+.panelset[
+.panel[.panel-name[Question]
+
+In the national debate on same-sex marriage, it is commonly stated that half of all Americans favor same-sex marriage.  In 2014, Pew research conducted a poll of millennials (Americans born after 1980) and found that 67% answered yes when asked: "Do you favor same-sex marriage?"  The poll was a random sample of 75 millennials.  Does this poll provide convincing evidence that the opinion of millennials is different from those of Americans at large?
+
+.task[
+What is the parameter value that will form our null hypothesis?
+]
+]
+
+.panel[.panel-name[Responses]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/0jNDM9uVSymyFG8v8qbpn?controls=none&amp;short_poll=true" width="600px" height="450px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.task[
+Explain how you could use cards, a coin, or a die to simulate the process of collecting data from using a survey of 75 people if half of millenials favor same-sex marriage.
+
+Discuss with your neighbors and prepare to be called on.
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.pull-left[
+_Observed_
+
+```
+## # A tibble: 75 × 2
+##       id response    
+##    &lt;int&gt; &lt;fct&gt;       
+##  1     1 do not favor
+##  2     2 do not favor
+##  3     3 do not favor
+##  4     4 favor       
+##  5     5 do not favor
+##  6     6 favor       
+##  7     7 favor       
+##  8     8 favor       
+##  9     9 do not favor
+## 10    10 favor       
+## # … with 65 more rows
+```
+]
+
+--
+
+.pull-right[
+_Draw 1_
+
+```
+## Response: response (factor)
+## Null Hypothesis: point
+## # A tibble: 75 × 2
+## # Groups:   replicate [1]
+##    response     replicate
+##    &lt;fct&gt;        &lt;fct&gt;    
+##  1 favor        1        
+##  2 do not favor 1        
+##  3 favor        1        
+##  4 do not favor 1        
+##  5 favor        1        
+##  6 do not favor 1        
+##  7 do not favor 1        
+##  8 do not favor 1        
+##  9 do not favor 1        
+## 10 favor        1        
+## # … with 65 more rows
+```
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.pull-left[
+_Observed_
+
+```
+## # A tibble: 75 × 2
+##       id response    
+##    &lt;int&gt; &lt;fct&gt;       
+##  1     1 do not favor
+##  2     2 do not favor
+##  3     3 do not favor
+##  4     4 favor       
+##  5     5 do not favor
+##  6     6 favor       
+##  7     7 favor       
+##  8     8 favor       
+##  9     9 do not favor
+## 10    10 favor       
+## # … with 65 more rows
+```
+]
+
+.pull-right[
+_Draw 2_
+
+```
+## Response: response (factor)
+## Null Hypothesis: point
+## # A tibble: 75 × 2
+## # Groups:   replicate [1]
+##    response     replicate
+##    &lt;fct&gt;        &lt;fct&gt;    
+##  1 favor        1        
+##  2 favor        1        
+##  3 do not favor 1        
+##  4 favor        1        
+##  5 do not favor 1        
+##  6 do not favor 1        
+##  7 do not favor 1        
+##  8 favor        1        
+##  9 do not favor 1        
+## 10 do not favor 1        
+## # … with 65 more rows
+```
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.pull-left[
+_Observed_
+
+```
+## # A tibble: 75 × 2
+##       id response    
+##    &lt;int&gt; &lt;fct&gt;       
+##  1     1 do not favor
+##  2     2 do not favor
+##  3     3 do not favor
+##  4     4 favor       
+##  5     5 do not favor
+##  6     6 favor       
+##  7     7 favor       
+##  8     8 favor       
+##  9     9 do not favor
+## 10    10 favor       
+## # … with 65 more rows
+```
+]
+
+.pull-right[
+_Draw 3_
+
+```
+## Response: response (factor)
+## Null Hypothesis: point
+## # A tibble: 75 × 2
+## # Groups:   replicate [1]
+##    response     replicate
+##    &lt;fct&gt;        &lt;fct&gt;    
+##  1 do not favor 1        
+##  2 favor        1        
+##  3 favor        1        
+##  4 do not favor 1        
+##  5 favor        1        
+##  6 favor        1        
+##  7 favor        1        
+##  8 favor        1        
+##  9 favor        1        
+## 10 favor        1        
+## # … with 65 more rows
+```
+]
+
+---
+
+## Null Distribution
+
+&lt;img src="hypothesis-testing-simulation_files/figure-html/unnamed-chunk-20-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+
+
+**p-value**: 0.0048.
+--
+
+- Our data is inconsistent with the hypothesis that millenials support same sex marriage at the same rate as Americans in general.
+- We reject the null hypothesis that `\(p = .5\)` at an `\(\alpha\)` level of .05.
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

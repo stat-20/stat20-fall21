@@ -1,0 +1,524 @@
+---
+title: "A Framework for Classical Inference"
+subtitle: "Testing with Permutation and Simulation"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+```
+
+<center>
+<iframe width="1008" height="567" src="https://www.youtube.com/embed/PjWKE-IJ4R8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+
+---
+class: center, middle, inverse
+
+# Announcements
+
+
+---
+## Announcements
+
+- Reminder about grades: this class is not graded on a curve. Grade bins are fixed but may be adjusted downwards (90% for an A- may be revised to, e.g. , 85% A-).
+
+--
+
+- New due date
+
+
+---
+.pull-left[
+**Friday 8 pm**
+
+_Pros_
+- Labs are done before new material
+- Frees up your weekend
+- We can staff Thursday evening study session for help
+- 8 pm allows you a few hours after class to finish Friday.
+
+_Cons_
+- Requires you to read ahead or work right after class
+- Some students main time for out-of-class work is the weekend
+]
+
+--
+
+.pull-right[
+**Tuesday 8 am**
+
+_Pros_
+- Have weekend to finish up work
+- Labs are done before new labs
+
+_Cons_
+- Have less support Monday
+- More students working on the weekend
+]
+
+---
+<center>
+<iframe src="https://embed.polleverywhere.com/multiple_choice_polls/ISCmkOPzoe88OQne9mkBO?controls=none&short_poll=true" width="800px" height="600px"></iframe>
+</center>
+
+---
+## Announcements
+
+- Reminder about grades: this class is not graded on a curve. Grade bins are fixed but may be adjusted downwards (90% for an A- may be revised to, e.g. , 85% A-).
+
+- New due date
+
+--
+
+- Lab Notes
+
+---
+class: center, middle, inverse
+
+# Hypothesis Testing via Permutation and Simulation
+
+---
+
+## Parameters and Statistics
+
+--
+
+**Parameter**: A numerical characteristic/property/summary of a _population_.
+
+--
+**Statistic**: A numerical characteristic/property/summary of a _sample_.
+
+--
+
+Compare the _parameters_ from the class population to the _statistics_ from Amanda's 8 am section regarding Midterm 1 Again.
+
+--
+
+.pull-left[
+In the class:
+- The mean grade was 90%: $\mu = 90\%$
+- The proportion of students who took it was 85%: $p = 85\%$
+]
+
+--
+
+.pull-right[
+In the 8 am section:
+- The mean grade was 94%: $\bar{x} = 94\%$
+- The proportion of students who took it was 88%: $\hat{p} = 88\%$
+]
+
+---
+
+## Example: Gender Discrimination
+
+.pull-left[
+```{r out.width=600, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/equal-pay.jpg")
+```
+]
+
+.pull-right[  
+  - 48 male supervisors given the same personnel file.
+  - Asked: promote or not.
+  - Files were identical except gender.
+  - Files were randomly assigned to the supervisors.
+  - Goal: are females unfairly discriminated against?
+]
+
+---
+
+## Example: Gender Discrimination
+
+.pull-left[
+```{r out.width=600, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/equal-pay.jpg")
+```
+]
+
+.pull-right[  
+$H_0: p_M - p_F = 0$
+
+$H_A: p_M - p_F \ne 0$
+
+$p_M - p_F$ is a _parameter_.
+
+$\hat{p}_M - \hat{p}_F = .87 - .58 = .29$ is a _statistic_.
+]
+
+---
+## Example: Seeded Yawning
+
+.pull-left[
+```{r out.width=600, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/dog-yawn.png")
+```
+]
+
+.pull-right[  
+- 50 volunteers randomly assigned to either seeded or unseeded.
+- Monitored for yawn or not.
+- Goal: does being in the seeded group affect the chance that you'll yawn?
+]
+
+---
+## Example: Seeded Yawning
+
+.pull-left[
+```{r out.width=600, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/dog-yawn.png")
+```
+]
+
+.pull-right[  
+$H_0: p_S - p_U = 0$
+
+$H_A: p_S - p_U \ne 0$
+
+$p_S - p_U$ is a _parameter_.
+
+$\hat{p}_S - \hat{p}_U = .29 - .25 = .04$ is a _statistic_.
+]
+
+---
+class: middle, center, inverse
+
+# A Framework for Classical Inference
+
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+---
+
+## Recall
+
+RVs $X$ and $Y$ are _independent_ if
+
+$$P(Y\,|\,X) = P(Y)$$
+
+--
+
+Let $Y$ be whether a promotion decision and let $X$ be the gender most often associated with the name on the file.
+
+--
+
+$$Y \sim \textrm{Bin}(p)$$
+
+--
+
+If $Y$ is independent of $X$, then,
+
+
+$$P(Y\,|\,X = M) = P(Y\,|\,X = F) = P(Y)$$
+
+The distribution of $Y$ should be the same across values of $X$ and $p_M - p_F = 0$
+
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+--
+
+.pull-left[
+_Observed_
+```{r echo = FALSE}
+library(tidyverse)
+library(stat20data)
+data(promote)
+tibble(promote) %>%
+  rename(gender = sex)
+```
+]
+
+--
+
+.pull-right[
+_Permutation 1_
+```{r echo = FALSE}
+tibble(id = 1:48,
+       gender = promote$sex,
+       decision = sample(promote$decision))
+```
+]
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+.pull-left[
+_Observed_
+```{r echo = FALSE}
+library(tidyverse)
+library(stat20data)
+data(promote)
+tibble(promote) %>%
+  rename(gender = sex)
+```
+]
+
+.pull-right[
+_Permutation 2_
+```{r echo = FALSE}
+tibble(id = 1:48,
+       gender = promote$sex,
+       decision = sample(promote$decision))
+```
+]
+
+
+
+---
+## Finding the Null Distribution: Permutation
+
+We can shuffle or **permute** the data in one of the variables to generate the kind of data we would expect under a null hypothesis of _independence_ between the two variables.
+
+.pull-left[
+_Observed_
+```{r echo = FALSE}
+library(tidyverse)
+library(stat20data)
+data(promote)
+tibble(promote) %>%
+  rename(gender = sex)
+```
+]
+
+.pull-right[
+_Permutation 3_
+```{r echo = FALSE}
+tibble(id = 1:48,
+       gender = promote$sex,
+       decision = sample(promote$decision))
+```
+]
+
+---
+
+## Null Distribution
+
+```{r fig.width = 10, echo = FALSE, fig.height=4}
+library(infer)
+null <- promote %>%
+  rename(gender = sex) %>%
+  specify(decision ~ gender, success = "promote") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 5000) %>%
+  calculate(stat = "diff in props",
+            order = c("male", "female"))
+
+obs_stat <- promote %>%
+  rename(gender = sex) %>%
+  specify(decision ~ gender, success = "promote") %>%
+  calculate(stat = "diff in props",
+            order = c("male", "female"))
+
+null %>%
+  visualize() +
+  shade_pvalue(obs_stat = obs_stat,
+               direction = NULL)
+```
+
+---
+
+## Null Distribution
+
+```{r fig.width = 10, echo = FALSE, fig.height=4}
+null %>%
+  visualize() +
+  shade_pvalue(obs_stat = obs_stat,
+               direction = "both")
+
+p_two <- null %>%
+  get_p_value(obs_stat = obs_stat, direction = "both")
+```
+
+**Two-tailed p-value**: The probability of observing the data or more extreme (in both direction). p-value = `r p_two`.
+
+---
+
+## Null Distribution
+
+```{r fig.width = 10, echo = FALSE, fig.height=4}
+null %>%
+  visualize() +
+  shade_pvalue(obs_stat = obs_stat,
+               direction = "right")
+
+p_one <- null %>%
+  get_p_value(obs_stat = obs_stat, direction = "right")
+```
+
+--
+
+**One-tailed p-value**: The probability of observing the data or more extreme (in one direction). p-value = `r p_one`.
+> Be wary of...
+
+---
+class: middle, center, inverse
+
+# A Different Kind of Null
+
+---
+
+## Millenials and same-sex marriage
+
+.panelset[
+.panel[.panel-name[Question]
+
+In the national debate on same-sex marriage, it is commonly stated that half of all Americans favor same-sex marriage.  In 2014, Pew research conducted a poll of millennials (Americans born after 1980) and found that 67% answered yes when asked: "Do you favor same-sex marriage?"  The poll was a random sample of 75 millennials.  Does this poll provide convincing evidence that the opinion of millennials is different from those of Americans at large?
+
+.task[
+What is the parameter value that will form our null hypothesis?
+]
+]
+
+.panel[.panel-name[Responses]
+<center>
+<iframe src="https://embed.polleverywhere.com/multiple_choice_polls/0jNDM9uVSymyFG8v8qbpn?controls=none&short_poll=true" width="600px" height="450px"></iframe>
+</center>
+]
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.task[
+Explain how you could use cards, a coin, or a die to simulate the process of collecting data from using a survey of 75 people if half of millenials favor same-sex marriage.
+
+Discuss with your neighbors and prepare to be called on.
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.pull-left[
+_Observed_
+```{r echo = FALSE}
+data("millenials")
+tibble(millenials)
+```
+]
+
+--
+
+.pull-right[
+_Draw 1_
+```{r echo = FALSE}
+millenials %>%
+  specify(response = response, success = "favor") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 1, type = "draw")
+```
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.pull-left[
+_Observed_
+```{r echo = FALSE}
+data("millenials")
+tibble(millenials)
+```
+]
+
+.pull-right[
+_Draw 2_
+```{r echo = FALSE}
+millenials %>%
+  specify(response = response, success = "favor") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 1, type = "draw")
+```
+]
+
+---
+## Finding the Null Distribution: Taking Draws
+
+If a null hypothesis concerns a particular value that a proportion should take (a _point_ null), then you can generate data under that null hypothesis by taking **draws** from that distribution.
+
+.pull-left[
+_Observed_
+```{r echo = FALSE}
+data("millenials")
+tibble(millenials)
+```
+]
+
+.pull-right[
+_Draw 3_
+```{r echo = FALSE}
+millenials %>%
+  specify(response = response, success = "favor") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 1, type = "draw")
+```
+]
+
+---
+
+## Null Distribution
+
+```{r fig.width = 10, echo = FALSE, fig.height=4}
+null <- millenials %>%
+  specify(response = response, success = "favor") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 5000, type = "draw") %>%
+  calculate(stat = "prop")
+
+obs_stat <- millenials %>%
+  specify(response = response, success = "favor") %>%
+  calculate(stat = "prop")
+
+null %>%
+  visualize() +
+  shade_pvalue(obs_stat = obs_stat,
+               direction = "both")
+```
+
+```{r echo = FALSE}
+p_two <- null %>%
+  get_p_value(obs_stat = obs_stat, direction = "both")
+```
+
+**p-value**: `r p_two`.
+--
+
+- Our data is inconsistent with the hypothesis that millenials support same sex marriage at the same rate as Americans in general.
+- We reject the null hypothesis that $p = .5$ at an $\alpha$ level of .05.
+
+
