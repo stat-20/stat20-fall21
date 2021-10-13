@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistical Errors</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical Errors
+## Wrong by Design
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+
+class: middle, center, inverse
+
+# Announcements
+
+---
+## Announcements
+
+1. Schedule
+
+---
+.pull-left[
+### Week 8
+- Lecture: Statistical Errors, Confidence Intervals
+- Lab 8 assigned, due Tues Week 10
+- PS 8 assigned, due Tues Week 9
+- Quiz: Sunday 11 am - Monday 11 am
+]
+
+.pull-right[
+### Week 9
+- Lecture: H-tests and CIs for numerical data
+- PS 9 assigned, due Tues Week 10
+- Quiz retake Thurs/Fri
+
+### Week 10
+- Lecture: Challenges and Solutions for Inference
+- Midterm Monday of Week 11
+]
+
+---
+## Announcements
+
+1. Schedule
+
+2. Quiz this coming Sunday/Monday
+
+3. Midterm II 11/1
+
+---
+class: center, middle, inverse
+
+# Working with the Normal Distribution
+
+---
+
+&lt;img src="figs/infer-w-approx.jpg" width="1940" style="display: block; margin: auto;" /&gt;
+
+---
+
+.panelset[
+.panel[.panel-name[Question 2]
+The distribution of car speeds on the I-5 in California is nearly normal with a mean of 72.6 mph and a standard deviation of 4.4 mph.
+
+.task[
+What % of the cars travel between 60 and 80 mph?
+]
+]
+
+.panel[.panel-name[Responses]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/QlHzhgLaQj82LTT41PufL?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+]
+
+---
+
+**Question 1**: What % of the cars travel slower than 75 mph? 
+--
+
+```r
+pnorm(75, mean = 72.6, sd = 4.4)
+```
+
+```
+## [1] 0.7072795
+```
+
+--
+**Question 2**: What % of the cars travel between 60 and 80 mph?
+--
+
+```r
+pnorm(80, mean = 72.6, sd = 4.4) -
+  pnorm(60, mean = 72.6, sd = 4.4)
+```
+
+```
+## [1] 0.9516039
+```
+
+---
+class: center, middle, inverse
+
+# Hypothesis Testing Review
+
+---
+
+## What is it good for?
+
+--
+
+Hypothesis test have been shown to be valuable contributors to science (p &lt; .05)
+but are sometimes abused (p &lt; .05).
+
+--
+
+- Used to assess the degree to which data is consistent with a particular model.
+- The most widely used tool in statistical inference.
+
+
+---
+## Step 1
+
+--
+
+Lay out your model(s).
+
+`\(H_0\)`: null model, business as usual  
+`\(H_A\)`: alternative model, business not as usual
+
+--
+
+- Hypotheses are statments about the TRUE STATE of the world and should involve
+*parameters*, not *statistics*.
+- Hypotheses should suggest a *test statistic* that has some bearing on the claim.
+- Always use two-tailed tests.
+
+
+---
+## Step 2
+
+--
+
+Contruct the appropriate null distribution.
+
+&lt;img src="statistical-errors_files/figure-html/unnamed-chunk-4-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+1. Permutation (when `null = "independence"`)
+--
+
+2. Simulation (when `null = "point"`)
+--
+
+3. Exact Probability Theory (when you're lucky)
+--
+
+4. Normal Approximation (when the CLT applies)
+
+
+---
+## Step 3
+
+--
+
+Calculate a measure of consistency between the observed test statistic (the data)
+and the null distribution (i.e., a p-value).
+
+--
+
+- If your observed test stat is in the tails &gt; low p-val &gt; data is inconsistent
+with null hypothesis &gt; "reject null hypothesis".
+- If your observed test stat is in the body &gt; high p-val &gt; data is consistent with
+the null hypothesis &gt; "fail to reject the null hypothesis".
+
+--
+
+#### What can go wrong?
+
+---
+class:  middle, center, inverse
+
+# Decision Errors
+
+---
+## Ex. Is there an outbreak?
+
+&lt;img src="figs/covid-dashboard.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+.pull-left[
+&lt;img src="figs/covid-barchart.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+**A simplified model**
+UHS tests a sample of the Cal community every week and monitors the positivity rate (proportion of tests that are positive). Assume the this is a random sample of constant size and that the test is perfectly accurate. Let `\(p\)` be the positivity rate.
+
+`\(H_0\)`: `\(p = 5%\)` The incidence of COVID at Cal is at a manageable level.
+
+`\(H_0\)`: `\(p &gt; 5%\)` The incidence of COVID at Cal is at an elevated level.
+]
+
+--
+
+**Decision protocol**: if there is a big enough spike in a given week, shift classes to remote.
+
+---
+
+.panelset[
+.panel[.panel-name[Question]
+
+Consider a setting where the Cal UHS testing system observes 87 positive cases of COVID in a one week interval, double the previous week.  Administration needs to decide whether or not to move  to remote learning. Which error would be worse?
+
+A. Moving to remote instruction when in fact the true number of cases on campus is still low.
+
+B. Failing to move to remote instruction when in fact the true number of cases on campus is elevated.
+
+.task[
+Discuss with a partner then enter your answer at `pollev.com/andrewbray088`.
+]
+
+<div class="countdown" id="timer_61671022" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+]
+
+.panel[.panel-name[Responses]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/whmhtgaeLPalaVqOZcMCS?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+]
+
+---
+## What affects the Error Rate?
+
+- **Sample size, `\(n\)`**: with increasing `\(n\)`, the variability of the null distribution will decrease.
+
+- **Changing `\(\alpha\)`**: decreasing `\(\alpha\)` will decrease type I error but increase type II error.
+
+- **Increasing _effect size_**: change data collection process to separate the distribution under `\(H_A\)` and decrease type II error.
+    - Ex: If you're testing whether a pain medicine provides back relief, only conduct the test if you have confident the medicine should have a dramatic decrease in pain.
+
+---
+## Errors in other settings
+
+&lt;img src="figs/millennials-error.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+--
+
+&gt; What is a type I error in this setting?
+
+&gt; What is a type II error in this setting?
+
+---
+## Errors with millennials
+
+&gt; What is a type I error in this setting?
+
+Concluding that millennials _are distinct_ from Americans at large with respect to same sex-marriage when in fact _they're not_.
+
+&gt; What is a type II error in this setting?
+
+Concluding that millennials _are indistinguishable_ from Americans at large with respect to same sex-marriage when in fact _they are_.
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

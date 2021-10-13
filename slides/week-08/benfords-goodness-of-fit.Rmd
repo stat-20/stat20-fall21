@@ -1,0 +1,641 @@
+---
+title: "Benford's Law and Elections"
+subtitle: "A Goodness of Fit Test"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+set.seed(489)
+```
+
+## Benford's Law
+
+A probability distribution on the digits 1 to 9 that is used to describe the distribution in first digits in collections of numbers that span multiple orders of magnitude (10s, 100s, 1000s, 10000s, etc).
+
+```{r, fig.height=3, echo = FALSE}
+benfords_p <- data.frame(first_digit = 1:9, 
+                         ben_prop = log10(1 + 1/1:9))
+colnames(benfords_p) <- c("digit", "prop")
+benfords_law <- ggplot(benfords_p, aes(x = digit, y = prop)) +
+  geom_bar(stat = "identity") +
+  scale_x_discrete(limits = 1:9) +
+  theme_bw() +
+  labs(title = "Benford's Law")
+```
+
+--
+
+>**Theory**: In an election is fair, the first digits of the vote counts should follow Benford's Law.
+
+---
+## A Hypothesis Test
+
+In the 2009 presidential election in Iran, there were accusations of fraud by the incumbment, Mahmoud Ahmadinejad. Can we use vote count data to demonstrate fraud?
+--
+
+\begin{align}
+H_0: & \textrm{First digits follow Benford's Law} \\
+H_0: & p_1 = .30, p_2 = .18, p_3 = .12, p_4 = .10, p_5 = .08, \\
+&p_6 = .07, p_7 = .06, p_8 = .05, p_9 = .04
+\end{align}
+--
+\begin{align}
+H_A: & \textrm{First digits don't follow Benford's Law} \\
+H_A: & \textrm{At least one } p_i \textrm{ is different}
+\end{align}
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/infer-w-approx.jpg")
+```
+
+---
+## Generating data under the null hypothesis
+
+\begin{align}
+H_0: & \textrm{First digits follow Benford's Law} \\
+H_0: & p_1 = .30, p_2 = .18, p_3 = .12, p_4 = .10, p_5 = .08, \\
+&p_6 = .07, p_7 = .06, p_8 = .05, p_9 = .04
+\end{align}
+
+--
+#### Simulation scheme
+1. Take one hundred cards and write 1 on 30 of them, 2 on 18 of them, 3 on 12 of them, ..., 9 on four of them.
+2. Shuffle the deck and select 1 card. That represents the first digit in the first city in a data set generated under the null.
+3. Repeat step 2 $n$ times to generate a full data set
+
+> This will generate a single data set under $H_0$.
+
+---
+## Generating one data set with `infer`
+
+First some setup.
+
+--
+
+```{r}
+library(tidyverse)
+library(stat20data)
+library(infer)
+data(iran)
+iran <- iran %>%
+  mutate(digit = get_first(ahmadinejad))
+ben_prop <- log10(1 + 1/1:9)
+names(ben_prop) <- 1:9
+ben_prop
+```
+
+---
+## Generating one data set with `infer`, cont.
+
+--
+
+```{r}
+iran %>%
+  specify(response = digit) #<<
+```
+
+---
+## Generating one data set with `infer`, cont.
+
+```{r}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point", #<<
+              p = ben_prop)   #<<
+```
+
+---
+## Generating one data set with `infer`, cont.
+
+```{r}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 1, type = "draw") #<<
+```
+
+---
+## Generating one data set with `infer`, cont.
+
+.pull-left[
+```{r}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 1, type = "draw") #<<
+```
+]
+
+.pull-right[
+```{r}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 1, type = "draw") #<<
+```
+]
+
+---
+## Visualizing one data set with `infer`, cont.
+
+.pull-left[
+```{r 1bar, eval = FALSE}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 1, type = "draw") %>%
+  ggplot(aes(x = digit)) + #<<
+  geom_bar() #<<
+```
+]
+--
+.pull-right[
+```{r ref.label = "1bar", echo = FALSE}
+```
+]
+
+---
+## Visualizing 9 data sets
+
+--
+
+```{r 9bar, eval = FALSE}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 9, type = "draw") %>% #<<
+  ggplot(aes(x = digit)) +
+  geom_bar() +
+  facet_wrap(vars(replicate)) #<<
+```
+
+---
+## Visualizing 9 data sets
+
+```{r echo = FALSE}
+g9 <- iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 9, type = "draw") 
+p9 <- g9 %>%
+  ggplot(aes(x = digit)) +
+  geom_bar() +
+  facet_wrap(vars(replicate))
+p9
+```
+
+
+---
+
+.pull-left[
+**Data under $H_0$**
+```{r echo = FALSE}
+p9
+```
+]
+
+--
+
+.pull-right[
+**Observed Data**
+```{r echo = FALSE, fig.width=3, fig.height=3}
+iran %>%
+  ggplot(aes(x = digit)) +
+  geom_bar()
+```
+
+> Does our observed data look similar to what we'd see if first digits followed Benford's Law?
+
+]
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/infer-w-approx.jpg")
+```
+
+---
+## Creating a distance statistic
+
+How far is our observed distribution from the null distribution?
+
+--
+
+.pull-left[
+**Observed Data**
+```{r echo = FALSE, fig.height=4}
+iran %>%
+  ggplot(aes(x = digit)) +
+  geom_bar()
+```
+]
+
+--
+
+.pull-right[
+**Benford's Law**
+```{r echo = FALSE, fig.height=4}
+benfords_law
+```
+]
+
+---
+## Creating a distance statistic, cont.
+
+.pull-left[
+```{r}
+iran %>%
+  group_by(digit) %>%
+  summarize(obs_prop = n()/nrow(iran)) %>%
+  mutate(ben_prop = log10(1 + 1/1:9))
+```
+]
+
+--
+
+Let $O_j$ the observed proportion of digit $j$ in the Iran data and $E_j$ be proportions we'd expect if Benford's Law holds.
+
+$$
+d = \sum_{j} | E_j - O_j |
+$$
+
+
+---
+## Creating a distance statistic, cont.
+
+.pull-left[
+```{r}
+iran %>%
+  group_by(digit) %>%
+  summarize(obs_prop = n()/nrow(iran)) %>%
+  mutate(ben_prop = log10(1 + 1/1:9)) %>%
+  summarize(d =  #<<
+              sum(abs(obs_prop - ben_prop))) #<<
+```
+]
+
+.pull-right[
+Let $O_j$ the observed proportion of digit $j$ in the Iran data and $E_j$ be proportions we'd expect if Benford's Law holds.
+
+$$
+d = \sum_{j} | E_j - O_j |
+$$
+]
+
+--
+
+This will work!
+
+- Is zero when the proportions are identical
+- Grows as the total deviation in proportions grows
+
+---
+## The chi-squared statistic
+
+A standard statistic used with categorical data. Formulated in terms of _counts_ instead of proportions. $O_j$ is the observed count in category $j$ and $E_j$ the expected count when $H_0$ is true.
+
+--
+
+$$
+\chi^2 = \sum_{j}{\frac{(O_j - E_j)^2}{E_j}}
+$$
+
+--
+
+- Is zero when the counts are identical
+- Grows as the total (squared) deviation in counts grows
+
+
+---
+## Calculating an observed $\chi^2$
+
+.pull-left[
+```{r eval = FALSE}
+iran %>%
+  mutate(digit = factor(digit)) %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop)
+```
+]
+
+---
+## Calculating an observed $\chi^2$
+
+.pull-left[
+```{r eval = FALSE}
+iran %>%
+  mutate(digit = factor(digit)) %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  calculate(stat = "Chisq") #<<
+```
+]
+
+---
+## Calculating an observed $\chi^2$
+
+.pull-left[
+```{r}
+iran %>%
+  mutate(digit = factor(digit)) %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  calculate(stat = "Chisq") #<<
+```
+]
+
+--
+
+.pull-right[
+```{r echo = FALSE, fig.height=4}
+iran %>%
+  ggplot(aes(x = digit)) +
+  geom_bar()
+```
+]
+
+--
+
+> Is this $\chi^2$ large or small?
+
+---
+## Calculating 9 simulated $\chi^2$
+
+.pull-left[
+```{r eval = FALSE}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 9, type = "draw") 
+```
+]
+
+---
+## Calculating 9 simulated $\chi^2$
+
+.pull-left[
+```{r eval = FALSE}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 9, type = "draw") %>%
+  calculate(stat = "Chisq") #<<
+```
+]
+
+---
+## Calculating 9 simulated $\chi^2$
+
+.pull-left[
+```{r eval = FALSE}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 9, type = "draw") %>%
+  calculate(stat = "Chisq") #<<
+```
+
+```{r echo = FALSE}
+g9 %>%
+  calculate(stat = "Chisq")
+```
+]
+
+--
+
+.pull-right[
+```{r echo = FALSE}
+p9
+```
+]
+
+
+---
+## Calculating 9 simulated $\chi^2$
+
+.pull-left[
+```{r eval = FALSE}
+iran %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 9, type = "draw") %>%
+  calculate(stat = "Chisq") #<<
+```
+
+```{r echo = FALSE}
+g9 %>%
+  calculate(stat = "Chisq")
+```
+]
+
+.pull-right[
+```{r echo = FALSE, cache = TRUE}
+x2s <- g9 %>%
+  calculate(stat = "Chisq") %>%
+  pull()
+p9b <- g9 %>%
+  ungroup() %>%
+  mutate(x2stat = round(rep(x2s, each = nrow(iran)),
+                        digits = 1),
+         label_x = 5,
+         label_y = 100) %>%
+  ggplot(aes(x = digit)) +
+  geom_bar() +
+  geom_label(aes(label = x2stat,
+                 x = label_x,
+                 y = label_y),
+             size = 8,
+             show.legend = FALSE) + 
+  facet_wrap(vars(replicate)) +
+  theme()
+```
+
+```{r echo = FALSE}
+p9b
+```
+]
+
+---
+## Calculating 9 simulated $\chi^2$
+
+.pull-left[
+```{r echo = FALSE, fig.height = 4}
+benfords_law
+```
+]
+
+.pull-right[
+```{r echo = FALSE}
+p9b
+```
+]
+
+
+---
+## Simulating the null (5000 reps)
+
+--
+
+```{r null1, eval = FALSE}
+null <- iran %>%
+  mutate(digit = factor(digit)) %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  generate(reps = 500, type = "draw") %>%
+  calculate(stat = "Chisq")
+null
+```
+
+--
+
+```{r ref.label = "null1", echo = FALSE}
+```
+
+---
+## Visualizing the null
+
+--
+
+```{r null2, eval = FALSE}
+null %>%
+  visualize()
+```
+
+--
+
+```{r ref.label = "null2", echo = FALSE, fig.height = 4}
+```
+
+---
+## Calculating the obs. stat
+
+--
+
+```{r obs, eval = FALSE}
+obs_stat <- iran %>%
+  mutate(digit = factor(digit)) %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  calculate(stat = "Chisq")
+obs_stat
+```
+
+--
+
+```{r ref.label = "obs", echo = FALSE}
+```
+
+---
+## Visualizing the p-value
+
+--
+
+```{r viz, eval = FALSE}
+null %>%
+  visualize() +
+  shade_p_value(obs_stat, direction = "right") #<<
+```
+
+--
+
+```{r ref.label = "viz", echo = FALSE, fig.height = 4}
+
+```
+
+--
+
+> What is your guess at the p-value?
+
+---
+
+```{r}
+null %>%
+  get_p_value(obs_stat, direction = "right")
+```
+
+--
+
+> Is there a probability shortcut for learning the shape of the null distribution and calculating the p-value?
+
+---
+## Probability Theory
+
+```{r}
+null <- iran %>%
+  mutate(digit = factor(digit)) %>%
+  specify(response = digit) %>%
+  hypothesize(null = "point",
+              p = ben_prop) %>%
+  assume("Chisq")
+```
+
+```{r}
+null %>%
+  visualize() +
+  shade_p_value(obs_stat, direction = "right") #<<
+```
+
+```{r}
+null %>%
+  get_p_value(obs_stat, direction = "right") #<<
+```
+
+--
+
+### Making a decision
+
+- At $\alpha = .05$, we fail to reject $H_0$.
+- At $\alpha = .10$, we reject $H_0$.
+
+---
+
+## Benford's Law and Elections
+
+The evidence out of Iran is ambiguous, at least as determined by Benford's Law. How did it work out in your state?
+
+--
+
+What conclusion should we draw?
+
+--
+
+> There's no systematic evidence that _fair_ elections have vote counts that follow Benford's Law, so it's a flawed approach for detecting fraud.
