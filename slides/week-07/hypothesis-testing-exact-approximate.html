@@ -22,7 +22,7 @@ class: center, middle, inverse, title-slide
 
 
 
-## Millenials and same-sex marriage
+## millennials and same-sex marriage
 
 In the national debate on same-sex marriage, it is commonly stated that half of all Americans favor same-sex marriage.  In 2014, Pew research conducted a poll of millennials (Americans born after 1980) and found that 67% answered yes when asked: "Do you favor same-sex marriage?"  The poll was a random sample of 75 millennials.  Does this poll provide convincing evidence that the opinion of millennials is different from those of Americans at large?
 
@@ -110,11 +110,23 @@ class: center, middle, inverse
 
 ---
 
+&lt;img src="figs/exact-1.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/exact-2.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/exact-3.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
 $$
 X \sim \textrm{Bin}(n = 75, p = .5)
 $$
 
-&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-9-1.png" width="720" style="display: block; margin: auto;" /&gt;
+&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-12-1.png" width="720" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -126,7 +138,7 @@ $$
 X \sim \textrm{Bin}(n = 75, p = .5)
 $$
 
-&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-10-1.png" width="720" style="display: block; margin: auto;" /&gt;
+&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-13-1.png" width="720" style="display: block; margin: auto;" /&gt;
 
 &gt; What is `\(P(X &gt; 37)\)`? `\(1 - P(X \le 37)\)`
 
@@ -150,7 +162,7 @@ $$
 X \sim \textrm{Bin}(n = 75, p = .5)
 $$
 
-&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-12-1.png" width="720" style="display: block; margin: auto;" /&gt;
+&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-15-1.png" width="720" style="display: block; margin: auto;" /&gt;
 
 &gt; What is `\(P(X \ge 50) + P(X \le 25)\)`?
 
@@ -173,7 +185,7 @@ $$
 
 ## Null Distribution with 50,000 reps 
 
-&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-14-1.png" width="720" style="display: block; margin: auto;" /&gt;
+&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-17-1.png" width="720" style="display: block; margin: auto;" /&gt;
 
 
 
@@ -218,10 +230,17 @@ f(x) &amp;= \frac{1}{\sigma \sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma
 --
 
 .pull-right[
-
-&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-16-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-19-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ]
+
+---
+
+&lt;img src="figs/approx-1.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/approx-2.jpg" width="85%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -229,7 +248,7 @@ $$
 X \sim \textrm{N}(\mu = 75 \cdot .5, \sigma = \sqrt(75 \cdot .5 \cdot .5)
 $$
 
-&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-17-1.png" width="720" style="display: block; margin: auto;" /&gt;
+&lt;img src="hypothesis-testing-exact-approximate_files/figure-html/unnamed-chunk-22-1.png" width="720" style="display: block; margin: auto;" /&gt;
 
 &gt; What is `\(P(X \ge 50) + P(X \le 25)\)`?
 

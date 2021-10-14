@@ -29,7 +29,7 @@ source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-th
 xaringanExtra::use_panelset()
 ```
 
-## Millenials and same-sex marriage
+## millennials and same-sex marriage
 
 In the national debate on same-sex marriage, it is commonly stated that half of all Americans favor same-sex marriage.  In 2014, Pew research conducted a poll of millennials (Americans born after 1980) and found that 67% answered yes when asked: "Do you favor same-sex marriage?"  The poll was a random sample of 75 millennials.  Does this poll provide convincing evidence that the opinion of millennials is different from those of Americans at large?
 
@@ -63,15 +63,15 @@ If a null hypothesis concerns a particular value that a proportion should take (
 ```{r fig.width = 10, echo = FALSE, fig.height=4}
 set.seed(51)
 library(stat20data)
-data(millenials)
+data(millennials)
 library(infer)
-null <- millenials %>%
+null <- millennials %>%
   specify(response = response, success = "favor") %>%
   hypothesize(null = "point", p = .5) %>%
   generate(reps = 100, type = "draw") %>%
   calculate(stat = "prop")
 
-obs_stat <- millenials %>%
+obs_stat <- millennials %>%
   specify(response = response, success = "favor") %>%
   calculate(stat = "prop")
 
@@ -99,13 +99,13 @@ What will happen if we repeat the simulation and look at the p-value from a _dif
 ## Null Distribution with (a new) 100 reps 
 
 ```{r fig.width = 10, echo = FALSE, fig.height=4}
-null <- millenials %>%
+null <- millennials %>%
   specify(response = response, success = "favor") %>%
   hypothesize(null = "point", p = .5) %>%
   generate(reps = 100, type = "draw") %>%
   calculate(stat = "prop")
 
-obs_stat <- millenials %>%
+obs_stat <- millennials %>%
   specify(response = response, success = "favor") %>%
   calculate(stat = "prop")
 
@@ -133,13 +133,13 @@ What will happen if we increase the number of simulations to 5000 reps?
 ## Null Distribution with 5,000 reps 
 
 ```{r fig.width = 10, echo = FALSE, fig.height=4}
-null <- millenials %>%
+null <- millennials %>%
   specify(response = response, success = "favor") %>%
   hypothesize(null = "point", p = .5) %>%
   generate(reps = 5000, type = "draw") %>%
   calculate(stat = "prop")
 
-obs_stat <- millenials %>%
+obs_stat <- millennials %>%
   specify(response = response, success = "favor") %>%
   calculate(stat = "prop")
 
@@ -176,6 +176,24 @@ knitr::include_graphics("figs/infer-w-approx.jpg")
 class: center, middle, inverse
 
 # Probability Theory: Exact Method
+
+---
+
+```{r out.width = "85%"}
+knitr::include_graphics("figs/exact-1.jpg")
+```
+
+---
+
+```{r out.width = "85%"}
+knitr::include_graphics("figs/exact-2.jpg")
+```
+
+---
+
+```{r out.width = "85%"}
+knitr::include_graphics("figs/exact-3.jpg")
+```
 
 ---
 
@@ -279,13 +297,13 @@ data.frame(heads = 0:n,
 ## Null Distribution with 50,000 reps 
 
 ```{r fig.width = 10, echo = FALSE, fig.height=4}
-null <- millenials %>%
+null <- millennials %>%
   specify(response = response, success = "favor") %>%
   hypothesize(null = "point", p = .5) %>%
   generate(reps = 50000, type = "draw") %>%
   calculate(stat = "prop")
 
-obs_stat <- millenials %>%
+obs_stat <- millennials %>%
   specify(response = response, success = "favor") %>%
   calculate(stat = "prop")
 
@@ -341,9 +359,7 @@ f(x) &= \frac{1}{\sigma \sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma} \r
 --
 
 .pull-right[
-
 ```{r fig.height=4}
-
 data.frame(heads = -3:3, 
            prob = rep(0, 7)) %>%
   ggplot(aes(x = heads, 
@@ -360,6 +376,18 @@ data.frame(heads = -3:3,
 ```
 
 ]
+
+---
+
+```{r out.width = "85%"}
+knitr::include_graphics("figs/approx-1.jpg")
+```
+
+---
+
+```{r out.width = "85%"}
+knitr::include_graphics("figs/approx-2.jpg")
+```
 
 ---
 
