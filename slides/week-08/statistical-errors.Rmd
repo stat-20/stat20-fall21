@@ -234,6 +234,13 @@ $H_A$: $p > 5%$ The incidence of COVID at Cal is at an elevated level.
 **Decision protocol**: if there is a big enough spike in a given week, shift classes to remote.
 
 ---
+## Decision Errors
+
+```{r, out.width="80%"}
+knitr::include_graphics("figs/decision-errors-table.jpg")
+```
+
+---
 
 .panelset[
 .panel[.panel-name[Question]
@@ -261,14 +268,21 @@ countdown::countdown(1)
 ]
 
 ---
-## What affects the Error Rate?
+## Decision Errors Rates
+
+```{r, out.width="80%"}
+knitr::include_graphics("figs/decision-error-rates.jpg")
+```
+
+---
+## What affects the error rates?
 
 - **Sample size, $n$**: with increasing $n$, the variability of the null distribution will decrease.
 
 - **Changing $\alpha$**: decreasing $\alpha$ will decrease type I error but increase type II error.
 
 - **Increasing _effect size_**: change data collection process to separate the distribution under $H_A$ and decrease type II error.
-    - Ex: If you're testing whether a pain medicine provides back relief, only conduct the test if you have confident the medicine should have a dramatic decrease in pain.
+    - Ex: If you're testing whether a pain medicine provides pain relief, only conduct the test if using a medicine that you expect to have cause a dramatic decrease in pain.
 
 ---
 ## Errors in other settings

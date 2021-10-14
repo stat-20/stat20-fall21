@@ -214,16 +214,21 @@ class:  middle, center, inverse
 
 .pull-right[
 **A simplified model**
-UHS tests a sample of the Cal community every week and monitors the positivity rate (proportion of tests that are positive). Assume the this is a random sample of constant size and that the test is perfectly accurate. Let `\(p\)` be the positivity rate.
+UHS tests a sample of the Cal community every week and monitors the positivity rate (proportion of tests that are positive). Assume this is a random sample of constant size and that the test is perfectly accurate. Let `\(p\)` be the positivity rate.
 
 `\(H_0\)`: `\(p = 5%\)` The incidence of COVID at Cal is at a manageable level.
 
-`\(H_0\)`: `\(p &gt; 5%\)` The incidence of COVID at Cal is at an elevated level.
+`\(H_A\)`: `\(p &gt; 5%\)` The incidence of COVID at Cal is at an elevated level.
 ]
 
 --
 
 **Decision protocol**: if there is a big enough spike in a given week, shift classes to remote.
+
+---
+## Decision Errors
+
+&lt;img src="figs/decision-errors-table.jpg" width="80%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -240,7 +245,7 @@ B. Failing to move to remote instruction when in fact the true number of cases o
 Discuss with a partner then enter your answer at `pollev.com/andrewbray088`.
 ]
 
-<div class="countdown" id="timer_61671022" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_61677d12" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 ]
@@ -253,14 +258,19 @@ Discuss with a partner then enter your answer at `pollev.com/andrewbray088`.
 ]
 
 ---
-## What affects the Error Rate?
+## Decision Errors Rates
+
+&lt;img src="figs/decision-error-rates.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+## What affects the error rates?
 
 - **Sample size, `\(n\)`**: with increasing `\(n\)`, the variability of the null distribution will decrease.
 
 - **Changing `\(\alpha\)`**: decreasing `\(\alpha\)` will decrease type I error but increase type II error.
 
 - **Increasing _effect size_**: change data collection process to separate the distribution under `\(H_A\)` and decrease type II error.
-    - Ex: If you're testing whether a pain medicine provides back relief, only conduct the test if you have confident the medicine should have a dramatic decrease in pain.
+    - Ex: If you're testing whether a pain medicine provides pain relief, only conduct the test if using a medicine that you expect to have cause a dramatic decrease in pain.
 
 ---
 ## Errors in other settings
@@ -283,7 +293,6 @@ Concluding that millennials _are distinct_ from Americans at large with respect 
 &gt; What is a type II error in this setting?
 
 Concluding that millennials _are indistinguishable_ from Americans at large with respect to same sex-marriage when in fact _they are_.
-
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
