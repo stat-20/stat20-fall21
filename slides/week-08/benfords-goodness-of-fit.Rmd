@@ -619,7 +619,7 @@ null %>%
   get_p_value(obs_stat, direction = "right") #<<
 ```
 
---
+---
 
 ### Making a decision
 
