@@ -66,59 +66,6 @@ class: middle, center, inverse
 ---
 class: center, middle, inverse
 
-# Working with the Normal Distribution
-
----
-
-&lt;img src="figs/infer-w-approx.jpg" width="1940" style="display: block; margin: auto;" /&gt;
-
----
-
-.panelset[
-.panel[.panel-name[Question 2]
-The distribution of car speeds on the I-5 in California is nearly normal with a mean of 72.6 mph and a standard deviation of 4.4 mph.
-
-.task[
-What % of the cars travel between 60 and 80 mph?
-]
-]
-
-.panel[.panel-name[Responses]
-&lt;center&gt;
-&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/QlHzhgLaQj82LTT41PufL?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
-&lt;/center&gt;
-]
-]
-
----
-
-**Question 1**: What % of the cars travel slower than 75 mph? 
---
-
-```r
-pnorm(75, mean = 72.6, sd = 4.4)
-```
-
-```
-## [1] 0.7072795
-```
-
---
-**Question 2**: What % of the cars travel between 60 and 80 mph?
---
-
-```r
-pnorm(80, mean = 72.6, sd = 4.4) -
-  pnorm(60, mean = 72.6, sd = 4.4)
-```
-
-```
-## [1] 0.9516039
-```
-
----
-class: center, middle, inverse
-
 # Hypothesis Testing Review
 
 ---
@@ -161,7 +108,7 @@ Lay out your model(s).
 
 Contruct the appropriate null distribution.
 
-&lt;img src="statistical-errors_files/figure-html/unnamed-chunk-4-1.png" width="720" style="display: block; margin: auto;" /&gt;
+&lt;img src="statistical-errors_files/figure-html/unnamed-chunk-1-1.png" width="720" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -245,7 +192,7 @@ B. Failing to move to remote instruction when in fact the true number of cases o
 Discuss with a partner then enter your answer at `pollev.com/andrewbray088`.
 ]
 
-<div class="countdown" id="timer_61677d12" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_61678090" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 ]
