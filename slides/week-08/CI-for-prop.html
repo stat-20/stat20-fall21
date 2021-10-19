@@ -63,12 +63,21 @@ Start class by drawing Plato's Cave on the board
 
 ---
 
-Boardwork
+&lt;img src="figs/sampling-dist.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/boot-1.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/boot-2.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
 
 ---
 class: center, middle, inverse
 
-# Finding the Sampling Distribution with the Bsootstrap
+# Approximating the Sampling Distribution with the Bootstrap
 
 ---
 ## Pew Data
@@ -150,7 +159,7 @@ pew %&gt;%
 --
 
 .pull-right[
-&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-7-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -373,7 +382,7 @@ boot_9 %&gt;%
 --
 
 .pull-right[
-&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-15-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-18-1.png" width="504" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -467,7 +476,65 @@ boot %&gt;%
 --
 
 .pull-right[
-&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-18-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-21-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Visualizing bootstrap dist. of `\(\hat{p}\)` (500 reps)
+
+`visualize()` is a short cut to make a ggplot for null and sampling (bootstrap) distributions.
+
+--
+
+.pull-left[
+
+```r
+boot %&gt;%
+  visualize()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-22-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+## Constructing a confidence interval
+
+.pull-left[
+**Characteristics of CIs**
+- A summary of sampling variability in an estimate using an interval
+    - (lower bound, upper bound)
+- These intervals are built to contain the parameter with probability `\(1-\alpha\)` (the confidence level).
+- A percentile bootstrap interval is the middle `\(1-\alpha\)` of the bootstrap distribution.
+]
+
+.pull-right[
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+## Visualizing the confidence interval
+
+
+
+--
+
+.pull-left[
+
+```r
+boot %&gt;%
+  visualize() +
+* shade_ci(ci_boot)
+```
+]
+
+.pull-right[
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -497,36 +564,20 @@ ci_boot
 
 
 ---
-## Visualizing bootstrap dist. of `\(\hat{p}\)` (500 reps)
+## Compute `\(1 - \alpha\)` confidence interval
 
-`visualize()` is a short cut to make a ggplot for null and sampling (bootstrap) distributions. Allows shading of p-values and confidence intervals.
+`get_ci()` takes the _bootstrap distribution_ and a `\(1 - \alpha\)` _confidence level_ and returns a _percentile confidence interval_.
 
---
+### 95% Percentile confidence interval
 
 .pull-left[
 
 ```r
-boot %&gt;%
-  visualize() +
-* shade_ci(ci_boot)
-```
-]
-
---
-
-.pull-right[
-&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
-]
-
----
-## Interpreting a Confidence Interval
-
---
-
-
-```r
+ci_boot &lt;- boot %&gt;%
+* get_ci(level = .95)
 ci_boot
 ```
+
 
 ```
 ## # A tibble: 1 × 2
@@ -534,31 +585,55 @@ ci_boot
 ##      &lt;dbl&gt;    &lt;dbl&gt;
 ## 1    0.627    0.654
 ```
+]
 
+.pull-right[
+**Interpretation**
 We are 95% confident that the true proportion of Republicans that think Democrats are closed minded is between 62.7% and 65.4%.
-
+]
 
 ---
 
-&lt;img src="figs/infer-w-approx.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/ci-interpretation.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/infer-1.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/infer-2.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/infer-3.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/infer-4.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/infer-5.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
 
 
 ---
 class: middle, inverse, center
 
-# Finding the Sampling Distribution with Probability Theory
+# Approximating the Sampling Distribution with Probability Theory
 
 ---
 ## Normal Approximation Method
 
-The sampling distribution of the point estimate `\(\hat{p}\)` can be well-approximated with:
+By the Central Limit Theorem, the sampling distribution of the point estimate `\(\hat{p}\)` can be well-approximated with:
   
 `$$\hat{p} \sim N(\mu = p, \sigma = \sqrt{\frac{p(1-p)}{n}}) \quad \quad$$` if
 
 --
 
 1. Observations are independent
-2. The sample is large enough (rule of thumb: the number of observed successes and failures is more than 10).
+2. The sample is large (rule of thumb: the number of observed successes and failures is more than 10).
 
 `$$n\hat{p} \ge 10 \\
 n(1 - \hat{p}) \ge 10$$`
@@ -567,7 +642,7 @@ n(1 - \hat{p}) \ge 10$$`
 ---
 ## Constructing a CI using the Normal
 
-&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-34-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -594,7 +669,7 @@ The sampling distribution of the point estimate `\(\hat{p}\)` can be well-approx
 point estimate `\(\pm\)` margin of error
 &lt;/center&gt;
 
-`$$\hat{p} \pm 1.96 \sqrt{(\hat{p} \times (0.36)1 - \hat{p})/n}$$`
+`$$\hat{p} \pm 1.96 \sqrt{(\hat{p} (1 - \hat{p})/n}$$`
 
 _margin of error_: amount above and below the point estimate where you are confident that parameter lies
 
@@ -602,7 +677,7 @@ _margin of error_: amount above and below the point estimate where you are confi
 ## Question
 
 We are given that `\(n = 4947, \hat{p} = 0.64\)`. Which of the
-below is the correct calculation of the 95% confidence interval?
+below is the correct calculation of the 95% confidence interval using the normal approximation?
 
 1. `\(0.64 \pm 1.96 \sqrt{(.64 \times 0.36)/4947}\)`
 2. `\(0.64 \pm 1.65 \sqrt{(.64 \times 0.36)/4947}\)`
@@ -612,7 +687,7 @@ below is the correct calculation of the 95% confidence interval?
 ---
 ## Constructing a CI using the Normal
 
-&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-24-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-35-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -661,7 +736,7 @@ ci_boot
 
 ### Normal approximation
 
-- Must satisfy assumptions (independence, sample size)
+- Must satisfy assumptions (independence, large sample size)
 - Most commonly used (still)
 
 

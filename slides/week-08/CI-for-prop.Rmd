@@ -78,12 +78,27 @@ knitr::include_graphics("figs/pew3.png")
 
 ---
 
-Boardwork
+```{r out.width = "80%", echo = FALSE}
+knitr::include_graphics("figs/sampling-dist.jpg")
+```
+
+---
+
+```{r out.width = "80%", echo = FALSE}
+knitr::include_graphics("figs/boot-1.jpg")
+```
+
+---
+
+```{r out.width = "80%", echo = FALSE}
+knitr::include_graphics("figs/boot-2.jpg")
+```
+
 
 ---
 class: center, middle, inverse
 
-# Finding the Sampling Distribution with the Bsootstrap
+# Approximating the Sampling Distribution with the Bootstrap
 
 ---
 ## Pew Data
@@ -324,6 +339,68 @@ boot %>%
 ]
 
 ---
+## Visualizing bootstrap dist. of $\hat{p}$ (500 reps)
+
+`visualize()` is a short cut to make a ggplot for null and sampling (bootstrap) distributions.
+
+--
+
+.pull-left[
+```{r bootv0, eval = FALSE}
+boot %>%
+  visualize()
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label = "bootv0", echo = FALSE, fig.height = 4.5}
+```
+]
+
+
+---
+## Constructing a confidence interval
+
+.pull-left[
+**Characteristics of CIs**
+- A summary of sampling variability in an estimate using an interval
+    - (lower bound, upper bound)
+- These intervals are built to contain the parameter with probability $1-\alpha$ (the confidence level).
+- A percentile bootstrap interval is the middle $1-\alpha$ of the bootstrap distribution.
+]
+
+.pull-right[
+```{r ref.label = "bootv0", echo = FALSE, fig.height = 4.5}
+```
+]
+
+
+---
+## Visualizing the confidence interval
+
+```{r echo = FALSE}
+ci_boot <- boot %>%
+  get_ci(level = .95)
+```
+
+--
+
+.pull-left[
+```{r bootv, eval = FALSE}
+boot %>%
+  visualize() +
+  shade_ci(ci_boot) #<<
+```
+]
+
+.pull-right[
+```{r ref.label = "bootv", echo = FALSE, fig.height = 4.5}
+```
+]
+
+---
 ## Compute $1 - \alpha$ confidence interval
 
 `get_ci()` takes the _bootstrap distribution_ and a $1 - \alpha$ _confidence level_ and returns a _percentile confidence interval_.
@@ -344,62 +421,82 @@ ci_boot
 
 
 ---
-## Visualizing bootstrap dist. of $\hat{p}$ (500 reps)
+## Compute $1 - \alpha$ confidence interval
 
-`visualize()` is a short cut to make a ggplot for null and sampling (bootstrap) distributions. Allows shading of p-values and confidence intervals.
+`get_ci()` takes the _bootstrap distribution_ and a $1 - \alpha$ _confidence level_ and returns a _percentile confidence interval_.
 
---
+### 95% Percentile confidence interval
 
 .pull-left[
-```{r bootv, eval = FALSE}
-boot %>%
-  visualize() +
-  shade_ci(ci_boot) #<<
-```
-]
-
---
-
-.pull-right[
-```{r ref.label = "bootv", echo = FALSE, fig.height = 4.5}
-```
-]
-
----
-## Interpreting a Confidence Interval
-
---
-
-```{r}
+```{r bootci2, eval = FALSE}
+ci_boot <- boot %>%
+  get_ci(level = .95) #<<
 ci_boot
 ```
 
-We are 95% confident that the true proportion of Republicans that think Democrats are closed minded is between 62.7% and 65.4%.
+```{r ref.label = "bootci2", echo = FALSE, fig.height = 4.5}
+```
+]
 
+.pull-right[
+**Interpretation**
+We are 95% confident that the true proportion of Republicans that think Democrats are closed minded is between 62.7% and 65.4%.
+]
 
 ---
 
 ```{r echo = FALSE, out.width="85%"}
-knitr::include_graphics("figs/infer-w-approx.jpg")
+knitr::include_graphics("figs/ci-interpretation.jpg")
 ```
+
+---
+
+```{r out.width = "85%", echo = FALSE}
+knitr::include_graphics("figs/infer-1.jpg")
+```
+
+---
+
+```{r out.width = "85%", echo = FALSE}
+knitr::include_graphics("figs/infer-2.jpg")
+```
+
+---
+
+```{r out.width = "85%", echo = FALSE}
+knitr::include_graphics("figs/infer-3.jpg")
+```
+
+---
+
+```{r out.width = "85%", echo = FALSE}
+knitr::include_graphics("figs/infer-4.jpg")
+```
+
+---
+
+```{r out.width = "85%", echo = FALSE}
+knitr::include_graphics("figs/infer-5.jpg")
+```
+
 
 
 ---
 class: middle, inverse, center
 
-# Finding the Sampling Distribution with Probability Theory
+# Approximating the Sampling Distribution with Probability Theory
 
 ---
 ## Normal Approximation Method
 
-The sampling distribution of the point estimate $\hat{p}$ can be well-approximated with:
+By the Central Limit Theorem, the sampling distribution of the point estimate $\hat{p}$ can be well-approximated with:
   
 $$\hat{p} \sim N(\mu = p, \sigma = \sqrt{\frac{p(1-p)}{n}}) \quad \quad$$ if
 
 --
 
 1. Observations are independent
-2. The sample is large enough (rule of thumb: the number of observed successes and failures is more than 10).
+2. The sample is large (rule of thumb: the number of observed successes and failures is more than 10).
 
 $$n\hat{p} \ge 10 \\
 n(1 - \hat{p}) \ge 10$$
@@ -441,7 +538,7 @@ $$\hat{p} \sim N(\mu = p, \sigma = \sqrt{\frac{p(1-p)}{n}}) \quad \quad$$
 point estimate $\pm$ margin of error
 </center>
 
-$$\hat{p} \pm 1.96 \sqrt{(\hat{p} \times (0.36)1 - \hat{p})/n}$$
+$$\hat{p} \pm 1.96 \sqrt{(\hat{p} (1 - \hat{p})/n}$$
 
 _margin of error_: amount above and below the point estimate where you are confident that parameter lies
 
@@ -449,7 +546,7 @@ _margin of error_: amount above and below the point estimate where you are confi
 ## Question
 
 We are given that $n = 4947, \hat{p} = 0.64$. Which of the
-below is the correct calculation of the 95% confidence interval?
+below is the correct calculation of the 95% confidence interval using the normal approximation?
 
 1. $0.64 \pm 1.96 \sqrt{(.64 \times 0.36)/4947}$
 2. $0.64 \pm 1.65 \sqrt{(.64 \times 0.36)/4947}$
@@ -500,7 +597,7 @@ ci_boot
 
 ### Normal approximation
 
-- Must satisfy assumptions (independence, sample size)
+- Must satisfy assumptions (independence, large sample size)
 - Most commonly used (still)
 
 
