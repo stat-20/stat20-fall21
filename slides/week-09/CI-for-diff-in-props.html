@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Confidence Intervals, cont.</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Confidence Intervals, cont.
+## Intervals for a Difference in Proportions
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+---
+## Returning to Pew . . .
+
+--
+
+&lt;img src="figs/pew2.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+--
+
+Was there really an increase in the proportion of Democrats that view Republicans as lazy or is that just sampling variability?
+
+---
+## The Data
+
+
+
+.pull-left[
+
+```r
+pew2 %&gt;%
+  head()
+```
+
+```
+##      party year lazy
+## 1 Democrat 2016  yes
+## 2 Democrat 2016  yes
+## 3 Democrat 2016  yes
+## 4 Democrat 2016  yes
+## 5 Democrat 2016  yes
+## 6 Democrat 2016  yes
+```
+]
+
+--
+
+.pull-left[
+
+```r
+pew2 %&gt;%
+  tail()
+```
+
+```
+##         party year lazy
+## 9889 Democrat 2019   no
+## 9890 Democrat 2019   no
+## 9891 Democrat 2019   no
+## 9892 Democrat 2019   no
+## 9893 Democrat 2019   no
+## 9894 Democrat 2019   no
+```
+]
+
+
+---
+## Visualizing the data
+
+--
+
+.pull-left[
+
+```r
+library(tidyverse)
+ggplot(pew2, aes(x = year, 
+                 fill = lazy)) +
+  geom_bar()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="CI-for-diff-in-props_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## The observed statistic
+
+The obs. stat. is a _point estimate_ of the parameter; the CI is an _interval estimate_.
+
+--
+
+
+```r
+library(infer)
+obs_stat &lt;- pew2 %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+  calculate(stat = "diff in props",
+            order = c(2019, 2016))
+obs_stat
+```
+
+--
+
+
+```
+## Error: The infer team has not implemented test statistics for the supplied variable types.
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'obs_stat' not found
+```
+
+
+---
+## The observed statistic, again
+
+The obs. stat. is a _point estimate_ of the parameter; the CI is an _interval estimate_.
+
+
+```r
+library(infer)
+pew2 &lt;- pew2 %&gt;%
+* mutate(year = factor(year))
+obs_stat &lt;- pew2 %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+  calculate(stat = "diff in props",
+            order = c(2019, 2016))
+obs_stat
+```
+
+--
+
+
+```
+## Response: lazy (factor)
+## Explanatory: year (factor)
+## # A tibble: 1 × 1
+##     stat
+##    &lt;dbl&gt;
+## 1 0.0200
+```
+
+---
+# Your Turn
+
+.task[
+Which of the data frames are examples of valid bootstrap samples?
+
+Turn to your partner and discuss, then respond at `pollev.com/andrewbray088`.
+]
+
+---
+## Generating a bootstrap sample
+
+--
+
+
+```r
+pew2 %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+* generate(reps = 1,
+*          type = "bootstrap")
+```
+
+--
+
+
+```
+## Response: lazy (factor)
+## Explanatory: year (factor)
+## # A tibble: 9,894 × 3
+## # Groups:   replicate [1]
+##    replicate lazy  year 
+##        &lt;int&gt; &lt;fct&gt; &lt;fct&gt;
+##  1         1 no    2016 
+##  2         1 no    2019 
+##  3         1 yes   2016 
+##  4         1 no    2019 
+##  5         1 no    2019 
+##  6         1 no    2016 
+##  7         1 no    2019 
+##  8         1 no    2019 
+##  9         1 no    2019 
+## 10         1 no    2016 
+## # … with 9,884 more rows
+```
+
+
+---
+## Generating a bootstrap sample, again
+
+--
+
+
+```r
+pew2 %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+* generate(reps = 1,
+*          type = "bootstrap")
+```
+
+--
+
+
+```
+## Response: lazy (factor)
+## Explanatory: year (factor)
+## # A tibble: 9,894 × 3
+## # Groups:   replicate [1]
+##    replicate lazy  year 
+##        &lt;int&gt; &lt;fct&gt; &lt;fct&gt;
+##  1         1 no    2016 
+##  2         1 yes   2019 
+##  3         1 no    2019 
+##  4         1 no    2019 
+##  5         1 no    2019 
+##  6         1 no    2019 
+##  7         1 no    2019 
+##  8         1 no    2016 
+##  9         1 yes   2016 
+## 10         1 no    2016 
+## # … with 9,884 more rows
+```
+
+
+---
+## Calculating 500 bootstrap statistics
+
+--
+
+
+```r
+boot &lt;- pew2 %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+  generate(reps = 500,
+           type = "bootstrap") %&gt;%
+* calculate(stat = "diff in props",
+*           order = c(2019, 2016))
+boot
+```
+
+--
+
+
+```
+## Response: lazy (factor)
+## Explanatory: year (factor)
+## # A tibble: 500 × 2
+##    replicate   stat
+##        &lt;int&gt;  &lt;dbl&gt;
+##  1         1 0.0215
+##  2         2 0.0271
+##  3         3 0.0226
+##  4         4 0.0155
+##  5         5 0.0320
+##  6         6 0.0273
+##  7         7 0.0189
+##  8         8 0.0210
+##  9         9 0.0196
+## 10        10 0.0137
+## # … with 490 more rows
+```
+
+
+---
+## The Bootstrap Distribution
+
+--
+
+.pull-left[
+
+```r
+boot %&gt;% 
+  visualize()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="CI-for-diff-in-props_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Visualizing the confidence interval
+
+
+
+--
+
+.pull-left[
+
+```r
+boot %&gt;%
+  visualize() +
+* shade_ci(ci_boot)
+```
+]
+
+.pull-right[
+&lt;img src="CI-for-diff-in-props_files/figure-html/unnamed-chunk-13-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Compute `\(1 - \alpha\)` confidence interval
+
+--
+
+**95% Percentile confidence interval**
+
+
+```r
+ci_boot &lt;- boot %&gt;%
+* get_ci(level = .95)
+ci_boot
+```
+
+--
+
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1  0.00372   0.0352
+```
+
+
+---
+## Compute `\(1 - \alpha\)` confidence interval
+
+**95% Percentile confidence interval**
+
+.pull-left[
+
+```r
+ci_boot &lt;- boot %&gt;%
+* get_ci(level = .95)
+ci_boot
+```
+
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1  0.00372   0.0352
+```
+]
+
+.pull-right[
+**Interpretation**
+We are 95% confident that the true change (from 2016 to 2019) in the proportion of Democrats that think Republicans are lazy is between .34% and .61%.
+]
+
+---
+## Returning to Pew . . .
+
+--
+
+&lt;img src="figs/pew2.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+--
+
+Was there really an increase in the proportion of Democrats that view Republicans as lazy or is that just sampling variability?
+
+--
+
+&gt; **Yes.**
+
+
+---
+
+&lt;img src="figs/infer-5.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle, inverse, center
+
+# Approximating the Sampling Distribution with Probability Theory
+
+---
+## Normal Approximation Method
+
+Conditions for the sampling distribution of `\(\hat{p}_1 - \hat{p}_2\)` to be normal:
+
+--
+
+- each proportion separately follows a normal model
+- the two samples are independent of one another
+
+--
+
+**Form of theoretical CI**
+
+&lt;center&gt;
+point estimate `\(\pm\)` margin of error
+&lt;/center&gt;
+
+`$$\hat{p}_1 - \hat{p}_2 \pm 1.96 \sqrt{\frac{\hat{p}_1 ( 1 - \hat{p}_1)}{n_1} + \frac{\hat{p}_2 ( 1 - \hat{p}_2)}{n_2}}$$`
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

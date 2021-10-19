@@ -1,0 +1,348 @@
+---
+title: "Confidence Intervals, cont."
+subtitle: "Intervals for a Difference in Proportions"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(infer)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+set.seed(401)
+```
+
+---
+## Returning to Pew . . .
+
+--
+
+```{r out.width = "60%", echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/pew2.png")
+```
+
+--
+
+Was there really an increase in the proportion of Democrats that view Republicans as lazy or is that just sampling variability?
+
+---
+## The Data
+
+```{r echo = FALSE}
+pew2 <- data.frame(party = "Democrat",
+                  year = rep(c(2016, 2019), 
+                             c(4947, 4947)),
+                  lazy = c(rep(c("yes", "no"),
+                               c(890, 4057)),
+                           rep(c("yes", "no"),
+                               c(989, 3958))))
+```
+
+.pull-left[
+```{r}
+pew2 %>%
+  head()
+```
+]
+
+--
+
+.pull-left[
+```{r}
+pew2 %>%
+  tail()
+```
+]
+
+
+---
+## Visualizing the data
+
+--
+
+.pull-left[
+```{r viz, eval = FALSE}
+library(tidyverse)
+ggplot(pew2, aes(x = year, 
+                 fill = lazy)) +
+  geom_bar()
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label = "viz", echo = FALSE}
+```
+]
+
+---
+## The observed statistic
+
+The obs. stat. is a _point estimate_ of the parameter; the CI is an _interval estimate_.
+
+--
+
+```{r pew2inf, eval = FALSE}
+library(infer)
+obs_stat <- pew2 %>%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %>%
+  calculate(stat = "diff in props",
+            order = c(2019, 2016))
+obs_stat
+```
+
+--
+
+```{r ref.label="pew2inf",echo = FALSE, error = TRUE}
+```
+
+
+---
+## The observed statistic, again
+
+The obs. stat. is a _point estimate_ of the parameter; the CI is an _interval estimate_.
+
+```{r pew2inf2, eval = FALSE}
+library(infer)
+pew2 <- pew2 %>%
+  mutate(year = factor(year)) #<<
+obs_stat <- pew2 %>%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %>%
+  calculate(stat = "diff in props",
+            order = c(2019, 2016))
+obs_stat
+```
+
+--
+
+```{r ref.label="pew2inf2", echo = FALSE}
+```
+
+---
+# Your Turn
+
+.task[
+Which of the data frames are examples of valid bootstrap samples?
+
+Turn to your partner and discuss, then respond at `pollev.com/andrewbray088`.
+]
+
+---
+## Generating a bootstrap sample
+
+--
+
+```{r pew2boot1, eval = FALSE}
+pew2 %>%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %>%
+  generate(reps = 1, #<<
+           type = "bootstrap") #<<
+```
+
+--
+
+```{r ref.label="pew2boot1", echo = FALSE}
+```
+
+
+---
+## Generating a bootstrap sample, again
+
+--
+
+```{r pew2boot2, eval = FALSE}
+pew2 %>%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %>%
+  generate(reps = 1, #<<
+           type = "bootstrap") #<<
+```
+
+--
+
+```{r ref.label="pew2boot2", echo = FALSE}
+```
+
+
+---
+## Calculating 500 bootstrap statistics
+
+--
+
+```{r pew2inf3, eval = FALSE}
+boot <- pew2 %>%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %>%
+  generate(reps = 500,
+           type = "bootstrap") %>%
+  calculate(stat = "diff in props", #<<
+            order = c(2019, 2016)) #<<
+boot
+```
+
+--
+
+```{r ref.label="pew2inf3", echo = FALSE}
+```
+
+
+---
+## The Bootstrap Distribution
+
+--
+
+.pull-left[
+```{r bootviz, eval = FALSE}
+boot %>% 
+  visualize()
+```
+]
+
+--
+
+.pull-right[
+```{r ref.label="bootviz", echo = FALSE, fig.height=5.5}
+```
+]
+
+---
+## Visualizing the confidence interval
+
+```{r echo = FALSE}
+ci_boot <- boot %>%
+  get_ci(level = .95)
+```
+
+--
+
+.pull-left[
+```{r bootv, eval = FALSE}
+boot %>%
+  visualize() +
+  shade_ci(ci_boot) #<<
+```
+]
+
+.pull-right[
+```{r ref.label = "bootv", echo = FALSE, fig.height = 4.5}
+```
+]
+
+---
+## Compute $1 - \alpha$ confidence interval
+
+--
+
+**95% Percentile confidence interval**
+
+```{r bootci, eval = FALSE}
+ci_boot <- boot %>%
+  get_ci(level = .95) #<<
+ci_boot
+```
+
+--
+
+```{r ref.label = "bootci", echo = FALSE, fig.height = 4.5}
+```
+
+
+---
+## Compute $1 - \alpha$ confidence interval
+
+**95% Percentile confidence interval**
+
+.pull-left[
+```{r bootci2, eval = FALSE}
+ci_boot <- boot %>%
+  get_ci(level = .95) #<<
+ci_boot
+```
+
+```{r ref.label = "bootci2", echo = FALSE, fig.height = 4.5}
+```
+]
+
+.pull-right[
+**Interpretation**
+We are 95% confident that the true change (from 2016 to 2019) in the proportion of Democrats that think Republicans are lazy is between .34% and .61%.
+]
+
+---
+## Returning to Pew . . .
+
+--
+
+```{r out.width = "50%", echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/pew2.png")
+```
+
+--
+
+Was there really an increase in the proportion of Democrats that view Republicans as lazy or is that just sampling variability?
+
+--
+
+> **Yes.**
+
+
+---
+
+```{r out.width = "85%", echo = FALSE}
+knitr::include_graphics("figs/infer-5.jpg")
+```
+
+---
+class: middle, inverse, center
+
+# Approximating the Sampling Distribution with Probability Theory
+
+---
+## Normal Approximation Method
+
+Conditions for the sampling distribution of $\hat{p}_1 - \hat{p}_2$ to be normal:
+
+--
+
+- each proportion separately follows a normal model
+- the two samples are independent of one another
+
+--
+
+**Form of theoretical CI**
+
+<center>
+point estimate $\pm$ margin of error
+</center>
+
+$$\hat{p}_1 - \hat{p}_2 \pm 1.96 \sqrt{\frac{\hat{p}_1 ( 1 - \hat{p}_1)}{n_1} + \frac{\hat{p}_2 ( 1 - \hat{p}_2)}{n_2}}$$
+
+
