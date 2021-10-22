@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Inference for Numerical Data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Inference for Numerical Data
+## Medians and means for samples large and small
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+## Agenda
+
+1. Bootstrap CIs for numerical data
+2. Small sample inference on a mean
+
+
+---
+class: center, middle, inverse
+
+# Bootstrap CIs for numerical data
+
+---
+
+&lt;img src="figs/infer-5.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Recall the penguins...
+
+&lt;img src="figs/penguins.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+library(tidyverse)
+library(palmerpenguins)
+data(penguins)
+penguins
+```
+
+```
+## # A tibble: 344 × 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 Adelie  Torgersen           39.1          18.7               181        3750
+##  2 Adelie  Torgersen           39.5          17.4               186        3800
+##  3 Adelie  Torgersen           40.3          18                 195        3250
+##  4 Adelie  Torgersen           NA            NA                  NA          NA
+##  5 Adelie  Torgersen           36.7          19.3               193        3450
+##  6 Adelie  Torgersen           39.3          20.6               190        3650
+##  7 Adelie  Torgersen           38.9          17.8               181        3625
+##  8 Adelie  Torgersen           39.2          19.6               195        4675
+##  9 Adelie  Torgersen           34.1          18.1               193        3475
+## 10 Adelie  Torgersen           42            20.2               190        4250
+## # … with 334 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+```
+
+--
+
+**Question 1**: What proportion of the penguin population near Palmer Station are female?
+
+---
+**Question 1**: What proportion of the penguin population near Palmer Station are female?
+
+--
+
+.panelset[
+.panel[.panel-name[Graphical Summary]
+
+```r
+penguins %&gt;%
+  ggplot(aes(x = sex)) +
+  geom_bar()
+```
+
+&lt;img src="CI-for-numerical-data_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[Point Estimate]
+
+```r
+library(infer)
+penguins %&gt;%
+  specify(response = sex,
+          success = "female") %&gt;%
+  calculate(stat = "prop")
+```
+
+```
+## Response: sex (factor)
+## # A tibble: 1 × 1
+##    stat
+##   &lt;dbl&gt;
+## 1 0.495
+```
+]
+.panel[.panel-name[Interval Estimate]
+
+```r
+penguins %&gt;%
+  specify(response = sex,
+          success = "female") %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "prop") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.441    0.550
+```
+]
+]
+
+
+---
+.task[What will happen to the confidence interval if we increase the _confidence level_?]
+
+.panelset[
+.panel[.panel-name[Question]
+
+```r
+penguins %&gt;%
+  specify(response = sex,
+          success = "female") %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "prop") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.441    0.550
+```
+
+]
+
+.panel[.panel-name[Responses]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/3y8nDdV7yJThvFRZzjGAf?controls=none&amp;short_poll=true" width="600px" height="450px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+
+.panel[.panel-name[Answer]
+
+```r
+penguins %&gt;%
+  specify(response = sex,
+          success = "female") %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "prop") %&gt;%
+  get_ci(level = .99)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.438    0.565
+```
+
+&gt; It will widen.
+]
+
+]
+
+---
+.task[What will happen to the confidence interval if we increase the _sample size_?]
+
+.panelset[
+.panel[.panel-name[Question]
+
+```r
+penguins %&gt;%
+  specify(response = sex,
+          success = "female") %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "prop") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.441    0.550
+```
+
+]
+
+.panel[.panel-name[Responses]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/GZiYDYnN7kaCwbeK25eLx?controls=none&amp;short_poll=true" width="600" height="450"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+
+.panel[.panel-name[Answer]
+
+```r
+penguins %&gt;%
+  rbind(penguins) %&gt;% # double the sample
+  specify(response = sex,
+          success = "female") %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "prop") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.455    0.535
+```
+
+&gt; It will narrow.
+]
+
+]
+
+---
+
+&lt;img src="figs/sampling-dist.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+## Inference for numerical data
+
+
+```r
+penguins
+```
+
+```
+## # A tibble: 344 × 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 Adelie  Torgersen           39.1          18.7               181        3750
+##  2 Adelie  Torgersen           39.5          17.4               186        3800
+##  3 Adelie  Torgersen           40.3          18                 195        3250
+##  4 Adelie  Torgersen           NA            NA                  NA          NA
+##  5 Adelie  Torgersen           36.7          19.3               193        3450
+##  6 Adelie  Torgersen           39.3          20.6               190        3650
+##  7 Adelie  Torgersen           38.9          17.8               181        3625
+##  8 Adelie  Torgersen           39.2          19.6               195        4675
+##  9 Adelie  Torgersen           34.1          18.1               193        3475
+## 10 Adelie  Torgersen           42            20.2               190        4250
+## # … with 334 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+```
+
+**Question 2**: What is the average bill length of the penguin population around Palmer Station?
+
+
+---
+**Question 2**: What is the average bill length of the penguin population around Palmer Station?
+
+--
+
+.panelset[
+.panel[.panel-name[Graphical Summary]
+
+```r
+penguins %&gt;%
+  ggplot(aes(x = bill_length_mm)) +
+  geom_histogram()
+```
+
+&lt;img src="CI-for-numerical-data_files/figure-html/unnamed-chunk-13-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[Point Estimate]
+
+```r
+penguins %&gt;%
+  specify(response = bill_length_mm) %&gt;%
+  calculate(stat = "mean")
+```
+
+```
+## Response: bill_length_mm (numeric)
+## # A tibble: 1 × 1
+##    stat
+##   &lt;dbl&gt;
+## 1  43.9
+```
+]
+.panel[.panel-name[Interval Estimate]
+
+```r
+penguins %&gt;%
+  specify(response = bill_length_mm) %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "mean") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1     43.4     44.4
+```
+]
+]
+
+---
+
+.task[What needs to change to answer Question 3?]
+
+**Question 3**: What is the _median_ bill length of the penguin population around Palmer Station?
+
+--
+
+Question 2: What is the average bill length of the penguin population around Palmer Station?
+
+
+```r
+penguins %&gt;%
+  specify(response = bill_length_mm) %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "mean") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1     43.3     44.6
+```
+
+---
+**Question 3**: What is the _median_ bill length of the penguin population around Palmer Station?
+
+.panelset[
+.panel[.panel-name[Graphical Summary]
+
+```r
+penguins %&gt;%
+  ggplot(aes(x = bill_length_mm)) +
+  geom_histogram()
+```
+
+&lt;img src="CI-for-numerical-data_files/figure-html/unnamed-chunk-17-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[Point Estimate]
+
+```r
+penguins %&gt;%
+  specify(response = bill_length_mm) %&gt;%
+* calculate(stat = "median")
+```
+
+```
+## Response: bill_length_mm (numeric)
+## # A tibble: 1 × 1
+##    stat
+##   &lt;dbl&gt;
+## 1  44.4
+```
+]
+.panel[.panel-name[Interval Estimate]
+
+```r
+penguins %&gt;%
+  specify(response = bill_length_mm) %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+* calculate(stat = "median") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1     42.9     45.3
+```
+]
+]
+
+---
+**Question 4**: What is the _difference in median_ bill length between male and female penguins in the population around Palmer Station?
+
+.panelset[
+.panel[.panel-name[Graphical Summary]
+
+```r
+penguins %&gt;%
+  drop_na(sex) %&gt;%
+  ggplot(aes(x = bill_length_mm,
+             fill = sex)) +
+  geom_density(alpha = .3)
+```
+
+&lt;img src="CI-for-numerical-data_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[Point Estimate]
+
+```r
+penguins %&gt;%
+  specify(response = bill_length_mm,
+*         explanatory = sex) %&gt;%
+* calculate(stat = "diff in medians")
+```
+
+```
+## Response: bill_length_mm (numeric)
+## Explanatory: sex (factor)
+## # A tibble: 1 × 1
+##    stat
+##   &lt;dbl&gt;
+## 1    -4
+```
+
+*Note that without an `order` argument, `calculate()` takes the difference alphabetically.
+]
+.panel[.panel-name[Interval Estimate]
+
+```r
+penguins %&gt;%
+  specify(response = bill_length_mm,
+          explanatory = sex) %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(stat = "diff in medians") %&gt;%
+  get_ci(level = .95)
+```
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1    -6.98     -1.5
+```
+]
+]
+
+---
+## Guidance with the bootstrap percentile method
+
+Used to construct confidence intervals that contain with parameter with probability `\(1 - \alpha\)` . For it to a reliable interval:
+
+--
+
+1. The distribution of the sample must resemble the population distribution &gt; reasonably large sample size.
+
+--
+
+2. Population distribution should not be heavily skewed.
+
+--
+
+3. Certain statistics are poorly suited: `\(max\)`, `\(min\)`.
+ 
+--
+
+&gt; How do you conduct inference if you have only a very small sample of data?
+
+---
+class: center, middle, inverse
+
+# Small Sample Inference on a Mean
+
+
+---
+
+&lt;img src="figs/guinness.jpg" width="350" style="display: block; margin: auto;" /&gt;
+
+---
+
+.pull-left[
+&lt;img src="figs/gosset.jpg" width="350" style="display: block; margin: auto;" /&gt;
+
+Meet William Sealy Gosset.
+]
+
+--
+.pull-right[
+**Problem**: A batch of beer should have a fixed [chemical level related to barley]
+in order to be of good quality. Can you test a small number of barrels and infer
+if the entire batch is of good enough quality?
+]
+
+
+---
+
+&lt;img src="figs/student-t.png" width="650" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/gosset-plaque.jpg" width="800" style="display: block; margin: auto;" /&gt;
+
+&lt;!--
+ One version of the origin of the pseudonym is that Gosset’s employer preferred staff to use pen names when publishing scientific papers instead of their real name, so he used the name “Student” to hide his identity. Another version is that Guinness did not want their competitors to know that they were using the t-test to determine the quality of raw material.
+--&gt;
+
+---
+# Gosset's insight
+
+--
+If you have a small number of observations (random variables)
+--
+ that are drawn from a nearly normal population,
+--
+ and if those observations are independent,
+--
+ and if you calculate the sample mean, `\(\bar{x} = 1/n \sum_{i = 1}^n x_i\)`, and the sample standard deviation `\(s = \sqrt{\frac{\sum_{i = 1}^n (x_i - \bar{x})^2}{n - 1}}\)`,
+--
+ then
+--
+
+$$
+t = \frac{\bar{x} - \mu}{s/\sqrt(n)}
+$$
+
+will follow a `\(t\)` distribution with `\(n - 1\)` degrees of freedom, or
+
+--
+
+$$
+t \sim t(df = n - 1)
+$$
+
+---
+## `\(t\)` versus normal
+--
+
+&lt;img src="CI-for-numerical-data_files/figure-html/tdist-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+The `\(t\)` has heavier tails than the normal distribution.
+
+---
+## Degrees of Freedom
+--
+
+*The number of parameters that are free to vary, without violating any constraint imposed on it*.
+
+--
+
+Since `\(\bar{x} = \frac{1}{n}\sum_{i = 1}^n x_i\)`, one of our *observations* is constrained, leaving `\(n-1\)` that are free to vary.
+
+$$ df = n - 1$$
+
+&lt;!-- --- --&gt;
+&lt;!-- # Hypothesis testing --&gt;
+&lt;!-- -- --&gt;
+
+&lt;!-- 1. State hypotheses: e.g. `\(H_0: \mu = \mu_0\)` versus `\(H_A: \mu \ne \mu_0\)` --&gt;
+&lt;!-- -- --&gt;
+
+&lt;!-- 2. Check conditions --&gt;
+&lt;!--     - Independent observations   --&gt;
+&lt;!--     - Nearly normal population --&gt;
+&lt;!-- -- --&gt;
+
+&lt;!-- 3. Compute observed `\(t\)`-statistic $$ t_{obs} = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} $$ --&gt;
+&lt;!-- -- --&gt;
+
+&lt;!-- 4. Draw picture to assess where `\(t_{obs}\)` falls in `\(t_{df = n - 1}\)` --&gt;
+&lt;!-- -- --&gt;
+
+&lt;!-- 5. Compute a (two-tailed) `\(p\)`-value --&gt;
+&lt;!-- -- --&gt;
+
+&lt;!-- 6. State conclusion --&gt;
+
+
+---
+## Confidence interval for `\(\mu\)`
+--
+
+point estimate `\(\pm\)` margin of error
+
+$$ \bar{x} \pm (t^*_{df} \times SE) $$
+
+- `\(\bar{x}\)`: point estimate of `\(\mu\)`.
+- `\(t^*_{df}\)`: critical value that leaves `\(\alpha\)` in the tails of a `\(t\)` with 
+`\(df = n - 1\)`.
+- `\(SE\)`: standard error of `\(\bar{x}\)`, `\(s/\sqrt{n}\)`.
+
+---
+## Finding `\(t^*_{df}\)`
+
+--
+`q_()`: family of quantile functions that take the probability in the left tail that you're interested in, and the parameters of the distribution, and returns the cutoff value.
+
+--
+
+**Ex: quantile function for the standard normal**
+--
+
+
+```r
+qnorm(.025, mean = 0, sd = 1)
+```
+
+--
+
+
+```
+## [1] -1.959964
+```
+
+--
+
+
+```r
+qnorm(.16, mean = 0, sd = 1)
+```
+
+--
+
+
+```
+## [1] -0.9944579
+```
+
+
+---
+## Finding `\(t^*_{df}\)`, cont.
+
+--
+`q_()`: family of quantile functions that take the probability in the left tail that you're interested in, and the parameters of the distribution, and returns the cutoff value.
+
+--
+
+
+```r
+qt(.025, df = 5)
+```
+
+--
+
+
+```
+## [1] -2.570582
+```
+
+--
+
+
+```r
+qt(.025, df = 30)
+```
+
+--
+
+
+```
+## [1] -2.042272
+```
+
+
+---
+# Example: The Kilogram
+--
+
+How do we know how much a kilogram weighs?
+
+
+---
+# Example: The Kilogram, cont.
+--
+
+Meet the IPK: International Prototype Kilogram, Paris, France.
+
+&lt;img src="figs/kilo.jpeg" width="400" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Example: The Kilogram
+--
+
+**Question**
+
+The US has two copies of the IPK. Say they make a third copy for Cal We take 6 measures of our new CPK and get the following:
+
+
+```
+## [1] 0.997 0.976 1.032 1.101 1.004
+```
+
+Is it a safe assumption that the CPK weighs the same as the IPK?
+
+
+---
+
+$$ \bar{x} \pm (t^*_{df} \times SE) $$
+
+--
+
+
+```r
+x_bar &lt;- mean(x)
+x_bar
+```
+
+```
+## [1] 1.022
+```
+
+--
+
+
+```r
+t_stat &lt;- qt(.025, df = 5)
+t_stat
+```
+
+```
+## [1] -2.570582
+```
+
+--
+
+
+```r
+SE &lt;- sd(x)/sqrt(length(n))
+SE
+```
+
+```
+## [1] 0.04849227
+```
+
+--
+
+
+```r
+c(x_bar - t_stat * SE, x_bar + t_stat * SE)
+```
+
+```
+## [1] 1.1466533 0.8973467
+```
+
+---
+## Using the `\(t\)`-distribution
+
+#### Recall
+The Central Limit Theorem says that sums of independent **random variables** become normally distribution as **n grows large**.
+
+--
+
+If you have a **small number** of observations (random variables) that are drawn from a **nearly normal population**, and if those observations are independent, and if you calculate the sample mean, `\(\bar{x} = 1/n \sum_{i = 1}^n x_i\)`, and the sample standard deviation `\(s = \sqrt{\frac{\sum_{i = 1}^n (x_i - \bar{x})^2}{n - 1}}\)`,
+
+then...
+ 
+use the `\(t\)`-distribution.
+
+
+---
+## RIP IPK
+
+&lt;img src="figs/rip-ipk.png" width="400" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="figs/rip-ipk2.png" width="400" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
