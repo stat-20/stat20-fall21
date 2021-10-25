@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Privacy</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data Privacy
+## Randomized reponse and differential privacy
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+## While you're waiting...
+
+Please flip a fair coin twice ([https://justflipacoin.com/](https://justflipacoin.com/)). Note the results but keep them to yourself. Later on I will ask everyone with an answer of "yes" to raise their hand according to the following rules.
+
+- If your first coin came up H, respond to the Question 1: _Have you ever done an illegal drug? (ecstasy, MDMA, magic mushrooms, LSD, cocaine, etc)_
+
+- If the first coin came up T, respond to the Question 2:, _Did your second coin come up H?_
+
+In addition to being ready with your responses, think through why you would be comfortable saying it publicly or why it makes you uncomfortable.
+
+---
+
+&lt;img src="figs/survey-1.png" width="878" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/survey-2.png" width="982" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/survey-3.png" width="983" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/survey-4.png" width="983" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/survey-5.png" width="984" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/survey-6.png" width="938" style="display: block; margin: auto;" /&gt;
+
+---
+## Mass. GIC Data Release (1997)
+
+--
+
+&lt;img src="figs/venn-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+## Mass. GIC Data Release (1997)
+
+&lt;img src="figs/venn-2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+## Mass. GIC Data Release (1997)
+
+&lt;img src="figs/venn-3.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+## Mass. GIC Data Release (1997)
+
+&lt;img src="figs/venn-4.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+No one was harmed in the making of this film.
+
+--
+
+&lt;img src="figs/weld-goes-down.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/weld-goes-down-2.png" width="807" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/weld-goes-down-3.png" width="804" style="display: block; margin: auto;" /&gt;
+
+---
+## Mass. GIC Data Release (1997)
+
+&lt;img src="figs/venn-5.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+## A False Dichotomy
+
+&lt;img src="figs/info-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+## A False Dichotomy
+
+&lt;img src="figs/info-2.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+## Lessons from the Netflix Prize
+
+&lt;img src="figs/netflix.png" width="30%" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="figs/arms-race.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Two definitions of privacy
+
+_Goal_: formalize what we mean when we say that data will be kept "private".
+
+--
+
+.pull-left[
+**k-anonymity**
+
+Latanya Sweeney et al. 1998
+
+The information for each person contained in the data set cannot be distinguished from at least k - 1 other individuals.
+]
+
+---
+## `\(k\)`-anonymity
+
+.pull-left-wide[
+&lt;img src="figs/k-anonymity-1.png" width="628" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right-narrow[
+Every row is unique.
+
+If you knew someone was in the data set, you may have enough information to identify their row.
+]
+
+---
+## `\(k\)`-anonymity
+
+.pull-left-wide[
+&lt;img src="figs/k-anonymity-2.png" width="667" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right-narrow[
+_Suppression_ is used to suppress highly identifying data.
+
+_Generalization_ is used to limit identifiability while preserving some information.
+]
+--
+&gt; This data set is 2-anonymous.
+
+---
+## Two definitions of privacy
+
+_Goal_: formalize what we mean when we say that data will be kept "private".
+
+.pull-left[
+**k-anonymity**
+
+Latanya Sweeney et al. 1998
+
+The information for each person contained in the data set cannot be distinguished from at least k - 1 other individuals.
+]
+
+--
+
+.pull-right[
+**Differential privacy**
+
+Cynthia Dwork et al. 2006
+
+The information learned about you by including your data in an analysis is essentially the same as would have been learned about you had you not contributed your data.
+]
+
+---
+## While you're waiting...
+
+Please flip a fair coin twice ([https://justflipacoin.com/](https://justflipacoin.com/)). Note the results but keep them to yourself. Later on I will ask everyone with an answer of "yes" to raise their hand according to the following rules.
+
+- If your first coin came up H, respond to the Question 1: _Have you ever done an illegal drug? (ecstasy, MDMA, magic mushrooms, LSD, cocaine, etc)_
+
+- If the first coin came up T, respond to the Question 2:, _Did your second coin come up H?_
+
+In addition to being ready with your responses, think through why you would be comfortable saying it publicly or why it makes you uncomfortable.
+
+---
+
+&lt;img src="figs/dp-1.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/dp-2.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/dp-3.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/dp-4.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/dp-5.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/dp-6.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/dp-7.jpg" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+## While you're waiting...
+
+.panelset[
+
+.panel[.panel-name[Question]
+Please flip a fair coin twice ([https://justflipacoin.com/](https://justflipacoin.com/)). Note the results but keep them to yourself. Later on I will ask everyone with an answer of "yes" to raise their hand according to the following rules.
+
+- If your first coin came up H, respond to the Question 1: _Have you ever done an illegal drug? (ecstasy, MDMA, magic mushrooms, LSD, cocaine, etc)_
+
+- If the first coin came up T, respond to the Question 2:, _Did your second coin come up H?_
+
+In addition to being ready with your responses, think through why you would be comfortable saying it publicly or why it makes you uncomfortable.
+]
+
+.panel[.panel-name[Responses]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/uqOWXZ3tGxXq6J7xWxS07?controls=none&amp;short_poll=true" width="600px" height="450px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+]
+
+---
+## Key points
+
+--
+1. Privacy requires a good definition.
+
+--
+2. Differential privacy adds noise to keep amount learned about an individual within provable bounds.
+
+--
+3. There is a necessary balance with sensitive data between provide enough signal to be useful, but enough noise to ensure privacy.
+
+---
+## People's Park Survey
+
+
+```
+## # A tibble: 1,658 × 41
+##       Q1 Q7_1  Q7_2  Q7_3  Q7_4  Q7_5  Q7_6  Q7_7     Q8  Q9_1  Q9_2  Q9_3  Q9_4
+##    &lt;dbl&gt; &lt;lgl&gt; &lt;lgl&gt; &lt;lgl&gt; &lt;lgl&gt; &lt;lgl&gt; &lt;lgl&gt; &lt;lgl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1     4 FALSE FALSE FALSE FALSE FALSE FALSE TRUE      5     4     3     1     5
+##  2     3 FALSE TRUE  FALSE FALSE FALSE FALSE FALSE     5     1     3     4     6
+##  3     5 NA    NA    NA    NA    NA    NA    NA        5     4     2     1     5
+##  4     3 TRUE  FALSE TRUE  FALSE TRUE  FALSE FALSE     4     1     2     3     4
+##  5     5 NA    NA    NA    NA    NA    NA    NA        2     1     2     3     5
+##  6     5 NA    NA    NA    NA    NA    NA    NA        4     1     2     3     4
+##  7     5 NA    NA    NA    NA    NA    NA    NA        5     2     1     2     6
+##  8     3 TRUE  FALSE FALSE FALSE TRUE  FALSE FALSE     5     6     1     3     5
+##  9     5 NA    NA    NA    NA    NA    NA    NA        4     3     4     2     5
+## 10     2 TRUE  TRUE  TRUE  FALSE TRUE  FALSE FALSE     5     2     1     3     4
+## # … with 1,648 more rows, and 28 more variables: Q9_5 &lt;dbl&gt;, Q9_6 &lt;dbl&gt;,
+## #   Q10 &lt;dbl&gt;, Q11_1 &lt;lgl&gt;, Q11_2 &lt;lgl&gt;, Q11_3 &lt;lgl&gt;, Q11_4 &lt;lgl&gt;, Q11_5 &lt;lgl&gt;,
+## #   Q11_6 &lt;lgl&gt;, Q11_7 &lt;lgl&gt;, Q15_1 &lt;dbl&gt;, Q17 &lt;dbl&gt;, Q18 &lt;dbl&gt;, Q20_1 &lt;lgl&gt;,
+## #   Q20_2 &lt;lgl&gt;, Q20_3 &lt;lgl&gt;, Q20_4 &lt;lgl&gt;, Q20_5 &lt;lgl&gt;, Q20_6 &lt;lgl&gt;,
+## #   Q20_7 &lt;lgl&gt;, Q21 &lt;dbl&gt;, Q22_1 &lt;lgl&gt;, Q22_2 &lt;lgl&gt;, Q22_3 &lt;lgl&gt;, Q22_4 &lt;lgl&gt;,
+## #   Q22_5 &lt;lgl&gt;, Q22_6 &lt;lgl&gt;, Q22_7 &lt;lgl&gt;
+```
+
+
+---
+## People's Park Survey
+
+Noise was introduced by:
+
+1. Bootstrapping the data set.
+2. Each record has at least one permuted row in it.
+
+---
+## References
+
+- Sweeney, Latanya. _k-anonymity: a model for protecting privacy
+_. International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems, Volume 10, Issue 5 (2002): 557–570 https://doi.org/10.1142/S0218488502001648.
+- Wood A., Altman M., Bembenek A., Bun M., Gaboardi M., Honaker J., Nissim K., OBrien D.R., Steinke T., and Vadan S. _Differential privacy: A primer for a non-technical audience._ VJETL 21, no. 1 (2018): 209-275.
+- Blair, Graeme; Imai, Kosuke; Zhou, Yang-Yang, 2015, _Design and Analysis of the Randomized Response Technique_, Journal of the American Statistical Association, September 2015, Vol. 110, No. 511, Review.
+- 2020 Census Data Products: Disclosure Avoidance Modernization: https://www.census.gov/programs-surveys/decennial-census/decade/2020/planning-management/process/disclosure-avoidance.html
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

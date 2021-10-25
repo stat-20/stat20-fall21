@@ -1,0 +1,354 @@
+---
+title: "Data Privacy"
+subtitle: "Randomized reponse and differential privacy"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(infer)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+library(palmerpenguins)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+set.seed(401)
+```
+
+## While you're waiting...
+
+Please flip a fair coin twice ([https://justflipacoin.com/](https://justflipacoin.com/)). Note the results but keep them to yourself. Later on I will ask everyone with an answer of "yes" to raise their hand according to the following rules.
+
+- If your first coin came up H, respond to the Question 1: _Have you ever done an illegal drug? (ecstasy, MDMA, magic mushrooms, LSD, cocaine, etc)_
+
+- If the first coin came up T, respond to the Question 2:, _Did your second coin come up H?_
+
+In addition to being ready with your responses, think through why you would be comfortable saying it publicly or why it makes you uncomfortable.
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/survey-1.png")
+```
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/survey-2.png")
+```
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/survey-3.png")
+```
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/survey-4.png")
+```
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/survey-5.png")
+```
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/survey-6.png")
+```
+
+---
+## Mass. GIC Data Release (1997)
+
+--
+
+```{r echo = FALSE, out.width = "90%"}
+knitr::include_graphics("figs/venn-1.png")
+```
+
+---
+## Mass. GIC Data Release (1997)
+
+```{r echo = FALSE, out.width = "90%"}
+knitr::include_graphics("figs/venn-2.png")
+```
+
+---
+## Mass. GIC Data Release (1997)
+
+```{r echo = FALSE, out.width = "90%"}
+knitr::include_graphics("figs/venn-3.png")
+```
+
+---
+## Mass. GIC Data Release (1997)
+
+```{r echo = FALSE, out.width = "90%"}
+knitr::include_graphics("figs/venn-4.png")
+```
+
+---
+
+No one was harmed in the making of this film.
+
+--
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/weld-goes-down.gif")
+```
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/weld-goes-down-2.png")
+```
+
+---
+
+```{r echo = FALSE}
+knitr::include_graphics("figs/weld-goes-down-3.png")
+```
+
+---
+## Mass. GIC Data Release (1997)
+
+```{r echo = FALSE, out.width = "90%"}
+knitr::include_graphics("figs/venn-5.png")
+```
+
+---
+## A False Dichotomy
+
+```{r echo = FALSE, out.width = "60%"}
+knitr::include_graphics("figs/info-1.png")
+```
+
+---
+## A False Dichotomy
+
+```{r echo = FALSE, out.width = "60%"}
+knitr::include_graphics("figs/info-2.png")
+```
+
+---
+## Lessons from the Netflix Prize
+
+```{r echo = FALSE, out.width = "30%"}
+knitr::include_graphics("figs/netflix.png")
+```
+
+--
+
+```{r echo = FALSE, out.width = "35%"}
+knitr::include_graphics("figs/arms-race.png")
+```
+
+
+---
+## Two definitions of privacy
+
+_Goal_: formalize what we mean when we say that data will be kept "private".
+
+--
+
+.pull-left[
+**k-anonymity**
+
+Latanya Sweeney et al. 1998
+
+The information for each person contained in the data set cannot be distinguished from at least k - 1 other individuals.
+]
+
+---
+## $k$-anonymity
+
+.pull-left-wide[
+```{r echo = FALSE}
+knitr::include_graphics("figs/k-anonymity-1.png")
+```
+]
+
+--
+
+.pull-right-narrow[
+Every row is unique.
+
+If you knew someone was in the data set, you may have enough information to identify their row.
+]
+
+---
+## $k$-anonymity
+
+.pull-left-wide[
+```{r echo = FALSE}
+knitr::include_graphics("figs/k-anonymity-2.png")
+```
+]
+
+--
+
+.pull-right-narrow[
+_Suppression_ is used to suppress highly identifying data.
+
+_Generalization_ is used to limit identifiability while preserving some information.
+]
+--
+> This data set is 2-anonymous.
+
+---
+## Two definitions of privacy
+
+_Goal_: formalize what we mean when we say that data will be kept "private".
+
+.pull-left[
+**k-anonymity**
+
+Latanya Sweeney et al. 1998
+
+The information for each person contained in the data set cannot be distinguished from at least k - 1 other individuals.
+]
+
+--
+
+.pull-right[
+**Differential privacy**
+
+Cynthia Dwork et al. 2006
+
+The information learned about you by including your data in an analysis is essentially the same as would have been learned about you had you not contributed your data.
+]
+
+---
+## While you're waiting...
+
+Please flip a fair coin twice ([https://justflipacoin.com/](https://justflipacoin.com/)). Note the results but keep them to yourself. Later on I will ask everyone with an answer of "yes" to raise their hand according to the following rules.
+
+- If your first coin came up H, respond to the Question 1: _Have you ever done an illegal drug? (ecstasy, MDMA, magic mushrooms, LSD, cocaine, etc)_
+
+- If the first coin came up T, respond to the Question 2:, _Did your second coin come up H?_
+
+In addition to being ready with your responses, think through why you would be comfortable saying it publicly or why it makes you uncomfortable.
+
+---
+
+```{r echo = FALSE, out.width = "85%"}
+knitr::include_graphics("figs/dp-1.jpg")
+```
+
+---
+
+```{r echo = FALSE, out.width = "85%"}
+knitr::include_graphics("figs/dp-2.jpg")
+```
+
+---
+
+```{r echo = FALSE, out.width = "85%"}
+knitr::include_graphics("figs/dp-3.jpg")
+```
+
+---
+
+```{r echo = FALSE, out.width = "85%"}
+knitr::include_graphics("figs/dp-4.jpg")
+```
+
+---
+
+```{r echo = FALSE, out.width = "85%"}
+knitr::include_graphics("figs/dp-5.jpg")
+```
+
+---
+
+```{r echo = FALSE, out.width = "85%"}
+knitr::include_graphics("figs/dp-6.jpg")
+```
+
+---
+
+```{r echo = FALSE, out.width = "85%"}
+knitr::include_graphics("figs/dp-7.jpg")
+```
+
+---
+## While you're waiting...
+
+.panelset[
+
+.panel[.panel-name[Question]
+Please flip a fair coin twice ([https://justflipacoin.com/](https://justflipacoin.com/)). Note the results but keep them to yourself. Later on I will ask everyone with an answer of "yes" to raise their hand according to the following rules.
+
+- If your first coin came up H, respond to the Question 1: _Have you ever done an illegal drug? (ecstasy, MDMA, magic mushrooms, LSD, cocaine, etc)_
+
+- If the first coin came up T, respond to the Question 2:, _Did your second coin come up H?_
+
+In addition to being ready with your responses, think through why you would be comfortable saying it publicly or why it makes you uncomfortable.
+]
+
+.panel[.panel-name[Responses]
+<center>
+<iframe src="https://embed.polleverywhere.com/multiple_choice_polls/uqOWXZ3tGxXq6J7xWxS07?controls=none&short_poll=true" width="600px" height="450px"></iframe>
+</center>
+]
+]
+
+---
+## Key points
+
+--
+1. Privacy requires a good definition.
+
+--
+2. Differential privacy adds noise to keep amount learned about an individual within provable bounds.
+
+--
+3. There is a necessary balance with sensitive data between provide enough signal to be useful, but enough noise to ensure privacy.
+
+---
+## People's Park Survey
+
+```{r echo = FALSE}
+ppk <- read_csv("https://www.dropbox.com/s/zamyjzlclortmtu/ppk.csv?dl=1")
+ppk
+```
+
+
+---
+## People's Park Survey
+
+Noise was introduced by:
+
+1. Bootstrapping the data set.
+2. Each record has at least one permuted row in it.
+
+---
+## References
+
+- Sweeney, Latanya. _k-anonymity: a model for protecting privacy
+_. International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems, Volume 10, Issue 5 (2002): 557–570 https://doi.org/10.1142/S0218488502001648.
+- Wood A., Altman M., Bembenek A., Bun M., Gaboardi M., Honaker J., Nissim K., OBrien D.R., Steinke T., and Vadan S. _Differential privacy: A primer for a non-technical audience._ VJETL 21, no. 1 (2018): 209-275.
+- Blair, Graeme; Imai, Kosuke; Zhou, Yang-Yang, 2015, _Design and Analysis of the Randomized Response Technique_, Journal of the American Statistical Association, September 2015, Vol. 110, No. 511, Review.
+- 2020 Census Data Products: Disclosure Avoidance Modernization: https://www.census.gov/programs-surveys/decennial-census/decade/2020/planning-management/process/disclosure-avoidance.html
+
