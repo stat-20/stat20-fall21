@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Inference for Many Means</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Inference for Many Means
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+## Announcements
+
+- Lab 10 due next Tuesday 8 am
+
+--
+
+- Problem Set 10 due next Tuesday 8 am
+
+--
+
+- Midterm II
+
+
+---
+## Midterm II
+
+&lt;img src="figs/midterm-2.png" width="620" style="display: block; margin: auto;" /&gt;
+
+--
+
+100B midterm is Tuesday evening and open till 5am. Monday is better
+
+--
+
+I feel like this is the right choice to do the midterm on Wednesday.
+
+--
+
+PLEAAASE WEDNESDAY
+
+
+---
+## Announcements
+
+- Lab 10 due next Tuesday 8 am
+
+- Problem Set 10 due next Tuesday 8 am
+
+- Midterm II
+  - Email ella.hiesmayr@berkeley.edu to arrange to take it Nov. 1st 11 am
+  - Otherwise, plan to take it Nov. 3rd 11 am
+      - Amanda's sections: Physics 3
+      - Jake and Ella's sections: Evans 10
+      - Alternative environment: look for email from me
+
+---
+## Midterm II
+
+.pull-left[
+**Tools of classical inference**
+- Hypothesis Test
+- Confidence Intervals
+
+**Methods for approximating null/sampling dists.**
+- _Computational_: Permutation, taking draws, bootstrap
+- _Mathematical_: Normal approximation (CLT), t-distribution
+]
+
+.pull-right[
+**Statistics/Settings**
+- One proportion
+- Difference in proportions
+- One mean/median
+- Difference in medians
+- Chi-squared
+- F
+
+**Data Privacy**
+- Myth of de-identification
+- k-anonymity
+- Differential privacy
+]
+
+
+---
+class: center, middle, inverse
+# Testing equality of many means
+
+---
+# Wolf River
+--
+
+&lt;img src="figs/wolf-river.jpg" width="700" style="display: block; margin: auto;" /&gt;
+
+--
+
+- The Wolf River in Tennessee flows past an abandoned site once used by the 
+pesticide industry for dumping wastes, including hexachlorobenzene (HCB).
+- HCB known to cause various cancers and birth defects.
+
+
+---
+# Wolf River study
+--
+
+- Standard method to test whether HCB is present in a river is to take samples at middepth.
+
+--
+- **Question: is it found at different concentrations at different depths?**
+
+--
+
+.pull-left[
+
+```r
+wolf
+```
+
+```
+## # A tibble: 30 × 3
+##    Depth   Aldrin   HCB
+##    &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;
+##  1 Surface   3.08  3.74
+##  2 Surface   3.58  4.61
+##  3 Surface   3.81  4   
+##  4 Surface   4.31  4.67
+##  5 Surface   4.35  4.87
+##  6 Surface   4.4   5.12
+##  7 Surface   3.67  4.52
+##  8 Surface   5.17  5.29
+##  9 Surface   5.17  5.74
+## 10 Surface   4.35  5.48
+## # … with 20 more rows
+```
+]
+
+--
+
+.pull-right[
+.task[
+What type of plot can I use to visualize the relationship between Depth and HCB?
+]
+]
+
+---
+# Wolf River data, 3 ways
+--
+
+&lt;img src="inf-for-many-means_files/figure-html/wolf-boxes-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Wolf River data, 3 ways
+
+&lt;img src="inf-for-many-means_files/figure-html/wolf-densities-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+# Wolf River data, 3 ways
+
+&lt;img src="inf-for-many-means_files/figure-html/wolf-hists-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+# Wolf River data, 3 ways
+
+&lt;img src="inf-for-many-means_files/figure-html/unnamed-chunk-3-1.png" width="1008" style="display: block; margin: auto;" /&gt;
+
+--
+
+**Question: is it found at different concentrations at different depths?**
+
+--
+
+&gt; There appears to be a difference in this data, but was this just due to chance?
+
+---
+class: center, middle
+
+## Poll test
+
+Let's be sure the poll is working.
+
+--
+
+.task[
+Prepare to vote at `pollev.com/andrewbray088`.
+]
+
+---
+
+Which of the following baby creatures is cutest?
+
+&lt;img src="figs/cute.png" width="868" style="display: block; margin: auto;" /&gt;
+
+A. Giraffe
+
+B. Pufferfish
+
+C. Hedgehog
+
+<div class="countdown" id="timer_61799537" style="right:0;bottom:0;" data-warnwhen="10">
+<code class="countdown-time"><span class="countdown-digits minutes">00</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">30</span></code>
+</div>
+
+---
+## Poll Results
+
+--
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/oPrWxchjofjVYpPRTWryF?controls=none&amp;short_poll=true" width="600px" height="450px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+## Question Protocol
+
+1. You will have 30 seconds to answer a question solo.
+
+--
+
+2. You will have 2 minutes to discuss with someone nearby _with a different answer_.
+
+--
+
+3. You will have 30 seconds to revote.
+
+---
+
+Which of the following plots shows groups with means that are *most* and *least* likely to be significantly different from each other?
+
+&lt;img src="figs/3-anovas.png" width="900" style="display: block; margin: auto;" /&gt;
+
+A. most: III, least: II
+
+B. most: II, least: III
+
+C. most: I, least: III
+
+D. most: I, least: II 
+
+<div class="countdown" id="timer_61799617" style="right:0;bottom:0;" data-warnwhen="10">
+<code class="countdown-time"><span class="countdown-digits minutes">00</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">30</span></code>
+</div>
+
+---
+## Question Protocol
+
+1. You will have 30 seconds to answer a question solo.
+
+2. **You will have 2 minutes to discuss with someone nearby _with a different answer_.**
+
+3. You will have 30 seconds to revote.
+
+---
+
+Which of the following plots shows groups with means that are *most* and *least* likely to be significantly different from each other?
+
+&lt;img src="figs/3-anovas.png" width="900" style="display: block; margin: auto;" /&gt;
+
+A. most: III, least: II
+
+B. most: II, least: III
+
+C. most: I, least: III
+
+D. most: I, least: II 
+
+<div class="countdown" id="timer_6179950a" style="right:0;bottom:0;" data-warnwhen="10">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+## Re-poll results
+
+--
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/wqjWfbxnZJsuiozLtK4u1?controls=none&amp;short_poll=true" width="600px" height="450px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+## Original Poll
+
+--
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/mBMshdsbwbQbecicgnA2Y?controls=none&amp;short_poll=true" width="600px" height="450px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+
+Which of the following plots shows groups with means that are *most* and *least* likely to be significantly different from each other?
+
+&lt;img src="figs/3-anovas.png" width="900" style="display: block; margin: auto;" /&gt;
+
+.pull-left[
+A. most: III, least: II
+
+B. most: II, least: III
+
+C. most: I, least: III
+
+D. most: I, least: II 
+]
+
+--
+
+.pull-right[
+&gt; What do you see in the plots that makes you draw your conclusion?
+
+&gt; Can we encode that in a summary statistic?
+
+]
+
+---
+
+Which of the following plots shows groups with means that are *most* and *least* likely to be significantly different from each other?
+
+&lt;img src="figs/3-anovas.png" width="900" style="display: block; margin: auto;" /&gt;
+
+--
+
+- I has a high F.
+- II has a low F.
+- III has a middling F.
+
+
+---
+# Wolf River data
+--
+
+.pull-left[
+&lt;img src="inf-for-many-means_files/figure-html/wolf-boxes2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+
+```r
+obs_stat &lt;- wolf %&gt;%
+  specify(HCB ~ Depth) %&gt;%
+  calculate(stat = "F")
+obs_stat
+```
+
+```
+## Response: HCB (numeric)
+## Explanatory: Depth (factor)
+## # A tibble: 1 × 1
+##    stat
+##   &lt;dbl&gt;
+## 1  3.03
+```
+]
+
+--
+
+How big is 3.0322793?
+
+
+
+
+---
+# ANOVA F-test
+--
+
+$$ H_0: \mu_1 = \mu_2 = \ldots = \mu_k $$
+$$ H_A: \textrm{At least one } \mu_j \textrm{ is different} $$
+
+--
+
+We can find the distribution of the F-statistic under the null hypothesis by
+
+- Permutation
+- Mathematical approximation
+
+--
+
+Permutation null:
+
+`\(H_0\)`: HCB level is independent of depth.
+
+---
+## Null dist for F stat
+--
+
+
+```r
+null &lt;- wolf %&gt;%
+  specify(response = HCB, 
+          explanatory = Depth) %&gt;%
+  hypothesize(null = "independence") %&gt;%
+  generate(reps = 1000, 
+           type = "permute") %&gt;%
+  calculate(stat = "F")
+null
+```
+--
+
+```
+## Response: HCB (numeric)
+## Explanatory: Depth (factor)
+## Null Hypothesis: independence
+## # A tibble: 1,000 × 2
+##    replicate   stat
+##        &lt;int&gt;  &lt;dbl&gt;
+##  1         1 0.327 
+##  2         2 1.00  
+##  3         3 0.746 
+##  4         4 1.17  
+##  5         5 0.0272
+##  6         6 0.649 
+##  7         7 0.0409
+##  8         8 2.43  
+##  9         9 0.886 
+## 10        10 0.880 
+## # … with 990 more rows
+```
+
+
+---
+## Null dist for F stat, cont.
+--
+
+&lt;img src="inf-for-many-means_files/figure-html/nullplot-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="inf-for-many-means_files/figure-html/unnamed-chunk-14-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## Null dist for F stat, cont.
+--
+
+
+```r
+null %&gt;%
+  get_p_value(obs_stat = obs_stat, 
+              direction = "right")
+```
+
+```
+## # A tibble: 1 × 1
+##   p_value
+##     &lt;dbl&gt;
+## 1   0.061
+```
+
+
+---
+## Null dist for F via Approximation
+
+If:
+
+1. Independent observations.
+2. Approximate normal distributions within groups.
+3. Constant variance between groups.
+
+--
+
+Then the sampling distribution for the `\(F\)` statistic under the `\(H_0\)` is well approximated by an F distribution with `\(df_1 = k - 1\)` and `\(df_2 = N - k\)`. The p-value is represented by the upper tail.
+
+
+
+
+
+```r
+1 - pf(obsstat, df1 = 2, df2 = 30 - 3)
+```
+
+```
+## [1] 0.06486553
+```
+
+---
+
+
+```r
+null %&gt;%
+  visualize(method = "both") +
+  shade_p_value(obs_stat = obs_stat,
+                direction = "right")
+```
+
+&lt;img src="inf-for-many-means_files/figure-html/unnamed-chunk-17-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Wolf River Conclusions
+--
+
+&lt;img src="inf-for-many-means_files/figure-html/conc, -1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+- With a p-value of `\(\approx 0.07\)`, it is questionable whether HCB concentration
+functions the same at all three depths.
+- *Replicating the study* could add some certainty.
+- In a subsequent study, we may wish to only test middepth versus bottom.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

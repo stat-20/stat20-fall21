@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Inference for One and Two Means</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Inference for One and Two Means
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+class: center, middle, inverse
+# Inference for one and two means
+
+---
+## Assessing the condition of People's Park
+--
+
+12) What is the mean and median rating of the condition of People's Park (question 15 on the survey)?
+
+--
+
+&lt;img src="figs/q15.png" width="700" style="display: block; margin: auto;" /&gt;
+
+---
+## Assessing the condition of People's Park, cont.
+--
+
+
+```r
+ppk &lt;- read_csv("https://www.dropbox.com/s/zamyjzlclortmtu/ppk.csv?dl=1")
+ppk %&gt;%
+  ggplot(aes(x = factor(Q15_1))) +
+  geom_bar()
+```
+
+--
+
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+--
+
+.task[
+Why are there so many NAs?
+]
+
+---
+
+&lt;img src="figs/q12.png" width="700" style="display: block; margin: auto;" /&gt;
+
+---
+12) What is our best est. of the mean rating of the condition of People's Park?
+--
+
+.panelset[
+.panel[.panel-name[Data]
+
+```r
+ppk %&gt;%
+  select(Q15_1)
+```
+
+```
+## # A tibble: 1,658 × 1
+##    Q15_1
+##    &lt;dbl&gt;
+##  1     5
+##  2     7
+##  3     3
+##  4    NA
+##  5     5
+##  6    NA
+##  7    NA
+##  8     9
+##  9     5
+## 10     1
+## # … with 1,648 more rows
+```
+
+]
+.panel[.panel-name[Plot]
+.pull-left[
+
+```r
+ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  ggplot(aes(x = factor(Q15_1))) +
+  geom_bar()
+```
+]
+.pull-right[
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+]
+.panel[.panel-name[Point Est.]
+.pull-left[
+
+```r
+ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  specify(response = Q15_1) %&gt;%
+  calculate(stat = "mean")
+```
+]
+.pull-right[
+
+```
+## Response: Q15_1 (numeric)
+## # A tibble: 1 × 1
+##    stat
+##   &lt;dbl&gt;
+## 1  3.05
+```
+]
+]
+.panel[.panel-name[CI via Bootstrap]
+.pull-left[
+
+```r
+boot &lt;- ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  specify(response = Q15_1) %&gt;%
+* generate(reps = 500,
+*          type = "bootstrap") %&gt;%
+  calculate(stat = "mean")
+ci &lt;- boot %&gt;%
+  get_ci(level = .95)
+boot %&gt;%
+  visualize() +
+  shade_ci(ci)
+ci
+```
+]
+.pull-right[
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-7-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1     2.91     3.19
+```
+]
+]
+.panel[.panel-name[CI via CLT]
+.pull-left[
+If the observations are independent and the sample size is large enough, `\(\bar{x}\)` becomes normally distributed.
+
+`\begin{align}
+\textrm{point estimate} &amp;\pm 2 SE \\
+\bar{x} &amp;\pm 2 s/\sqrt{n}
+\end{align}`
+]
+.pull-right[
+
+```r
+stats &lt;- ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  summarize(xbar = mean(Q15_1),
+            s = sd(Q15_1),
+            n = n())
+stats %&gt;%
+  mutate(lb = xbar - 2*s/sqrt(n),
+         ub = xbar + 2*s/sqrt(n)) %&gt;%
+  select(lb, ub)
+```
+
+```
+## # A tibble: 1 × 2
+##      lb    ub
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  2.90  3.19
+```
+]
+]
+]
+
+---
+## A New Question
+
+What is our best estimate of the difference in mean rating between undergrads and grads?
+
+--
+
+Data source:
+
+&lt;img src="figs/q1.png" width="700" style="display: block; margin: auto;" /&gt;
+
+---
+## Distribution of Q1
+--
+
+
+```r
+ppk %&gt;%
+  ggplot(aes(x = factor(Q1))) +
+  geom_bar()
+```
+
+--
+
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+--
+
+.task[
+How can we create a new variable indicating grad or undergrad?
+]
+
+---
+## Creating a new variable
+--
+
+
+```r
+ppk &lt;- ppk %&gt;%
+  mutate(grad_student = Q1 == 5)
+ppk %&gt;%
+  select(Q1, grad_student)
+```
+
+--
+
+
+```
+## # A tibble: 1,658 × 2
+##       Q1 grad_student
+##    &lt;dbl&gt; &lt;lgl&gt;       
+##  1     4 FALSE       
+##  2     3 FALSE       
+##  3     5 TRUE        
+##  4     3 FALSE       
+##  5     5 TRUE        
+##  6     5 TRUE        
+##  7     5 TRUE        
+##  8     3 FALSE       
+##  9     5 TRUE        
+## 10     2 FALSE       
+## # … with 1,648 more rows
+```
+
+
+
+---
+## Distribution of grad/undergrad
+--
+
+
+```r
+ppk %&gt;%
+  ggplot(aes(x = grad_student)) +
+  geom_bar()
+```
+
+--
+
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-12-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+What is our best estimate of the diff in mean rating between ugrads and grads?
+--
+
+.panelset[
+.panel[.panel-name[Data]
+
+```r
+ppk %&gt;%
+  select(grad_student, Q15_1)
+```
+
+```
+## # A tibble: 1,658 × 2
+##    grad_student Q15_1
+##    &lt;lgl&gt;        &lt;dbl&gt;
+##  1 FALSE            5
+##  2 FALSE            7
+##  3 TRUE             3
+##  4 FALSE           NA
+##  5 TRUE             5
+##  6 TRUE            NA
+##  7 TRUE            NA
+##  8 FALSE            9
+##  9 TRUE             5
+## 10 FALSE            1
+## # … with 1,648 more rows
+```
+]
+.panel[.panel-name[Plot]
+.pull-left[
+
+```r
+ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  ggplot(aes(x = factor(Q15_1))) +
+  geom_bar() +
+* facet_wrap(vars(grad_student),
+*            scales = "free_y")
+```
+]
+.pull-right[
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-14-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+]
+.panel[.panel-name[Stats]
+.pull-left[
+
+```r
+ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  group_by(grad_student) %&gt;%
+  summarize(mean(Q15_1))
+```
+]
+.pull-right[
+
+```
+## # A tibble: 2 × 2
+##   grad_student `mean(Q15_1)`
+##   &lt;lgl&gt;                &lt;dbl&gt;
+## 1 FALSE                 3.04
+## 2 TRUE                  3.07
+```
+]
+]
+.panel[.panel-name[Point Est.]
+.pull-left[
+
+```r
+obs_stat &lt;- ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  specify(response = Q15_1,
+*         explanatory = grad_student) %&gt;%
+* calculate(stat = "diff in means")
+```
+]
+.pull-right[
+
+]
+]
+.panel[.panel-name[CI via Bootstrap]
+.pull-left[
+
+```r
+boot &lt;- ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  specify(response = Q15_1,
+          explanatory = grad_student) %&gt;%
+* generate(reps = 500,
+*          type = "bootstrap") %&gt;%
+  calculate(stat = "diff in means") 
+ci &lt;- boot %&gt;%
+  get_ci(level = .95)
+boot %&gt;%
+  visualize() +
+  shade_ci(ci)
+ci
+```
+]
+.pull-right[
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-17-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+```
+## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1   -0.350    0.262
+```
+]
+]
+]
+
+---
+## Phrasing it as a Hypothesis Test
+--
+
+`\(H_0\)`: Perception of the condition of People's Park is _independent_ of whether someone is an undergrad or grad student.
+
+`\(H_A\)`: Perception of the condition of People's Park is _dependent_ on whether someone is an undergrad or grad student.
+
+--
+
+&gt; We can generate data under this null using _permutation_.
+
+---
+## Data sets under the null
+--
+
+.pull-left[
+
+```r
+null_9 &lt;- ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  specify(response = Q15_1,
+          explanatory = grad_student) %&gt;%
+* hypothesize(null = "independence") %&gt;%
+  generate(reps = 9, 
+           type = "permute")
+null_9
+```
+]
+--
+.pull-right[
+
+```
+## Response: Q15_1 (numeric)
+## Explanatory: grad_student (factor)
+## Null Hypothesis: independence
+## # A tibble: 8,568 × 3
+## # Groups:   replicate [9]
+##    Q15_1 grad_student replicate
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;int&gt;
+##  1     8 FALSE                1
+##  2     5 FALSE                1
+##  3     2 TRUE                 1
+##  4     1 TRUE                 1
+##  5     4 FALSE                1
+##  6     2 TRUE                 1
+##  7     2 FALSE                1
+##  8     3 TRUE                 1
+##  9     2 TRUE                 1
+## 10    10 FALSE                1
+## # … with 8,558 more rows
+```
+]
+
+---
+## Data sets under the null, cont.
+
+.pull-left[
+
+```r
+null_9 %&gt;%
+  ggplot(aes(x = Q15_1,
+             y = grad_student)) +
+  geom_boxplot() +
+  facet_wrap(vars(replicate))
+```
+]
+--
+.pull-right[
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-19-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+What is our best estimate of the diff in mean ratings between ugrads and grads?
+--
+
+.panelset[
+.panel[.panel-name[Obs. Stat]
+.pull-left[
+
+```r
+obs_stat &lt;- ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  specify(response = Q15_1,
+          explanatory = grad_student) %&gt;%
+  calculate(stat = "diff in means")
+obs_stat
+```
+]
+.pull-right[
+
+```
+## Response: Q15_1 (numeric)
+## Explanatory: grad_student (factor)
+## # A tibble: 1 × 1
+##      stat
+##     &lt;dbl&gt;
+## 1 -0.0247
+```
+]
+]
+.panel[.panel-name[Null Stats]
+.pull-left[
+
+```r
+null &lt;- ppk %&gt;%
+  drop_na(Q15_1) %&gt;%
+  specify(response = Q15_1,
+          explanatory = grad_student) %&gt;%
+  hypothesize(null = "independence") %&gt;%
+  generate(reps = 500, 
+           type = "permute") %&gt;%
+  calculate(stat = "diff in means")
+null
+```
+]
+.pull-right[
+
+```
+## Response: Q15_1 (numeric)
+## Explanatory: grad_student (factor)
+## Null Hypothesis: independence
+## # A tibble: 500 × 2
+##    replicate    stat
+##        &lt;int&gt;   &lt;dbl&gt;
+##  1         1  0.0621
+##  2         2  0.0331
+##  3         3 -0.210 
+##  4         4 -0.0536
+##  5         5 -0.0305
+##  6         6 -0.0247
+##  7         7 -0.123 
+##  8         8  0.0100
+##  9         9  0.155 
+## 10        10  0.166 
+## # … with 490 more rows
+```
+]
+]
+.panel[.panel-name[Null Dist.]
+.pull-left[
+
+```r
+null %&gt;%
+  visualize() +
+  shade_p_value(obs_stat = obs_stat, 
+                direction = "both")
+```
+]
+.pull-right[
+&lt;img src="inf-for-one-and-two-means_files/figure-html/unnamed-chunk-22-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+]
+.panel[.panel-name[p-value]
+.pull-left[
+
+```r
+null %&gt;%
+  get_p_value(obs_stat = obs_stat,
+              direction = "both")
+```
+]
+.pull-right[
+
+```
+## # A tibble: 1 × 1
+##   p_value
+##     &lt;dbl&gt;
+## 1   0.928
+```
+]
+.task[
+What does this p-value tell us about data relative to the null hypothesis?
+]
+]
+.panel[.panel-name[Conclusion]
+.pull-left[
+Our data is consistent with the notion that there is no difference in the way that undergrads and grad students assess the conditions of People's Park.
+]
+]
+]
+
+---
+## Inferential Tools Compared
+
+--
+**Hypothesis Test**
+
+Asserts a value of a _parameter_ and considers the probability of the _statistic_.
+
+--
+
+**Confidence Intverval**
+
+Considers the uncertainty of the _statistic_ to find a plausible range for the _parameter_.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
