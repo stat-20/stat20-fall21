@@ -584,7 +584,7 @@ x_bar
 --
 
 ```{r}
-t_stat <- qt(.025, df = 5)
+t_stat <- qt(.025, df = 4)
 t_stat
 ```
 
