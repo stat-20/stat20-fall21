@@ -1,0 +1,369 @@
+---
+title: "Correlation"
+subtitle: "Describing the relationship between two numerical variables"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(infer)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+library(ggrepel)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+set.seed(401)
+```
+
+---
+## Announcements
+--
+
+- Midterm II
+  - Goal: grades and topics published Saturday evening
+  - Retake: Sunday 11 am - Monday 11 am
+- PS like normal next week
+- Lab Tuesday, not Thursday (holiday)
+
+
+---
+class: center, middle, inverse
+
+.adage[Welcome to Part III]
+
+.adage[of Stat 20]
+
+---
+## 
+
+.pull-left[
+## Part I
+
+**Describing Data**
+- Numerical and graphical summaries
+- Data fundamentals
+  - Data frames
+  - Data taxonomy
+- Data collection
+  - Obs. studies vs experiments
+  - Random assignment and causation
+- (Probability)
+]
+
+--
+
+.pull-right[
+## Part II
+
+**Classical Inference**
+- Confidence intervals
+  - Bootstrapping
+- Hypothesis tests
+  - Permutation and point nulls
+- Mathematical approximations
+
+]
+
+---
+## Part III
+
+**Regression**
+- Models for multivariate data
+  - Simple linear regression
+  - Multiple linear regression
+  - Logistic regression
+- Uses
+  - Description
+  - Prediction
+  - Inference
+
+---
+class: center, middle
+
+.adage[Please take out a piece of paper and pencil.]
+
+---
+## Example: Poverty and Graduation
+--
+
+What is the relationship between _poverty rate_ and _graduation rate_ at the state level?
+
+--
+
+1. Sketch the data frame that can answer this question.
+  - Dimensions
+  - Unit of observation
+  - Column names
+  - Range of values
+
+2. Sketch a plot that captures this relationship.
+  - How are you applying the grammar of graphics?
+  - How would you describe the relationship in words?
+
+--
+
+```{r echo = FALSE}
+countdown::countdown(minutes = 2)
+```
+  
+---
+## Discuss: Poverty and Graduation
+
+What is the relationship between _poverty rate_ and _graduation rate_ at the state level?
+
+
+1. Sketch the data frame that can answer this question.
+  - Dimensions
+  - Unit of observation
+  - Column names
+  - Range of values
+
+2. Sketch a plot that captures this relationship.
+  - How are you applying the grammar of graphics?
+  - How would you describe the relationship in words?
+
+```{r echo = FALSE}
+countdown::countdown(minutes = 2)
+```
+
+---
+
+## The data frame
+
+.pull-left[
+1. Sketch the data frame that can answer this question.
+  - Dimensions
+  - Unit of observation
+  - Column names
+  - Range of values
+]
+--
+.pull-right[
+```{r echo = FALSE}
+poverty <- read_delim("figs/poverty.txt")
+poverty %>%
+  select(State, Graduates, Poverty)
+```
+]
+
+---
+
+.panelset[
+.panel[.panel-name[Question]
+2. Sketch a plot that captures this relationship.
+  - How are you applying the grammar of graphics?
+  - How would you describe the relationship in words?
+]
+.panel[.panel-name[Grammar]
+
+```{r gg1, eval = FALSE}
+ggplot(poverty, aes(x = Poverty, 
+                    y = Graduates)) +
+  geom_point()
+```
+
+- Map `Poverty` to the x-axis.
+- Map `Graduates` to the y-axis.
+- Use the point geometry.
+
+]
+.panel[.panel-name[Plot]
+.pull-left-wide[
+```{r echo = FALSE, fig.width=10}
+p1 <- ggplot(poverty, aes(x = Poverty, 
+                    y = Graduates)) +
+  geom_point() +
+  theme_bw(base_size = 18)
+p1
+```
+]
+.pull-right-narrow[
+The trend is:
+
+- linear
+- moderately strong
+- negative
+  
+> How can we capture this notion in a _statistic_?
+  ]
+]
+]
+
+---
+class: center, middle
+
+boardwork
+
+---
+
+.panelset[
+
+.panel[.panel-name[Question]
+```{r echo = FALSE, fig.width=12, fig.height=5.5}
+library(openintro)
+library(ggpubr)
+p_scatter <- simulated_scatter %>%
+  filter(group %in% c(9:12, 14:17)) %>%
+  mutate(group_label = rep(LETTERS[1:8], each = 50)) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(size = 2, alpha = 0.8) +
+  theme_void(base_size = 18) +
+  facet_wrap(~group_label, nrow = 2, scales = "free") + 
+  theme(
+    panel.border = element_rect(colour = "gray", fill = NA, size = 1),
+    strip.background = element_blank()
+  )
+p_scatter
+```
+
+.task[
+Which of the following relationships is weakest, as measured by $r$?
+]
+
+]
+
+.panel[.panel-name[Responses]
+<center>
+<iframe src="https://embed.polleverywhere.com/multiple_choice_polls/UsYXLVmOwZcvgXWXwng1U?controls=none&short_poll=true" width="600px" height="450px"></iframe>
+</center>
+]
+
+.panel[.panel-name[Answer]
+```{r echo = FALSE, fig.width=12, fig.height=5.5}
+p_scatter + 
+  stat_cor(aes(label = paste("r", ..r.., sep = "~`=`~")))
+```
+
+**Remember**: r measures only the strength of the _linear_ relationship.
+]
+
+]
+
+
+---
+## Poverty and Graduation: Correlation
+--
+
+.pull-left[
+```{r echo = FALSE, fig.height = 5}
+p1
+```
+
+```{r cor, eval = FALSE}
+poverty %>%
+  summarize(r = cor(Graduates, Poverty))
+```
+]
+--
+.pull-right[
+```{r ref.label = "cor", echo = FALSE}
+```
+
+The relationship between poverty and graduation is _linear_, _negative_ and _moderately strong_.
+
+> What other questions can we ask?
+
+]
+
+
+---
+## What other questions can we ask?
+
+```{r fig.width=14, echo = FALSE}
+p1
+```
+
+???
+Which state has the highest graduation rate?
+
+Which state has the highest poverty rate?
+
+Which state has the highest graduate rate for its poverty rate?
+
+---
+## Which state has the highest ...
+
+.pull-left-narrow[
+graduation rate?
+
+poverty rate?
+
+graduation rate for its poverty rate?
+]
+--
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+p2 <- p1 +
+  geom_text_repel(aes(label = State))
+p2
+```
+]
+
+---
+## The Linear Model
+
+.pull-left-narrow[
+Expresses an expected value for $y$, $\hat{y}$,  as a linear function of $x$.
+
+$$\hat{y} = b_0 + b_1x$$
+
+$b_0$: intercept
+
+$b_1$: slope
+
+]
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+p2 +
+  geom_smooth(method='lm',formula=y~x, se = FALSE)
+```
+]
+
+
+
+
+---
+## Residuals
+
+---
+## Residuals in R
+
+```{r}
+m1 <- lm(Graduates ~ Poverty, data = poverty)
+attributes(m1)
+m1$fitted
+```
+
+---
+## Residuals in R, cont.
+
+```{r}
+m1$residuals
+```
+
+
+---
+## Residual plot
+
+```{r}
+m1 <- lm(Graduates ~ Poverty, data = poverty)
+plot(m1, 1)
+```
+

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Correlation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Correlation
+## Describing the relationship between two numerical variables
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+---
+## Announcements
+--
+
+- Midterm II
+  - Goal: grades and topics published Saturday evening
+  - Retake: Sunday 11 am - Monday 11 am
+- PS like normal next week
+- Lab Tuesday, not Thursday (holiday)
+
+
+---
+class: center, middle, inverse
+
+.adage[Welcome to Part III]
+
+.adage[of Stat 20]
+
+---
+## 
+
+.pull-left[
+## Part I
+
+**Describing Data**
+- Numerical and graphical summaries
+- Data fundamentals
+  - Data frames
+  - Data taxonomy
+- Data collection
+  - Obs. studies vs experiments
+  - Random assignment and causation
+- (Probability)
+]
+
+--
+
+.pull-right[
+## Part II
+
+**Classical Inference**
+- Confidence intervals
+  - Bootstrapping
+- Hypothesis tests
+  - Permutation and point nulls
+- Mathematical approximations
+
+]
+
+---
+## Part III
+
+**Regression**
+- Models for multivariate data
+  - Simple linear regression
+  - Multiple linear regression
+  - Logistic regression
+- Uses
+  - Description
+  - Prediction
+  - Inference
+
+---
+class: center, middle
+
+.adage[Please take out a piece of paper and pencil.]
+
+---
+## Example: Poverty and Graduation
+--
+
+What is the relationship between _poverty rate_ and _graduation rate_ at the state level?
+
+--
+
+1. Sketch the data frame that can answer this question.
+  - Dimensions
+  - Unit of observation
+  - Column names
+  - Range of values
+
+2. Sketch a plot that captures this relationship.
+  - How are you applying the grammar of graphics?
+  - How would you describe the relationship in words?
+
+--
+
+<div class="countdown" id="timer_6185777d" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+  
+---
+## Discuss: Poverty and Graduation
+
+What is the relationship between _poverty rate_ and _graduation rate_ at the state level?
+
+
+1. Sketch the data frame that can answer this question.
+  - Dimensions
+  - Unit of observation
+  - Column names
+  - Range of values
+
+2. Sketch a plot that captures this relationship.
+  - How are you applying the grammar of graphics?
+  - How would you describe the relationship in words?
+
+<div class="countdown" id="timer_6185750a" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+## The data frame
+
+.pull-left[
+1. Sketch the data frame that can answer this question.
+  - Dimensions
+  - Unit of observation
+  - Column names
+  - Range of values
+]
+--
+.pull-right[
+
+```
+## # A tibble: 51 × 3
+##    State                Graduates Poverty
+##    &lt;chr&gt;                    &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Alabama                   79.9    14.6
+##  2 Alaska                    90.6     8.3
+##  3 Arizona                   83.8    13.3
+##  4 Arkansas                  80.9    18  
+##  5 California                81.1    12.8
+##  6 Colorado                  88.7     9.4
+##  7 Connecticut               87.5     7.8
+##  8 Delaware                  88.7     8.1
+##  9 District of Columbia      86      16.8
+## 10 Florida                   84.7    12.1
+## # … with 41 more rows
+```
+]
+
+---
+
+.panelset[
+.panel[.panel-name[Question]
+2. Sketch a plot that captures this relationship.
+  - How are you applying the grammar of graphics?
+  - How would you describe the relationship in words?
+]
+.panel[.panel-name[Grammar]
+
+
+```r
+ggplot(poverty, aes(x = Poverty, 
+                    y = Graduates)) +
+  geom_point()
+```
+
+- Map `Poverty` to the x-axis.
+- Map `Graduates` to the y-axis.
+- Use the point geometry.
+
+]
+.panel[.panel-name[Plot]
+.pull-left-wide[
+&lt;img src="correlation_files/figure-html/unnamed-chunk-4-1.png" width="720" style="display: block; margin: auto;" /&gt;
+]
+.pull-right-narrow[
+The trend is:
+
+- linear
+- moderately strong
+- negative
+  
+&gt; How can we capture this notion in a _statistic_?
+  ]
+]
+]
+
+---
+class: center, middle
+
+boardwork
+
+---
+
+.panelset[
+
+.panel[.panel-name[Question]
+&lt;img src="correlation_files/figure-html/unnamed-chunk-5-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+.task[
+Which of the following relationships is weakest, as measured by `\(r\)`?
+]
+
+]
+
+.panel[.panel-name[Responses]
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/UsYXLVmOwZcvgXWXwng1U?controls=none&amp;short_poll=true" width="600px" height="450px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+]
+
+.panel[.panel-name[Answer]
+&lt;img src="correlation_files/figure-html/unnamed-chunk-6-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+**Remember**: r measures only the strength of the _linear_ relationship.
+]
+
+]
+
+
+---
+## Poverty and Graduation: Correlation
+--
+
+.pull-left[
+&lt;img src="correlation_files/figure-html/unnamed-chunk-7-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+```r
+poverty %&gt;%
+  summarize(r = cor(Graduates, Poverty))
+```
+]
+--
+.pull-right[
+
+```
+## # A tibble: 1 × 1
+##        r
+##    &lt;dbl&gt;
+## 1 -0.747
+```
+
+The relationship between poverty and graduation is _linear_, _negative_ and _moderately strong_.
+
+&gt; What other questions can we ask?
+
+]
+
+
+---
+## What other questions can we ask?
+
+&lt;img src="correlation_files/figure-html/unnamed-chunk-9-1.png" width="1008" style="display: block; margin: auto;" /&gt;
+
+???
+Which state has the highest graduation rate?
+
+Which state has the highest poverty rate?
+
+Which state has the highest graduate rate for its poverty rate?
+
+---
+## Which state has the highest ...
+
+.pull-left-narrow[
+graduation rate?
+
+poverty rate?
+
+graduation rate for its poverty rate?
+]
+--
+.pull-right-wide[
+&lt;img src="correlation_files/figure-html/unnamed-chunk-10-1.png" width="720" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## The Linear Model
+
+.pull-left-narrow[
+Expresses an expected value for `\(y\)`, `\(\hat{y}\)`,  as a linear function of `\(x\)`.
+
+`$$\hat{y} = b_0 + b_1x$$`
+
+`\(b_0\)`: intercept
+
+`\(b_1\)`: slope
+
+]
+.pull-right-wide[
+&lt;img src="correlation_files/figure-html/unnamed-chunk-11-1.png" width="720" style="display: block; margin: auto;" /&gt;
+]
+
+
+
+
+---
+## Residuals
+
+---
+## Residuals in R
+
+
+```r
+m1 &lt;- lm(Graduates ~ Poverty, data = poverty)
+attributes(m1)
+```
+
+```
+## $names
+##  [1] "coefficients"  "residuals"     "effects"       "rank"         
+##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
+##  [9] "xlevels"       "call"          "terms"         "model"        
+## 
+## $class
+## [1] "lm"
+```
+
+```r
+m1$fitted
+```
+
+```
+##        1        2        3        4        5        6        7        8 
+## 83.09267 88.74951 84.25996 80.03978 84.70891 87.76181 89.19847 88.92909 
+##        9       10       11       12       13       14       15       16 
+## 81.11727 85.33745 85.33745 86.68432 85.60682 86.14557 88.39035 88.74951 
+##       17       18       19       20       21       22       23       24 
+## 87.76181 84.43954 80.93769 86.05578 89.64742 87.58223 86.95369 90.36575 
+##       25       26       27       28       29       30       31       32 
+## 80.39894 87.58223 83.90079 87.67202 88.74951 91.17387 89.19847 80.21936 
+##       33       34       35       36       37       38       39       40 
+## 83.63142 84.43954 85.51703 87.13327 83.00288 86.14557 87.94139 86.95369 
+##       41       42       43       44       45       46       47       48 
+## 84.08038 87.04348 83.45184 82.46414 87.85160 87.31286 88.39035 86.50474 
+##       49       50       51 
+## 81.83560 88.48014 87.67202
+```
+
+---
+## Residuals in R, cont.
+
+
+```r
+m1$residuals
+```
+
+```
+##          1          2          3          4          5          6          7 
+## -3.1926740  1.8504874 -0.4599582  0.8602230 -3.6089136  0.9381894 -1.6984680 
+##          8          9         10         11         12         13         14 
+## -0.2290948  4.8827299 -0.6374512 -0.2374512  1.8156824  2.5931755 -0.2455710 
+##         15         16         17         18         19         20         21 
+## -1.9903482  0.9504874  0.8381894 -1.6395404 -1.1376879  0.5442201 -2.0474235 
+##         22         23         24         25         26         27         28 
+## -0.4822284  0.6463092  1.2342478  0.8010586  0.7177716  6.1992062  3.1279805 
+##         29         30         31         32         33         34         35 
+## -3.1495126  0.9261280 -2.9984680  1.4806408  0.5685794 -3.0395404  4.1829666 
+##         36         37         38         39         40         41         42 
+##  0.0667270  2.6971170  0.7544290 -1.9413928 -5.9536908 -3.2803760  1.6565181 
+##         43         44         45         46         47         48         49 
+## -2.4518384 -5.2641364  1.5483983  1.5871448 -0.5903482  2.5952646 -3.1355988 
+##         50         51 
+##  0.1198607  3.2279805
+```
+
+
+---
+## Residual plot
+
+
+```r
+m1 &lt;- lm(Graduates ~ Poverty, data = poverty)
+plot(m1, 1)
+```
+
+&lt;img src="correlation_files/figure-html/unnamed-chunk-14-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
