@@ -1,0 +1,399 @@
+---
+title: "A Simple Linear Model"
+subtitle: "Finding the best line"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3)
+
+library(tidyverse)
+library(infer)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+library(ggrepel)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+set.seed(401)
+```
+
+---
+## Announcements
+--
+
+- Midterm II
+  - Goal: grades and topics published Saturday evening
+  - Retake: Sunday 11 am - Monday 11 am
+- PS like normal next week
+- Lab Tuesday, not Thursday (holiday)
+
+---
+
+```{r out.width=800, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/id-the-slr.png")
+```
+
+---
+## Which state has the highest ...
+
+```{r echo = FALSE}
+poverty <- read_delim("figs/poverty.txt")
+```
+
+.pull-left-narrow[
+Graduation rate?
+
+]
+
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+poverty <- poverty %>%
+  mutate(hi_grad = case_when(
+    State %in% c("New Hampshire", "Minnesota") ~ State, 
+    TRUE ~ ""),
+    hi_pov = case_when(
+      State %in% c("New Mexico", "Arkansas", "Mississippi") ~ State,
+      TRUE ~ ""),
+    hi_res = case_when(
+      State %in% c("Montana", "District of Columbia") ~ State,
+      TRUE ~ ""))
+p1 <- poverty %>%
+  ggplot(aes(x = Poverty, 
+             y = Graduates)) +
+  geom_point(size = 3) +
+  theme_bw(base_size = 18)
+p1
+```
+]
+
+---
+## Which state has the highest ...
+
+.pull-left-narrow[
+Graduation rate?
+
+]
+
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+p2 <- p1 +
+  geom_text_repel(aes(label = hi_grad))
+p2
+```
+]
+
+---
+## Which state has the highest ...
+
+.pull-left-narrow[
+Graduation rate?
+
+Poverty rate?
+
+]
+
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+p2
+```
+]
+
+---
+## Which state has the highest ...
+
+.pull-left-narrow[
+Graduation rate?
+
+Poverty rate?
+
+]
+
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+p3 <- p2 +
+  geom_text_repel(aes(label = hi_pov))
+p3
+```
+]
+---
+## Which state has the highest ...
+
+.pull-left-narrow[
+Graduation rate?
+
+Poverty rate?
+
+Grad rate given its poverty rate?
+
+]
+
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+p3
+```
+]
+
+---
+## Which state has the highest ...
+
+.pull-left-narrow[
+Graduation rate?
+
+Poverty rate?
+
+Grad rate given its poverty rate?
+
+]
+
+.pull-right-wide[
+```{r echo=FALSE, fig.width=10}
+p4 <- p3 +
+  geom_text_repel(aes(label = hi_res))
+p4
+```
+]
+
+---
+## The Linear Model
+
+Expresses a predicted value for $y$, $\hat{y}$,  as a linear function of $x$.
+
+$$\hat{y} = b_0 + b_1x$$
+
+$$b_0\textrm{: intercept} \quad \quad b_1\textrm{: slope}$$
+
+--
+
+```{r echo=FALSE, fig.height = 4.5}
+p1 +
+  geom_text_repel(aes(label = State)) +
+  geom_smooth(method='lm',formula=y~x, se = FALSE)
+```
+
+
+---
+### Residuals
+
+.pull-left[
+A _residual_ for observation $i$, $e_i$, is the difference between the observed value $y$ and the predicted value $\hat{y}$.
+
+$$e_i = y_i - \hat{y}_i$$
+]
+--
+.pull-right[
+```{r echo=FALSE, fig.height = 4.5}
+poverty <- poverty %>%
+  mutate(is_MT = case_when(
+    State == "Montana" ~ "Montana (13.7, 90.1)", 
+    TRUE ~ ""))
+m1 <- lm(Graduates ~ Poverty, data = poverty)
+mt_pred <- m1$fitted.values[poverty$State == "Montana"]
+poverty %>%
+  ggplot(aes(x = Poverty, 
+             y = Graduates)) +
+  annotate("segment", x = 13.7, xend = 13.7, 
+           y = mt_pred, yend = 90.1,
+           lty = 2,
+           color = "tomato", lwd = 1.5) +
+  geom_point(size = 3) +
+  theme_bw(base_size = 18) +
+  geom_text_repel(aes(label = is_MT)) +
+  annotate("text", x = 15, y = mt_pred, label = "(13.7, 83.9)") +
+  geom_smooth(method='lm',formula=y~x, se = FALSE)
+```
+
+Montana's residual:
+
+$$ 90.1 - 83.9 = 6.2 $$
+
+]
+---
+class: center, middle
+
+boardwork
+
+---
+## Estimation via optimization
+
+<center>
+<iframe width="784" height="444" src="https://www.youtube.com/embed/j2gcuRVbwR0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<center>
+
+Nelder-Mead Algorithm (downhill simplex method)
+
+---
+## Estimating $\beta_1$
+--
+
+```{r find-b1, echo = FALSE, fig.height = 6, fig.width = 10}
+p1 <- ggplot(poverty, aes(Poverty, Graduates)) + 
+  xlim(0, 20) +
+  ylim(75, 96) +
+  geom_point(size = 3) +
+  theme_bw(base_size = 18)
+p1
+```
+
+Use $s_x, s_y, \textrm{ and } r$ to calculate $b_1$.
+
+---
+## Estimating $\beta_1$
+--
+```{r stats1, eval = FALSE}
+stats <- poverty %>%
+  summarize(r = cor(Graduates, Poverty),
+            sx = sd(Poverty),
+            sy = sd(Graduates))
+stats
+```
+--
+```{r ref.label = "stats1", echo = FALSE}
+```
+--
+```{r stats2, eval = FALSE}
+stats2 <- stats %>%
+  mutate(b1 = sy/sx * r)
+stats2
+```
+--
+```{r ref.label = "stats2", echo = FALSE}
+```
+
+
+---
+## Estimating $\beta_1$, cont.
+
+```{r find-b1-2, echo = FALSE, fig.height = 6, fig.width = 10}
+m1 <- lm(Graduates ~ Poverty, data = poverty)
+p2 <- p1 + 
+  geom_abline(intercept = 93, slope = m1$coef[2], col = "goldenrod") +
+  annotate("text", x = 3, y = 87, label = paste("slope = ", round(m1$coef[2], 2)))
+p2
+```
+
+Use $s_x, s_y, \textrm{ and } r$ to calculate $b_1$.
+
+---
+## Estimating $\beta_0$
+
+```{r find-b02, echo = FALSE, fig.height = 6, fig.width = 10}
+x_bar <- mean(poverty$Poverty)
+y_bar <- mean(poverty$Graduates)
+p1 + 
+  geom_vline(xintercept = mean(poverty$Poverty), 
+                col = "steelblue",
+                lty = 2) +
+  geom_hline(yintercept = mean(poverty$Graduates), 
+                col = "steelblue",
+                lty = 2) + 
+  geom_abline(intercept = m1$coef[1], slope = m1$coef[2], col = "goldenrod") +
+  annotate("text", x = 3, y = 91, label = paste("slope = ", round(m1$coef[2], 2))) +
+  annotate("text", x = 14, y = 96, label = paste("x-bar = ", round(x_bar, 2))) +
+  annotate("text", x = 19, y = 85, label = paste("y-bar = ", round(y_bar, 2)))
+```
+
+If the line of best fit *must* pass through $(\bar{x}, \bar{y})$, what is $b_0$?
+
+---
+## Estimating $\beta_0$, cont.
+--
+
+Since $(11.35, 86.01)$ is on the line, the following relationship holds.
+
+$$ 86.01 = b_0 - 0.9 (11.35) $$
+--
+
+Then just solve for $b_0$.
+
+$$ b_0 = 86.01 + 0.9 (11.35) = 96.22$$
+--
+
+More generally:
+
+$$ b_0 = \bar{y} - b_1 \bar{x} $$
+
+---
+## Estimation in R
+--
+
+```{r fitlm}
+m1 <- lm(Graduates ~ Poverty, data = poverty)
+summary(m1)
+```
+
+
+---
+## The `lm` object
+--
+
+```{r showlm}
+attributes(m1)
+m1$coef
+m1$fit
+```
+
+
+---
+## Interpretation of $b_1$
+--
+
+The **slope** describes the estimated difference in the $y$ variable if the explanatory
+variable $x$ for a case happened to be one unit larger.
+
+--
+
+```{r}
+m1$coef[2]
+```
+
+*For each additional percentage point of people living below the poverty level,
+we expect a state to have a proportion of high school graduates that is 0.898
+lower*.
+
+**Be Cautious**: if it is observational data, you do not have evidence of a 
+*causal link*, but of an association, which still can be used for prediction.
+
+
+---
+## Interpretation of $b_0$
+--
+
+The **intercept** is the estimated $y$ value that will be taken by a case with 
+an $x$ value of zero.
+
+--
+
+```{r}
+m1$coef[1]
+```
+
+While necessary for prediction, the intercept often has no meaningful interpretation.
+
+---
+## Linear Models for Prediction
+
+```{r, echo = FALSE, fig.height = 6, fig.width = 10}
+x_bar <- mean(poverty$Poverty)
+y_bar <- mean(poverty$Graduates)
+p1 + 
+  geom_abline(intercept = m1$coef[1], slope = m1$coef[2], col = "goldenrod")
+```
+
+$$\hat{y} = 96.2 - .9 x$$
+
+

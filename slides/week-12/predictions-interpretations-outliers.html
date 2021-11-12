@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>The Linear Model: what is it good for?</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# The Linear Model: what is it good for?
+## Predictions, residuals, and description
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+## Announcements
+--
+
+- Midterm II
+  - Mean unadjusted score: 17.6/24
+- PS like normal this week
+- Read Ch. 7
+- No lab meeting Thursday
+
+---
+class: center, middle
+
+.adage[Last time...]
+
+---
+
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-1-1.png" width="1008" style="display: block; margin: auto;" /&gt;
+
+???
+We were interested in the relationship between poverty rates and graduates rates, so we started by visualizing it with a scatter plot. We described the strength of the linear relationship with the correlation coefficient. A linear model is more interesting, involving two statistics, so we considered the full range of lines we _could_ fit.
+
+To decide which to use, we need to decide which line is "best" in some sense.
+
+---
+
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-2-1.png" width="1008" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-3-1.png" width="1008" style="display: block; margin: auto;" /&gt;
+
+---
+## Ordinary Least Squares
+
+Find the line that minimizes the sum of the squared residuals.
+
+--
+
+`$$\sum_{i=1}^n (y_i - \hat{y}_i)^2$$`
+
+--
+
+Two methods of finding that line:
+
+--
+.pull-left[
+Numerical Optimization
+]
+.pull-right[
+Calculus
+]
+
+---
+
+`$$\sum_{i=1}^n (y_i - \hat{y}_i)^2 = \sum_{i=1}^n (y_i - \mathbf{b_0} - \mathbf{b_1}x)^2 = f_{RSS}(b_0, b_1)$$`
+
+--
+
+.pull-left[
+&lt;center&gt;
+&lt;iframe width="784" height="444" src="https://www.youtube.com/embed/j2gcuRVbwR0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+&lt;center&gt;
+]
+--
+.pull-right[
+Take derivatives of `\(f_{RSS}\)`, set to 0, solve.
+
+$$ b_1 = r \frac{s_y}{s_x} $$
+
+$$ b_0 = \bar{y} - b_1 \bar{x} $$
+]
+
+---
+
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-4-1.png" width="1008" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-5-1.png" width="1008" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle, center, inverse
+
+# Estimation in R
+
+---
+## Estimation in R
+--
+
+
+```r
+m1 &lt;- lm(Graduates ~ Poverty, data = poverty)
+summary(m1)
+```
+
+```
+## 
+## Call:
+## lm(formula = Graduates ~ Poverty, data = poverty)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.9537 -1.8199  0.5442  1.5145  6.1992 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  96.2022     1.3427  71.647  &lt; 2e-16 ***
+## Poverty      -0.8979     0.1142  -7.862 3.11e-10 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.503 on 49 degrees of freedom
+## Multiple R-squared:  0.5578,	Adjusted R-squared:  0.5488 
+## F-statistic: 61.81 on 1 and 49 DF,  p-value: 3.109e-10
+```
+
+
+---
+## The `lm` object
+--
+
+
+```r
+attributes(m1)
+```
+
+```
+## $names
+##  [1] "coefficients"  "residuals"     "effects"       "rank"         
+##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
+##  [9] "xlevels"       "call"          "terms"         "model"        
+## 
+## $class
+## [1] "lm"
+```
+
+```r
+coefficients(m1)
+```
+
+```
+## (Intercept)     Poverty 
+##  96.2021729  -0.8979109
+```
+
+```r
+coef(m1)
+```
+
+```
+## (Intercept)     Poverty 
+##  96.2021729  -0.8979109
+```
+
+---
+## The `lm` object, cont.
+--
+
+
+```r
+fitted(m1)
+```
+
+```
+##        1        2        3        4        5        6        7        8 
+## 83.09267 88.74951 84.25996 80.03978 84.70891 87.76181 89.19847 88.92909 
+##        9       10       11       12       13       14       15       16 
+## 81.11727 85.33745 85.33745 86.68432 85.60682 86.14557 88.39035 88.74951 
+##       17       18       19       20       21       22       23       24 
+## 87.76181 84.43954 80.93769 86.05578 89.64742 87.58223 86.95369 90.36575 
+##       25       26       27       28       29       30       31       32 
+## 80.39894 87.58223 83.90079 87.67202 88.74951 91.17387 89.19847 80.21936 
+##       33       34       35       36       37       38       39       40 
+## 83.63142 84.43954 85.51703 87.13327 83.00288 86.14557 87.94139 86.95369 
+##       41       42       43       44       45       46       47       48 
+## 84.08038 87.04348 83.45184 82.46414 87.85160 87.31286 88.39035 86.50474 
+##       49       50       51 
+## 81.83560 88.48014 87.67202
+```
+
+---
+## The `lm` object, cont.
+--
+
+
+```r
+residuals(m1)
+```
+
+```
+##          1          2          3          4          5          6          7 
+## -3.1926740  1.8504874 -0.4599582  0.8602230 -3.6089136  0.9381894 -1.6984680 
+##          8          9         10         11         12         13         14 
+## -0.2290948  4.8827299 -0.6374512 -0.2374512  1.8156824  2.5931755 -0.2455710 
+##         15         16         17         18         19         20         21 
+## -1.9903482  0.9504874  0.8381894 -1.6395404 -1.1376879  0.5442201 -2.0474235 
+##         22         23         24         25         26         27         28 
+## -0.4822284  0.6463092  1.2342478  0.8010586  0.7177716  6.1992062  3.1279805 
+##         29         30         31         32         33         34         35 
+## -3.1495126  0.9261280 -2.9984680  1.4806408  0.5685794 -3.0395404  4.1829666 
+##         36         37         38         39         40         41         42 
+##  0.0667270  2.6971170  0.7544290 -1.9413928 -5.9536908 -3.2803760  1.6565181 
+##         43         44         45         46         47         48         49 
+## -2.4518384 -5.2641364  1.5483983  1.5871448 -0.5903482  2.5952646 -3.1355988 
+##         50         51 
+##  0.1198607  3.2279805
+```
+
+---
+class: center, middle, inverse
+
+# The linear model: what is it good for?
+
+---
+## The linear model: what is it good for?
+--
+
+1. _Prediction_: predicting the unknown value of `\(y_i\)` for a new `\(x_i\)` not in the data set.
+
+--
+
+2. _Residual Analysis_: understanding the deviation of each observation, `\(y_i\)`, relative to the model's prediction, `\(\hat{y}_i\)`.
+
+--
+
+3. _Description_: describing the linear relationship between the variables in the data set.
+
+---
+## Linear Models for Prediction
+
+.pull-left-narrow[
+.task[
+What graduation rate would you expect for a state with a poverty rate of 15%?
+]
+`$$\hat{y} = 96.2 - .9 x$$`
+]
+
+.pull-right-wide[
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-8-1.png" width="648" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Linear Models for Prediction
+
+.pull-left-narrow[
+.task[
+What graduation rate would you expect for a state with a poverty rate of 15%?
+]
+`$$\hat{y} = 96.2 - .9 x$$`
+]
+
+.pull-right-wide[
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-9-1.png" width="648" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Linear Models for Prediction
+
+.pull-left-narrow[
+.task[
+What graduation rate would you expect for a state with a poverty rate of 15%?
+]
+`$$\hat{y} = 96.2 - .9 x$$`
+]
+
+.pull-right-wide[
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-10-1.png" width="648" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Linear Models for Prediction
+
+.pull-left-narrow[
+.task[
+What graduation rate would you expect for a state with a poverty rate of 15%?
+]
+`$$\hat{y} = 96.2 - .9 x$$`
+
+$$ 96.2 - .9 \times 15 = 82.7$$
+]
+
+.pull-right-wide[
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-11-1.png" width="648" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Linear Models for Prediction in R
+--
+
+.pull-left[
+By hand:
+
+```r
+coef(m1)[1] + coef(m1)[2] * 15
+```
+
+```
+## (Intercept) 
+##    82.73351
+```
+]
+--
+.pull-right[
+Using `predict()`:
+
+```r
+newx &lt;- data.frame(Poverty = 15)
+predict(m1, newx)
+```
+
+```
+##        1 
+## 82.73351
+```
+]
+
+---
+## How good were the predictions?
+--
+
+.task[
+Which data set(s) will yield a linear model with the best predictions?
+]
+
+--
+
+&lt;img src="figs/id-the-slr.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+---
+
+boardwork
+
+---
+
+&lt;img src="figs/r-squared.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+## How good were the predictions?
+--
+
+`\(r^2\)`, the square of the correlation coefficient measures the proportion of total variability in the `\(y\)` that is explained by the linear model.
+
+--
+
+- `\(r^2 \in [0, 1]\)`
+
+- `\(r^2\)` near 1 means predictions were more accurate.
+
+- `\(r^2\)` near 0 means predictions were less accurate.
+
+---
+## Two classes of predictions
+--
+
+1. _Interpolation_: Prediction using a value of `\(x\)` that is _within_ the range of `\(x\)` values found in the data set used to fit the model.
+
+--
+
+2. _Extrapolation_: Prediction using a value of `\(x\)` that is _outside_ the range of `\(x\)` values found in the data set used to fit the model.
+
+---
+## Linear Models for Prediction
+
+.pull-left-narrow[
+.task[
+What graduation rate would you expect for a state with a poverty rate of 1%?
+]
+`$$\hat{y} = 96.2 - .9 x$$`
+
+]
+
+.pull-right-wide[
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-16-1.png" width="648" style="display: block; margin: auto;" /&gt;
+]
+
+---
+class: center
+&lt;img src="https://imgs.xkcd.com/comics/extrapolating.png" width="60%" style="display: block; margin: auto;" /&gt;
+.cite[source: https://xkcd.com/605/]
+--
+  
+_Extrapolation is treacherous._
+
+---
+## The linear model: what is it good for?
+--
+
+1. _Prediction_: predicting the unknown value of `\(y_i\)` for a new `\(x_i\)` not in the data set.
+
+--
+
+2. _Residual Analysis_: understanding the deviation of each observation, `\(y_i\)`, relative to the model's prediction, `\(\hat{y}_i\)`.
+
+--
+
+3. _Description_: describing the linear relationship between the variables in the data set.
+
+---
+## Residual Analysis
+--
+
+.task[
+What is the definition of _residual_?
+]
+
+--
+
+A) `\(\hat{y}_i - \bar{y}_i\)`
+
+B) `\(y_i - \bar{y}_i\)`
+
+C) `\(\hat{y}_i - \bar{y}_i\)`
+
+D) `\(y_i - \hat{y}_i\)`
+
+E) `\(\hat{y}_i - y_i\)`
+
+---
+## Residual Analysis
+--
+
+A _residual_ is the difference between the observed value and the "predicted" value of a given `\(y_i\)`.
+
+$$ e_i = y_i - \hat{y}_i $$
+
+--
+
+Can be used to:
+
+- Describe where a given observation lay relative to the model.
+- Uncover more general trends in the interaction of the data and the model.
+
+---
+## Residual Analysis, cont.
+
+Consider the case of Montana.
+
+--
+
+
+```r
+p1
+```
+
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-18-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Residuals vs `\(x\)`
+--
+
+.pull-left[
+
+```r
+poverty %&gt;%
+  mutate(yhat = fitted(m1),
+         res  = residuals(m1)) %&gt;%
+  ggplot(aes(x = Poverty,
+             y = res)) +
+  geom_point(size = 3) +
+  geom_text_repel(aes(label = State)) +
+  theme_bw(base_size = 18)
+```
+]
+--
+.pull-right[
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-19-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Residuals vs `\(\hat{y}\)`
+
+.pull-left[
+
+```r
+poverty %&gt;%
+  mutate(yhat = fitted(m1),
+         res  = residuals(m1)) %&gt;%
+  ggplot(aes(x = yhat,
+             y = res)) +
+  geom_point(size = 3) +
+  geom_text_repel(aes(label = State)) +
+  theme_bw(base_size = 18)
+```
+]
+--
+.pull-right[
+&lt;img src="predictions-interpretations-outliers_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Residual plots
+
+What to look for:
+
+- Increasing or descreasing variance in the residuals (_heteroskedasticity_)
+
+- Non-linear trends
+
+---
+## The linear model: what is it good for?
+--
+
+1. _Prediction_: predicting the unknown value of `\(y_i\)` for a new `\(x_i\)` not in the data set.
+
+--
+
+2. _Residual Analysis_: understanding the deviation of each observation, `\(y_i\)`, relative to the model's prediction, `\(\hat{y}_i\)`.
+
+--
+
+3. _Description_: describing the linear relationship between the variables in the data set.
+
+---
+## Interpretation of `\(b_1\)`
+--
+
+The **slope** describes the estimated difference in the `\(y\)` variable if the explanatory
+variable `\(x\)` for a case happened to be one unit larger.
+
+--
+
+
+```r
+coef(m1)[2]
+```
+
+```
+##    Poverty 
+## -0.8979109
+```
+
+*For each additional percentage point of people living below the poverty level,
+we expect a state to have a proportion of high school graduates that is 0.898
+lower*.
+
+**Be Cautious**: if it is observational data, you do not have evidence of a 
+*causal link*, but of an association, which still can be used for prediction.
+
+
+---
+## Interpretation of `\(b_0\)`
+--
+
+The **intercept** is the predicted value that `\(y\)` will take for a case with an `\(x\)` value of zero.
+
+--
+
+
+```r
+coef(m1)[2]
+```
+
+```
+##    Poverty 
+## -0.8979109
+```
+
+While necessary for prediction, the intercept often has no meaningful interpretation.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
