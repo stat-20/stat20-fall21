@@ -36,7 +36,7 @@ set.seed(401)
 class: center, middle
 .adage[Some chatter from the internets]
 
---
+---
 
 ## 2016 Election
 
