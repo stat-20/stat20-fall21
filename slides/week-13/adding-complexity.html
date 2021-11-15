@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Adding Complexity</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Adding Complexity
+## Two intercepts, two slopes
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+&lt;img src="figs/model-assumptions-1.jpg" width="870" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/model-assumptions-2.jpg" width="870" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/model-assumptions-3.jpg" width="870" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/model-assumptions-4.jpg" width="870" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle
+
+.adage[
+That is simple linear regression. Let's begin to add some complexity.
+]
+
+---
+
+## Example: shipping books
+--
+
+&lt;img src="figs/pile-of-books.jpg" width="480" style="display: block; margin: auto;" /&gt;
+
+When you buy a book off of Amazon, you get a quote for how much it
+costs to ship. This is based on the weight of the book. If you
+didn't know the weight a book, what other characteristics of it
+could you measure to help predict weight?
+
+
+
+
+---
+## The data
+--
+
+Consider the following data set, a simple random sample of books from Amazon's catalog where the weight of the books is known.
+
+
+```r
+books %&gt;%
+  select(weight, volume)
+```
+--
+
+```
+## # A tibble: 15 × 2
+##    weight volume
+##     &lt;dbl&gt;  &lt;dbl&gt;
+##  1    800    885
+##  2    950   1016
+##  3   1050   1125
+##  4    350    239
+##  5    750    701
+##  6    600    641
+##  7   1075   1228
+##  8    250    412
+##  9    700    953
+## 10    650    929
+## 11    975   1492
+## 12    350    419
+## 13    950   1010
+## 14    425    595
+## 15    725   1034
+```
+
+
+---
+## Shipping books visualized
+--
+
+&lt;img src="adding-complexity_files/figure-html/plotallbacks-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Shipping books visualized, cont.
+
+
+
+&lt;img src="adding-complexity_files/figure-html/plotallbackswline-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: small
+## Fitting the linear model
+--
+
+
+```r
+m1 &lt;- lm(weight ~ volume, data = books)
+summary(m1)
+```
+
+--
+
+
+```
+## 
+## Call:
+## lm(formula = weight ~ volume, data = books)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -189.97 -109.86   38.08  109.73  145.57 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 107.67931   88.37758   1.218    0.245    
+## volume        0.70864    0.09746   7.271 6.26e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 123.9 on 13 degrees of freedom
+## Multiple R-squared:  0.8026,	Adjusted R-squared:  0.7875 
+## F-statistic: 52.87 on 1 and 13 DF,  p-value: 6.262e-06
+```
+
+
+---
+
+**Question 1**: What is the equation for the line?
+--
+
+$$ \hat{y} = 107.7 + 0.708 x $$
+
+$$ \widehat{weight} = 107.7 + 0.708 volume $$
+
+
+---
+**Question 2**: Does this appear to be a reasonable setting in which to apply linear regression for inference?
+
+--
+
+We need to consider:
+
+1. Linear trend
+2. Independent observations
+3. Normal residuals
+4. Equal variance
+
+---
+## Residual Plot
+--
+
+&lt;img src="adding-complexity_files/figure-html/resplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Histogram of Residuals
+--
+
+&lt;img src="adding-complexity_files/figure-html/resplot2-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+**Question 2**: Does this appear to be a reasonable setting in which to apply linear regression for inference?
+
+--
+
+We need to consider:
+
+1. Linear trend: _Looks reasonable_
+2. Independent observations _Seems reasonable_
+3. Normal residuals _Questionable_
+4. Equal variance _Looks reasonable_
+
+--
+
+&gt; We should be skeptical of the accuracy of our p-values.
+
+---
+**Question 3**: Is volume a significant predictor?
+--
+
+
+```r
+summary(m1)
+```
+
+```
+## 
+## Call:
+## lm(formula = weight ~ volume, data = books)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -189.97 -109.86   38.08  109.73  145.57 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 107.67931   88.37758   1.218    0.245    
+## volume        0.70864    0.09746   7.271 6.26e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 123.9 on 13 degrees of freedom
+## Multiple R-squared:  0.8026,	Adjusted R-squared:  0.7875 
+## F-statistic: 52.87 on 1 and 13 DF,  p-value: 6.262e-06
+```
+
+**Question 4**: How much of the variation in weight is explained by the model?
+
+
+---
+## Multiple Regression
+--
+
+Allows us create a model to explain one `\(numerical\)` variable, the response, as a linear function of many explanatory variables that can be both `\(numerical\)` and
+`\(categorical\)`.
+
+--
+
+We posit a true model (here with a normal errors assumption):
+
+$$ y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots + \beta_p x_p + \epsilon; \quad \epsilon \sim N(0, \sigma^2) $$
+
+We use the data to estimate our fitted model:
+
+$$ \hat{y} = b_0 + b_1 x_1 + b_2 x_2 + \ldots + b_p x_p $$
+
+---
+## Estimating `\(\beta_0, \beta_1\)` etc.
+--
+
+In least-squares regression, we're still finding the estimates that minimize
+the sum of squared residuals.
+
+$$ e_i = y_i - \hat{y}_i $$
+
+$$ \sum_{i = 1}^n e_i^2 $$
+
+And yes, they have a closed-form solution.
+
+$$ \mathbf{b} = (X'X)^{-1}X'Y $$
+
+--
+
+In R:
+
+```r
+lm(Y ~ X1 + X2 + ... + Xp, data = mydata)
+```
+
+
+---
+## Example: shipping books
+--
+
+
+```r
+books
+```
+--
+
+```
+## # A tibble: 15 × 3
+##    weight volume cover
+##     &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;
+##  1    800    885 hb   
+##  2    950   1016 hb   
+##  3   1050   1125 hb   
+##  4    350    239 hb   
+##  5    750    701 hb   
+##  6    600    641 hb   
+##  7   1075   1228 hb   
+##  8    250    412 pb   
+##  9    700    953 pb   
+## 10    650    929 pb   
+## 11    975   1492 pb   
+## 12    350    419 pb   
+## 13    950   1010 pb   
+## 14    425    595 pb   
+## 15    725   1034 pb
+```
+
+
+
+---
+## Example: shipping books
+--
+
+&lt;img src="adding-complexity_files/figure-html/plotcolors-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Example: shipping books
+--
+
+
+```r
+m2 &lt;- lm(weight ~ volume + cover, data = books)
+summary(m2)
+```
+
+```
+## 
+## Call:
+## lm(formula = weight ~ volume + cover, data = books)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -110.10  -32.32  -16.10   28.93  210.95 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  197.96284   59.19274   3.344 0.005841 ** 
+## volume         0.71795    0.06153  11.669  6.6e-08 ***
+## coverpb     -184.04727   40.49420  -4.545 0.000672 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 78.2 on 12 degrees of freedom
+## Multiple R-squared:  0.9275,	Adjusted R-squared:  0.9154 
+## F-statistic: 76.73 on 2 and 12 DF,  p-value: 1.455e-07
+```
+
+---
+## How do we interpret these estimates?
+
+Think about the geometry of the model.
+
+---
+
+&lt;img src="figs/ancova-geometry-1.jpg" width="870" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Example: shipping books
+--
+
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-12-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## MLR slope interpretation
+--
+
+The slope corresponding to the dummy variable tells us:
+
+- How much vertical separation there is between our lines
+- How much `weight` is expected to increase if `cover` goes
+from 0 to 1 and `volume` is left unchanged.
+
+Each `\(b_i\)` tells you how much you expect the `\(Y\)` to change when you change the
+`\(X_i\)`, while **holding all other variables constant**.
+
+
+---
+## Your turn 1
+--
+
+.pull-left-wide[
+
+```r
+summary(m2)
+```
+
+```
+## 
+## Call:
+## lm(formula = weight ~ volume + cover, data = books)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -110.10  -32.32  -16.10   28.93  210.95 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  197.96284   59.19274   3.344 0.005841 ** 
+## volume         0.71795    0.06153  11.669  6.6e-08 ***
+## coverpb     -184.04727   40.49420  -4.545 0.000672 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 78.2 on 12 degrees of freedom
+## Multiple R-squared:  0.9275,	Adjusted R-squared:  0.9154 
+## F-statistic: 76.73 on 2 and 12 DF,  p-value: 1.455e-07
+```
+]
+--
+.pull-right-narrow[
+- Is the difference between cover types significant?
+- How much of the variation in weight is explained by a model containing both
+volume and cover?
+]
+
+---
+## Your turn 2
+--
+
+
+```r
+coef(summary(m2))
+```
+
+```
+##                 Estimate  Std. Error   t value     Pr(&gt;|t|)
+## (Intercept)  197.9628436 59.19273726  3.344377 5.840595e-03
+## volume         0.7179537  0.06152501 11.669299 6.598333e-08
+## coverpb     -184.0472714 40.49419938 -4.545028 6.719488e-04
+```
+
+```r
+qt(.025, df = nrow(books) - 3)
+```
+
+```
+## [1] -2.178813
+```
+
+.task[Which of the follow represents the appropriate 95% CI for `coverpb`?]
+
+1. `\(197 \pm 1.96 \times 59.19\)`
+2. `\(-184 \pm 2.18 \times 40.5\)`
+3. `\(-184 \pm -4.55 \times 40.5\)`
+
+
+```r
+countdown::countdown(2)
+```
+
+<div class="countdown" id="timer_6192ae36" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/G5f4aGxEBfiyURlsZxxe4?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+## Mathematical CIs in R
+
+.pull-left[
+By hand.
+
+
+```r
+LB &lt;- coef(m2)[3] + 
+  qt(.025, nrow(books)-3) * 40.5
+UB &lt;- coef(m2)[3] - 
+  qt(.025, nrow(books)-3) * 40.5
+c(LB, UB)
+```
+
+```
+##    coverpb    coverpb 
+## -272.28919  -95.80535
+```
+
+]
+--
+.pull-right[
+With `confint()`.
+
+
+```r
+confint(m2)
+```
+
+```
+##                    2.5 %      97.5 %
+## (Intercept)   68.9929482 326.9327389
+## volume         0.5839023   0.8520052
+## coverpb     -272.2765525 -95.8179902
+```
+]
+
+
+
+
+---
+## Extending the model
+--
+
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-17-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+The two cover types have different intercepts. Do they share the same slope?
+
+
+---
+## Extending the model
+
+Think about the geometry.
+
+---
+
+&lt;img src="figs/ancova-geometry-2.jpg" width="870" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Extending the model
+
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-19-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+class:small
+## Interaction terms
+--
+
+
+```r
+m3 &lt;- lm(weight ~ volume + cover + volume:cover, 
+         data = books)
+summary(m3)
+```
+
+```
+## 
+## Call:
+## lm(formula = weight ~ volume + cover + volume:cover, data = books)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -89.67 -32.07 -21.82  17.94 215.91 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     161.58654   86.51918   1.868   0.0887 .  
+## volume            0.76159    0.09718   7.837 7.94e-06 ***
+## coverpb        -120.21407  115.65899  -1.039   0.3209    
+## volume:coverpb   -0.07573    0.12802  -0.592   0.5661    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 80.41 on 11 degrees of freedom
+## Multiple R-squared:  0.9297,	Adjusted R-squared:  0.9105 
+## F-statistic:  48.5 on 3 and 11 DF,  p-value: 1.245e-06
+```
+
+Do we have evidence that two types of books have different relationships
+between volume and weight?
+
+
+---
+## Take home messages
+--
+
+- There is a statistically significant relationship between volume and weight.
+- There is a statistically significant difference in weight between paperback
+and hardcover books, when controlling for volume.
+- There is no strong evidence that the relationship between volume and weight
+differs between paperbacks and hardbacks.
+
+This is **inference**, which requires **valid models**.
+
+---
+
+Recall the original residual plots for the simple model.
+
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-21-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+
+Residual plots for the two-intercept model.
+
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-22-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-23-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
