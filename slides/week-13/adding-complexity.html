@@ -111,7 +111,6 @@ books %&gt;%
 
 
 ---
-class: small
 ## Fitting the linear model
 --
 
@@ -375,8 +374,6 @@ Each `\(b_i\)` tells you how much you expect the `\(Y\)` to change when you chan
 
 
 ---
-## Your turn 1
---
 
 .pull-left-wide[
 
@@ -414,8 +411,6 @@ volume and cover?
 ]
 
 ---
-## Your turn 2
---
 
 
 ```r
@@ -437,26 +432,11 @@ qt(.025, df = nrow(books) - 3)
 ## [1] -2.178813
 ```
 
-.task[Which of the follow represents the appropriate 95% CI for `coverpb`?]
+Which of the follow represents the appropriate 95% CI for `coverpb`?
 
 1. `\(197 \pm 1.96 \times 59.19\)`
 2. `\(-184 \pm 2.18 \times 40.5\)`
 3. `\(-184 \pm -4.55 \times 40.5\)`
-
-
-```r
-countdown::countdown(2)
-```
-
-<div class="countdown" id="timer_6192ae36" style="right:0;bottom:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
----
-
-&lt;center&gt;
-&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/G5f4aGxEBfiyURlsZxxe4?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
-&lt;/center&gt;
 
 ---
 ## Mathematical CIs in R
@@ -496,14 +476,119 @@ confint(m2)
 ```
 ]
 
+---
+.task[
+Take a moment to sketch out the infer pipeline that will result in a collection of 500 bootstrapped slopes that represent slopes that we might have observed had we drawn a different random sample from the population.
+
+Turn to a neighbor and discuss your pipeline. I will ask for a pair to share.
+]
+
+--
 
 
+```r
+books
+```
+
+```
+## # A tibble: 15 × 3
+##    weight volume cover
+##     &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;
+##  1    800    885 hb   
+##  2    950   1016 hb   
+##  3   1050   1125 hb   
+##  4    350    239 hb   
+##  5    750    701 hb   
+##  6    600    641 hb   
+##  7   1075   1228 hb   
+##  8    250    412 pb   
+##  9    700    953 pb   
+## 10    650    929 pb   
+## 11    975   1492 pb   
+## 12    350    419 pb   
+## 13    950   1010 pb   
+## 14    425    595 pb   
+## 15    725   1034 pb
+```
+
+
+<div class="countdown" id="timer_61953f6c" style="right:0;bottom:0;" data-warnwhen="20">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+## Bootstrap CIs in R
+
+
+```r
+books %&gt;%
+  specify(weight ~ volume + cover) %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+  calculate(slope)
+```
+
+--
+
+
+```
+## Error: Multiple explanatory variables are not supported in calculate(). When working with multiple explanatory variables, use fit() instead.
+```
+
+---
+## Bootstrap CIs in R, cont.
+
+
+```r
+books %&gt;%
+  specify(weight ~ volume + cover) %&gt;%
+  generate(reps = 500, type = "bootstrap") %&gt;%
+* fit()
+```
+
+--
+
+
+```
+## # A tibble: 1,500 × 3
+## # Groups:   replicate [500]
+##    replicate term      estimate
+##        &lt;int&gt; &lt;chr&gt;        &lt;dbl&gt;
+##  1         1 intercept  170.   
+##  2         1 volume       0.745
+##  3         1 coverpb   -195.   
+##  4         2 intercept  235.   
+##  5         2 volume       0.682
+##  6         2 coverpb   -223.   
+##  7         3 intercept  231.   
+##  8         3 volume       0.705
+##  9         3 coverpb   -215.   
+## 10         4 intercept  233.   
+## # … with 1,490 more rows
+```
+
+---
+## Bootstrap CIs in R, cont.
+--
+
+&lt;img src="adding-complexity_files/figure-html/inf3-1.png" width="864" style="display: block; margin: auto;" /&gt;
+--
+
+```
+##                    2.5 %      97.5 %
+## (Intercept)   68.9929482 326.9327389
+## volume         0.5839023   0.8520052
+## coverpb     -272.2765525 -95.8179902
+```
+--
+
+&gt; With `\(n=15\)`, bootstrap intervals are likely inaccurate.
 
 ---
 ## Extending the model
 --
 
-&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-17-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-21-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 The two cover types have different intercepts. Do they share the same slope?
 
@@ -521,11 +606,10 @@ Think about the geometry.
 ---
 ## Extending the model
 
-&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-19-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-23-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 
 ---
-class:small
 ## Interaction terms
 --
 
@@ -568,10 +652,16 @@ between volume and weight?
 --
 
 - There is a statistically significant relationship between volume and weight.
-- There is a statistically significant difference in weight between paperback
-and hardcover books, when controlling for volume.
-- There is no strong evidence that the relationship between volume and weight
-differs between paperbacks and hardbacks.
+
+--
+
+- There is a statistically significant difference in weight between paperback and hardcover books, when controlling for volume.
+
+--
+
+- There is no strong evidence that the relationship between volume and weight differs between paperbacks and hardbacks.
+
+--
 
 This is **inference**, which requires **valid models**.
 
@@ -579,17 +669,20 @@ This is **inference**, which requires **valid models**.
 
 Recall the original residual plots for the simple model.
 
-&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-21-1.png" width="864" style="display: block; margin: auto;" /&gt;
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-25-1.png" width="864" style="display: block; margin: auto;" /&gt;
 
 ---
 
 Residual plots for the two-intercept model.
 
-&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-22-1.png" width="864" style="display: block; margin: auto;" /&gt;
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-26-1.png" width="864" style="display: block; margin: auto;" /&gt;
 
 ---
+class: center, middle
 
-&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-23-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="adding-complexity_files/figure-html/unnamed-chunk-27-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+👌
 
 
     </textarea>

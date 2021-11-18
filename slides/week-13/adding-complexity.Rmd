@@ -127,7 +127,6 @@ p1 +
 
 
 ---
-class: small
 ## Fitting the linear model
 --
 
@@ -333,8 +332,6 @@ $X_i$, while **holding all other variables constant**.
 
 
 ---
-## Your turn 1
---
 
 .pull-left-wide[
 ```{r}
@@ -349,29 +346,17 @@ volume and cover?
 ]
 
 ---
-## Your turn 2
---
 
 ```{r}
 coef(summary(m2))
 qt(.025, df = nrow(books) - 3)
 ```
 
-.task[Which of the follow represents the appropriate 95% CI for `coverpb`?]
+Which of the follow represents the appropriate 95% CI for `coverpb`?
 
 1. $197 \pm 1.96 \times 59.19$
 2. $-184 \pm 2.18 \times 40.5$
 3. $-184 \pm -4.55 \times 40.5$
-
-```{r}
-countdown::countdown(2)
-```
-
----
-
-<center>
-<iframe src="https://embed.polleverywhere.com/multiple_choice_polls/G5f4aGxEBfiyURlsZxxe4?controls=none&short_poll=true" width="800px" height="600px"></iframe>
-</center>
 
 ---
 ## Mathematical CIs in R
@@ -397,8 +382,79 @@ confint(m2)
 ```
 ]
 
+---
+.task[
+Take a moment to sketch out the infer pipeline that will result in a collection of 500 bootstrapped slopes that represent slopes that we might have observed had we drawn a different random sample from the population.
+
+Turn to a neighbor and discuss your pipeline. I will ask for a pair to share.
+]
+
+--
+
+```{r}
+books
+```
 
 
+```{r echo = FALSE}
+countdown::countdown(minutes = 2, warn_when = 20)
+```
+
+
+---
+## Bootstrap CIs in R
+
+```{r inf1, eval = FALSE}
+books %>%
+  specify(weight ~ volume + cover) %>%
+  generate(reps = 500, type = "bootstrap") %>%
+  calculate(slope)
+```
+
+--
+
+```{r ref.label = "inf1", echo = FALSE, error = TRUE}
+```
+
+---
+## Bootstrap CIs in R, cont.
+
+```{r inf2, eval = FALSE}
+books %>%
+  specify(weight ~ volume + cover) %>%
+  generate(reps = 500, type = "bootstrap") %>%
+  fit() #<<
+```
+
+--
+
+```{r ref.label = "inf2", echo = FALSE, error = TRUE}
+```
+
+---
+## Bootstrap CIs in R, cont.
+--
+
+```{r inf3, echo = FALSE, fig.width=12, fig.height=3.5}
+boot <- books %>%
+  specify(weight ~ volume + cover) %>%
+  generate(reps = 500, type = "bootstrap") %>%
+  fit()
+boot %>%
+  ggplot(aes(x = estimate)) +
+  geom_histogram(col = "white") +
+  facet_wrap(vars(term), 
+             nrow = 1,
+             scales = "free_x") +
+  theme_gray(base_size = 18)
+```
+--
+```{r echo = FALSE}
+confint(m2)
+```
+--
+
+> With $n=15$, bootstrap intervals are likely inaccurate.
 
 ---
 ## Extending the model
@@ -433,7 +489,6 @@ p2 +
 
 
 ---
-class:small
 ## Interaction terms
 --
 
@@ -452,10 +507,16 @@ between volume and weight?
 --
 
 - There is a statistically significant relationship between volume and weight.
-- There is a statistically significant difference in weight between paperback
-and hardcover books, when controlling for volume.
-- There is no strong evidence that the relationship between volume and weight
-differs between paperbacks and hardbacks.
+
+--
+
+- There is a statistically significant difference in weight between paperback and hardcover books, when controlling for volume.
+
+--
+
+- There is no strong evidence that the relationship between volume and weight differs between paperbacks and hardbacks.
+
+--
 
 This is **inference**, which requires **valid models**.
 
@@ -498,9 +559,12 @@ p1 + p2
 ```
 
 ---
+class: center, middle
 
 ```{r echo = FALSE}
 p3
 ```
+
+`r emo::ji("ok_hand")`
 
 
