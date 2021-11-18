@@ -1,0 +1,297 @@
+---
+title: "Geometry of Multiple Linear Regression"
+author: "Stat 20 UC Berkeley, Fall 2021"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3,
+                      fig.width=9,
+                      fig.height = 5)
+
+library(tidyverse)
+library(infer)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+library(ggrepel)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+set.seed(401)
+```
+
+## Ex: Restaurants in NYC
+--
+
+```{r out.width=650, echo = FALSE}
+knitr::include_graphics("figs/zagat.png")
+```
+
+
+---
+class:small
+## Ex: Restaurants in NYC 
+--
+
+```{r echo = FALSE}
+nyc <- read_csv("figs/nyc.csv")
+```
+
+```{r}
+nyc
+```
+
+**Question**: What is the unit of observation?
+--
+ *A restaurant*
+
+---
+## What determines the price of a meal?
+--
+
+Let's look at the relationship between price, food rating, and decor rating.
+
+$$Price \sim Food + Decor$$
+
+--
+
+```{r}
+m1 <- lm(Price ~ Food + Decor, data = nyc)
+```
+
+
+---
+## Model 1: Food + Decor
+--
+
+```{r sum, eval = FALSE}
+summary(m1)
+```
+--
+```{r ref.label = "sum", echo = FALSE}
+```
+
+---
+## The geometry of regression models 
+
+The function for $\hat{y}$ is . . .
+
+--
+
+- A *line* when you have one numerical $x$.
+
+--
+
+- *Parallel lines* when you have one numerical $x_1$ and one categorical $x_2$.
+
+--
+
+- *Unrelated lines* when you have one numerical $x_1$, one categorical $x_2$, 
+and an interaction term $x_1 : x_2$.
+
+--
+
+When you have two **numerical** predictors $x_1$, $x_2$, then your function for $\hat{y}$
+is . . .
+
+--
+
+> **a plane**
+
+---
+class: middle, center
+
+<center>
+```{r fig.align = "center", fig.height = 9, fig.width=9, echo = FALSE}
+library(plotly)
+library(reshape2)
+m1 <- lm(Price ~ Food + Decor, data = nyc)
+grid_points <- 30
+axis_x <- seq(min(nyc$Food), 
+              max(nyc$Food),
+              length.out = grid_points)
+axis_y <- seq(min(nyc$Decor), 
+              max(nyc$Decor),
+              length.out = grid_points)
+nyc_plane <- expand.grid(Food = axis_x, 
+                         Decor = axis_y, 
+                         KEEP.OUT.ATTRS = F)
+nyc_plane$Price <- predict.lm(m1, newdata = nyc_plane)
+z <- acast(nyc_plane, Food ~ Decor, value.var = "Price")
+
+plot_ly(nyc, x = ~Food, y = ~Decor, z = ~Price) %>%
+  add_markers(marker = list(size = 5,
+                            opacity = .6)) %>%
+  add_surface(x = ~axis_x, 
+              y = ~axis_y, 
+              z = ~z,
+              showscale = FALSE)
+```
+</center>
+
+---
+## Location, location, location
+--
+
+Does the price depend on where the restaurant is located in Manhattan?
+
+$$Price \sim Food + Decor + East$$
+--
+
+```{r}
+nyc
+```
+
+---
+## Model 2: Food + Decor + East
+--
+
+```{r}
+m2 <- lm(Price ~ Food + Decor + East, data = nyc)
+summary(m2)
+```
+
+
+---
+## The geometry of regression models 
+--
+
+- When you have two numerical predictors $x_1$, $x_2$, then your mean function is *a plane*.
+
+--
+
+- When you have two numerical predictors $x_1$, $x_2$, and a categorical predictor $x_3$, then your mean function represents ...
+
+--
+
+> **parallel planes**
+
+
+---
+class: middle, center
+
+<center>
+```{r fig.align = "center", fig.height = 9, fig.width=9, echo = FALSE}
+nyc_plane_east <- nyc_plane %>%
+  mutate(East = 1)
+nyc_plane_east$Price <- predict.lm(m2, newdata = nyc_plane_east)
+z_east <- acast(nyc_plane_east, Food ~ Decor, value.var = "Price")
+nyc_plane_west <- nyc_plane %>%
+  mutate(East = 0)
+nyc_plane_west$Price <- predict.lm(m2, newdata = nyc_plane_west)
+z_west <- acast(nyc_plane_west, Food ~ Decor, value.var = "Price")
+
+plot_ly(nyc, x = ~Food, y = ~Decor, z = ~Price) %>%
+  add_markers(marker = list(size = 5,
+                            opacity = .6)) %>%
+  add_surface(x = ~axis_x, 
+              y = ~axis_y, 
+              z = ~z_east,
+              showscale = FALSE) %>%
+  add_surface(x = ~axis_x, 
+              y = ~axis_y, 
+              z = ~z_west,
+              showscale = FALSE)
+```
+</center>
+
+---
+## The geometry of regression models 
+--
+
+- When you have two numerical predictors $x_1$, $x_2$, then your mean function is *a plane*.
+
+--
+
+- When you have two numerical predictors $x_1$, $x_2$, and a categorical predictor $x_3$, then your mean function represents *parallel planes*.
+
+--
+
+- When you add in interaction effects, the planes become *tilted*.
+
+
+---
+## Model 3: Food + Decor + East + Decor:East
+--
+
+```{r}
+m3 <- lm(Price ~ Food + Decor + East + Decor:East, data = nyc)
+summary(m3)
+```
+
+
+---
+class: middle, center
+
+<center>
+```{r fig.align = "center", fig.height = 9, fig.width=9, echo = FALSE}
+nyc_plane_east <- nyc_plane %>%
+  mutate(East = 1)
+nyc_plane_east$Price <- predict.lm(m3, newdata = nyc_plane_east)
+z_east <- acast(nyc_plane_east, Food ~ Decor, value.var = "Price")
+nyc_plane_west <- nyc_plane %>%
+  mutate(East = 0)
+nyc_plane_west$Price <- predict.lm(m3, newdata = nyc_plane_west)
+z_west <- acast(nyc_plane_west, Food ~ Decor, value.var = "Price")
+
+plot_ly(nyc, x = ~Food, y = ~Decor, z = ~Price) %>%
+  add_markers(marker = list(size = 5,
+                            opacity = .6)) %>%
+  add_surface(x = ~axis_x, 
+              y = ~axis_y, 
+              z = ~z_east,
+              showscale = FALSE) %>%
+  add_surface(x = ~axis_x, 
+              y = ~axis_y, 
+              z = ~z_west,
+              showscale = FALSE)
+```
+</center>
+
+---
+## Comparing Models
+--
+
+- The `East` term was significant in model 2, suggesting that there is a 
+significant relationship between location and price.
+
+--
+
+- That term became non-significant when we allowed the slope of `Decor` to vary with location, and that difference in slopes was also non-significant.
+
+--
+
+- Notice that slope estimate for a given variable will almost *always* change depending on the other variables that are in the model.
+
+---
+## Taking the big picture
+--
+
+Are we using the model to...
+- **describe** the data at hand,
+--
+
+- **predict** the $y$ for new data,
+--
+
+- to make **inferences** on population parameters, or to
+--
+
+- draw **causal conclusions**?
+
+--
+
+> Stronger claims require stronger, more careful analysis.
