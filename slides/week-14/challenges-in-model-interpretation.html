@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Challenges in Model Interpretation</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Challenges in Model Interpretation
+
+---
+
+
+
+
+## Ex: LA Homes
+--
+
+.pull-left[
+&lt;img src="figs/david-mansion-LA.jpg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+We'd like to build a model to explain prices of homes in LA as a function of the characteristics of those homes.
+
+Steps in model building:
+
+1. Statistical question
+2. Data wrangling
+3. Exploratory data analysis (EDA)
+4. **Modeling**
+5. **Interpretation**
+]
+
+---
+## Modeling: a simple model for price  
+--
+
+$$ \widehat{log(price)} \sim bed $$
+
+
+```r
+LA &lt;- read.csv("figs/LA.csv") %&gt;%
+  mutate(logprice = log(price),
+         logsqft = log(sqft))
+```
+
+
+
+```r
+m4 &lt;- lm(logprice ~ bed, data = LA)
+```
+
+--
+
+.task[
+What do you expect the *sign* of the slope for `bed` to be?
+]
+
+---
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/3ZSPOtvDm4RmpHChIwGjh?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+## Modeling: a simple model for price  
+
+$$ \widehat{log(price)} \sim bed $$
+
+
+```r
+m4 &lt;- lm(logprice ~ bed, data = LA)
+```
+
+.task[
+What do you expect the *sign* of the slope for `bed` to be?
+]
+
+
+```r
+summary(m4)$coef
+```
+
+```
+##               Estimate Std. Error   t value      Pr(&gt;|t|)
+## (Intercept) 11.8019583 0.04361555 270.59059  0.000000e+00
+## bed          0.5317318 0.01423942  37.34223 9.771372e-220
+```
+
+
+---
+## A less simple model for price  
+--
+
+$$ \widehat{log(price)} \sim bed + log(sqft) $$
+
+
+```r
+m5 &lt;- lm(log(price) ~ bed + logsqft, data = LA)
+```
+
+--
+
+.task[
+What do you expect the *sign* of the slope for `bed` and `logsqft` to be?
+]
+
+---
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/iEkLemdbdWXFtpS2b4qVn?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+
+---
+## A less simple model for price  
+
+$$ \widehat{log(price)} \sim bed + log(sqft) $$
+
+
+```r
+m5 &lt;- lm(log(price) ~ bed + logsqft, data = LA)
+```
+
+.task[
+What do you expect the *sign* of the slope for `bed` and `logsqft` to be?
+]
+
+
+```r
+summary(m5)$coef
+```
+
+```
+##               Estimate Std. Error   t value      Pr(&gt;|t|)
+## (Intercept)  1.4669328 0.21780903  6.734949  2.283762e-11
+## bed         -0.1225516 0.01643769 -7.455527  1.463283e-13
+## logsqft      1.6562996 0.03461792 47.845152 2.595985e-310
+```
+
+---
+What is the relationship between `bed` and `logprice`?
+
+--
+
+&lt;img src="challenges-in-model-interpretation_files/figure-html/unnamed-chunk-9-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+What is the relationship between `logsqft` and `logprice`?
+
+--
+
+&lt;img src="challenges-in-model-interpretation_files/figure-html/unnamed-chunk-10-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+What is the relationship between `logsqft` and `logprice`, controlling for `bed`?
+
+--
+
+&lt;img src="challenges-in-model-interpretation_files/figure-html/unnamed-chunk-11-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+What is the relationship between `bed` and `logprice`, controlling for `logsqft`?
+
+--
+
+&lt;img src="challenges-in-model-interpretation_files/figure-html/unnamed-chunk-12-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+class: center, middle
+
+# What is a *model*?
+
+--
+
+&gt; .adage[A useful simplification of reality.]
+
+--
+
+&gt; .adage[A specific answer to a specific question.]
+
+---
+## Model Interpretation
+
+**Question 1**
+What is the relationship between the number of bedrooms in a house and its price?
+--
+
+$$ \widehat{\textrm{log(price)}} = 11.8 + .53 \textrm{bed}$$
+
+--
+
+**Question 2**
+After controlling for the size of a house, what is the relationship between the number of bedrooms in a house and its price?
+
+$$ \widehat{\textrm{log(price)}} = 11.8 + -0.12 \textrm{bed} + 1.66 \textrm{log(sqft)}$$
+
+
+
+
+---
+## Immigration and Illiteracy
+
+.pull-left[
+&lt;img src="figs/eco-robinson.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+Suggests foreign-born people tend to be more literate (cor = -0.51).
+]
+
+.cite[Source: Robinson, 1950]
+
+---
+## Immigration and Illiteracy
+--
+
+.pull-left[
+&lt;img src="challenges-in-model-interpretation_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+The individual-level data
+
+correlation = 0.11
+]
+
+
+
+---
+## What's going on?
+
+.pull-left[
+&lt;img src="figs/eco-robinson.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+- **Unit of observation**: region (New England, Mountain, Pacific, etc.)
+- **Explanation**: regions with many foreign-born have highly literate natives.
+]
+
+
+---
+## Ecological Fallacy
+
+The false assumption that relationships that exist at an **aggregated level** (e.g.
+between states, counties, nations) also hold at the **individual level**.
+
+&lt;img src="figs/simpsons.gif" width="50%" style="display: block; margin: auto;" /&gt;
+
+.cite[Source: Wikipedia]
+
+
+&lt;!-- --- --&gt;
+&lt;!-- ## Immigration and Income {.flexbox .vcenter .build} --&gt;
+
+&lt;!-- Freedman (1999) --&gt;
+
+&lt;!-- ```{r echo = FALSE, out.width="50%", fig.align='center'} --&gt;
+&lt;!-- knitr::include_graphics("figs/eco-freedman.png") --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- **Suggests that foreign-born populations tend to have higher incomes (corr = 0.52).** --&gt;
+
+
+&lt;!-- --- --&gt;
+&lt;!-- ## Immigration and Income --&gt;
+
+&lt;!-- ```{r echo = FALSE, fig.height = 3.5, fig.width = 5} --&gt;
+&lt;!-- birthplace &lt;- rep(c("foreign", "native"), each = 100) --&gt;
+&lt;!-- highincome &lt;- as.factor(c(rep(c("yes", "no"), c(28, 72)), rep(c("yes", "no"), c(35, 65)))) --&gt;
+&lt;!-- highincome &lt;-  factor(highincome, levels(highincome)[c(2,1)]) --&gt;
+&lt;!-- df &lt;- data.frame(birthplace, highincome) --&gt;
+&lt;!-- ggplot(df, aes(x = birthplace, fill = highincome)) + --&gt;
+&lt;!--   geom_bar(position = "fill") --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- - correlation = -0.05 --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- ## What's going on? --&gt;
+
+&lt;!-- ```{r echo = FALSE, out.width="50%", fig.align='center'} --&gt;
+&lt;!-- knitr::include_graphics("figs/eco-freedman.png") --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- - **Unit of observation**: state --&gt;
+&lt;!-- - **Explanation**: states with many foreign-born people have natives with --&gt;
+&lt;!-- higher incomes. --&gt;
+
+
+&lt;!-- --- --&gt;
+&lt;!-- ## Ecological Fallacy --&gt;
+
+&lt;!-- The false assumption that relationships that exist at an **aggregated level** (e.g. --&gt;
+&lt;!-- between states, counties, nations) also hold at the **individual level**. --&gt;
+
+&lt;!-- Interpretations can invert due to: --&gt;
+
+&lt;!-- - confounding / omitted variable (Model 1) --&gt;
+&lt;!-- - aggregation (Model 2) --&gt;
+
+
+---
+## Strategies
+
+1. When dealing with an ecological study, restrict model interpretations to the 
+same observational level on which the data was collected.
+
+2. If you want to make individual-level inferences, be sure your data is collected
+on that same level. Aggregate-level effects can be introduced via a multi-level model.
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

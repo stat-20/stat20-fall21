@@ -1,0 +1,357 @@
+---
+title: "Challenges in Model Interpretation"
+output:
+  xaringan::moon_reader:
+    css: stat20-theme.css
+    lib_dir: libs
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = TRUE,
+                      fig.align = "center",
+                      fig.retina = 3,
+                      fig.width=9,
+                      fig.height = 5)
+
+library(tidyverse)
+library(infer)
+library(knitr)
+library(xaringanthemer)
+library(kableExtra)
+library(ggrepel)
+source("https://raw.githubusercontent.com/stat-20/stat-20-website/main/stat20-theme.R")
+xaringanExtra::use_panelset()
+set.seed(401)
+```
+
+## Ex: LA Homes
+--
+
+.pull-left[
+```{r echo = FALSE, out.width="100%", fig.align='center'}
+knitr::include_graphics("figs/david-mansion-LA.jpg")
+```
+]
+--
+.pull-right[
+We'd like to build a model to explain prices of homes in LA as a function of the characteristics of those homes.
+
+Steps in model building:
+
+1. Statistical question
+2. Data wrangling
+3. Exploratory data analysis (EDA)
+4. **Modeling**
+5. **Interpretation**
+]
+
+---
+## Modeling: a simple model for price  
+--
+
+$$ \widehat{log(price)} \sim bed $$
+
+```{r}
+LA <- read.csv("figs/LA.csv") %>%
+  mutate(logprice = log(price),
+         logsqft = log(sqft))
+```
+
+
+```{r}
+m4 <- lm(logprice ~ bed, data = LA)
+```
+
+--
+
+.task[
+What do you expect the *sign* of the slope for `bed` to be?
+]
+
+---
+
+<center>
+<iframe src="https://embed.polleverywhere.com/multiple_choice_polls/3ZSPOtvDm4RmpHChIwGjh?controls=none&short_poll=true" width="800px" height="600px"></iframe>
+</center>
+
+---
+## Modeling: a simple model for price  
+
+$$ \widehat{log(price)} \sim bed $$
+
+```{r}
+m4 <- lm(logprice ~ bed, data = LA)
+```
+
+.task[
+What do you expect the *sign* of the slope for `bed` to be?
+]
+
+```{r}
+summary(m4)$coef
+```
+
+
+---
+## A less simple model for price  
+--
+
+$$ \widehat{log(price)} \sim bed + log(sqft) $$
+
+```{r}
+m5 <- lm(log(price) ~ bed + logsqft, data = LA)
+```
+
+--
+
+.task[
+What do you expect the *sign* of the slope for `bed` and `logsqft` to be?
+]
+
+---
+
+<center>
+<iframe src="https://embed.polleverywhere.com/multiple_choice_polls/iEkLemdbdWXFtpS2b4qVn?controls=none&short_poll=true" width="800px" height="600px"></iframe>
+</center>
+
+
+---
+## A less simple model for price  
+
+$$ \widehat{log(price)} \sim bed + log(sqft) $$
+
+```{r}
+m5 <- lm(log(price) ~ bed + logsqft, data = LA)
+```
+
+.task[
+What do you expect the *sign* of the slope for `bed` and `logsqft` to be?
+]
+
+```{r}
+summary(m5)$coef
+```
+
+---
+What is the relationship between `bed` and `logprice`?
+
+--
+
+```{r echo = FALSE, fig.width=10, fig.height=7}
+LA %>%
+  filter(bed > 0, bed < 7) %>%
+  ggplot(aes(x = bed, y = logprice)) +
+  geom_jitter(alpha = .5) +
+  theme_bw(base_size = 18)
+```
+
+---
+What is the relationship between `logsqft` and `logprice`?
+
+--
+
+```{r echo = FALSE, fig.width=10, fig.height=7}
+LA %>%
+  filter(bed > 0, bed < 7) %>%
+  ggplot(aes(x = logsqft, y = logprice)) +
+  geom_point(alpha = .5) +
+  theme_bw(base_size = 18)
+```
+
+---
+What is the relationship between `logsqft` and `logprice`, controlling for `bed`?
+
+--
+
+```{r echo = FALSE, fig.width=10, fig.height=7}
+LA %>%
+  filter(bed < 7, bed > 0) %>%
+  ggplot(aes(x = logsqft, y = logprice)) +
+  geom_point(alpha = .3) +
+  facet_wrap(vars(bed)) +
+  theme_bw(base_size = 18)
+```
+
+---
+What is the relationship between `bed` and `logprice`, controlling for `logsqft`?
+
+--
+
+```{r echo = FALSE, fig.width=10, fig.height=7}
+LA %>%
+  filter(bed < 7, bed > 0) %>%
+  mutate(logsqft_cat = cut(logsqft, breaks = 6)) %>%
+  ggplot(aes(x = bed, y = logprice)) +
+  geom_jitter(alpha = .3) +
+  facet_wrap(vars(logsqft_cat)) +
+  theme_bw(base_size = 18)
+```
+
+
+
+
+---
+class: center, middle
+
+# What is a *model*?
+
+--
+
+> .adage[A useful simplification of reality.]
+
+--
+
+> .adage[A specific answer to a specific question.]
+
+---
+## Model Interpretation
+
+**Question 1**
+What is the relationship between the number of bedrooms in a house and its price?
+--
+
+$$ \widehat{\textrm{log(price)}} = 11.8 + .53 \textrm{bed}$$
+
+--
+
+**Question 2**
+After controlling for the size of a house, what is the relationship between the number of bedrooms in a house and its price?
+
+$$ \widehat{\textrm{log(price)}} = 11.8 + -0.12 \textrm{bed} + 1.66 \textrm{log(sqft)}$$
+
+
+
+
+---
+## Immigration and Illiteracy
+
+.pull-left[
+```{r echo = FALSE, out.width="100%", fig.align='center'}
+knitr::include_graphics("figs/eco-robinson.png")
+```
+]
+--
+.pull-right[
+Suggests foreign-born people tend to be more literate (cor = -0.51).
+]
+
+.cite[Source: Robinson, 1950]
+
+---
+## Immigration and Illiteracy
+--
+
+.pull-left[
+```{r echo = FALSE, fig.height = 5, fig.width = 8}
+birthplace <- rep(c("foreign", "native"), each = 100)
+literate <- as.factor(c(rep(c("yes", "no"), c(90, 10)), rep(c("yes", "no"), c(96, 4))))
+literate <-  factor(literate, levels(literate)[c(2,1)])
+df <- data.frame(birthplace, literate)
+ggplot(df, aes(x = birthplace, fill = literate)) +
+  geom_bar(position = "fill")
+```
+]
+.pull-right[
+The individual-level data
+
+correlation = 0.11
+]
+
+
+
+---
+## What's going on?
+
+.pull-left[
+```{r echo = FALSE, out.width="100%", fig.align='center'}
+knitr::include_graphics("figs/eco-robinson.png")
+```
+]
+--
+.pull-right[
+- **Unit of observation**: region (New England, Mountain, Pacific, etc.)
+- **Explanation**: regions with many foreign-born have highly literate natives.
+]
+
+
+---
+## Ecological Fallacy
+
+The false assumption that relationships that exist at an **aggregated level** (e.g.
+between states, counties, nations) also hold at the **individual level**.
+
+```{r echo = FALSE, out.width="50%", fig.align='center'}
+knitr::include_graphics("figs/simpsons.gif")
+```
+
+.cite[Source: Wikipedia]
+
+
+<!-- --- -->
+<!-- ## Immigration and Income {.flexbox .vcenter .build} -->
+
+<!-- Freedman (1999) -->
+
+<!-- ```{r echo = FALSE, out.width="50%", fig.align='center'} -->
+<!-- knitr::include_graphics("figs/eco-freedman.png") -->
+<!-- ``` -->
+
+<!-- **Suggests that foreign-born populations tend to have higher incomes (corr = 0.52).** -->
+
+
+<!-- --- -->
+<!-- ## Immigration and Income -->
+
+<!-- ```{r echo = FALSE, fig.height = 3.5, fig.width = 5} -->
+<!-- birthplace <- rep(c("foreign", "native"), each = 100) -->
+<!-- highincome <- as.factor(c(rep(c("yes", "no"), c(28, 72)), rep(c("yes", "no"), c(35, 65)))) -->
+<!-- highincome <-  factor(highincome, levels(highincome)[c(2,1)]) -->
+<!-- df <- data.frame(birthplace, highincome) -->
+<!-- ggplot(df, aes(x = birthplace, fill = highincome)) + -->
+<!--   geom_bar(position = "fill") -->
+<!-- ``` -->
+
+<!-- - correlation = -0.05 -->
+
+<!-- --- -->
+<!-- ## What's going on? -->
+
+<!-- ```{r echo = FALSE, out.width="50%", fig.align='center'} -->
+<!-- knitr::include_graphics("figs/eco-freedman.png") -->
+<!-- ``` -->
+
+<!-- - **Unit of observation**: state -->
+<!-- - **Explanation**: states with many foreign-born people have natives with -->
+<!-- higher incomes. -->
+
+
+<!-- --- -->
+<!-- ## Ecological Fallacy -->
+
+<!-- The false assumption that relationships that exist at an **aggregated level** (e.g. -->
+<!-- between states, counties, nations) also hold at the **individual level**. -->
+
+<!-- Interpretations can invert due to: -->
+
+<!-- - confounding / omitted variable (Model 1) -->
+<!-- - aggregation (Model 2) -->
+
+
+---
+## Strategies
+
+1. When dealing with an ecological study, restrict model interpretations to the 
+same observational level on which the data was collected.
+
+2. If you want to make individual-level inferences, be sure your data is collected
+on that same level. Aggregate-level effects can be introduced via a multi-level model.
+
+
