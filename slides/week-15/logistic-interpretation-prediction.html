@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Logistic Regression</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Logistic Regression
+## Interpretation and Prediction
+
+---
+
+
+
+
+## Announcements
+
+1. Last PS is available and due next Tuesday 8 am.
+--
+
+2. Last Lab assignment will be available tomorrow morning and due Tuesday 8 am.
+--
+3. Please fill out course evaluations!
+--
+4. OH and Evening Study Session like normal this week (2-2:30 today will be one-on-one meetings)
+--
+5. Stat 20 Spring 2022 will need tutors!
+
+---
+
+&lt;img src="figs/log-2.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/log-3.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/log-4.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/log-5.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+## Logistic Regression for Filter B
+--
+
+`$$spam \sim log(num\_char)$$`
+
+&lt;img src="logistic-interpretation-prediction_files/figure-html/unnamed-chunk-5-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+## Model fitting
+--
+
+
+```r
+m1 &lt;- glm(spam ~ log_num_char, data = email, family = "binomial")
+summary(m1)
+```
+
+```
+## 
+## Call:
+## glm(formula = spam ~ log_num_char, family = "binomial", data = email)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8149  -0.4674  -0.3347  -0.2545   3.0129  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -1.72435    0.06062  -28.45   &lt;2e-16 ***
+## log_num_char -0.54350    0.03646  -14.91   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2437.2  on 3920  degrees of freedom
+## Residual deviance: 2190.3  on 3919  degrees of freedom
+## AIC: 2194.3
+## 
+## Number of Fisher Scoring iterations: 5
+```
+
+---
+
+&lt;img src="figs/log-geo.jpg" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+## Interpreting Logistic Regression
+--
+
+1. A positive slope estimate indicates that there is a positive association.
+
+--
+
+2. Each row of the summary output is still a H-test on that parameter being 0.
+
+--
+
+3. Each estimate is still conditional on the other variables held constant.
+
+--
+
+Other details:
+
+1. The coefficients aren't estimated using Least Squares but with a method called _maximum likelihood_.
+
+2. The p-values rely upon the Central Limit Theorem -&gt; large `\(n\)`.
+
+
+---
+## A more sophisticated model
+--
+
+
+```r
+m2 &lt;- glm(spam ~ log_num_char + to_multiple + attach + dollar + inherit + viagra, 
+          data = email, family = "binomial")
+coef(summary(m2))
+```
+
+```
+##                  Estimate  Std. Error      z value      Pr(&gt;|z|)
+## (Intercept)  -1.596419596  0.06443273 -24.77653134 1.605482e-135
+## log_num_char -0.548688764  0.03831373 -14.32094310  1.619110e-46
+## to_multiple1 -1.928889166  0.30493119  -6.32565387  2.521625e-10
+## attach        0.199697685  0.06552207   3.04779252  2.305290e-03
+## dollar       -0.004557482  0.01897756  -0.24015104  8.102132e-01
+## inherit       0.400029935  0.15166273   2.63762845  8.348800e-03
+## viagra        1.736070370 40.59296323   0.04276777  9.658867e-01
+```
+
+---
+## From fitted values to predictions
+--
+
+The fitted values, `\(\hat{p}_i\)`, are _probabilities_. They can be converted to predictions by setting a threshold probability for a case being a 1.
+
+$$
+\texttt{if P(y = 1) &gt; threshold, then y-hat = 1}
+$$
+
+--
+
+
+```r
+tibble(y = email$spam,
+       p_y_is_1 = fitted(m2)) %&gt;%
+  mutate(y_pred = p_y_is_1 &gt; .5)
+```
+--
+
+```
+## # A tibble: 3,921 × 3
+##        y p_y_is_1 y_pred
+##    &lt;dbl&gt;    &lt;dbl&gt; &lt;lgl&gt; 
+##  1     0   0.0507 FALSE 
+##  2     0   0.0528 FALSE 
+##  3     0   0.0879 FALSE 
+##  4     0   0.0468 FALSE 
+##  5     0   0.153  FALSE 
+##  6     0   0.162  FALSE 
+##  7     0   0.0122 FALSE 
+##  8     0   0.0118 FALSE 
+##  9     0   0.0990 FALSE 
+## 10     0   0.106  FALSE 
+## # … with 3,911 more rows
+```
+
+---
+## From fitted values to predictions, cont.
+--
+
+
+```r
+tibble(y = email$spam,
+       p_y_is_1 = fitted(m2)) %&gt;%
+  mutate(y_pred = p_y_is_1 &gt; .5) %&gt;%
+  count(y, y_pred)
+```
+--
+
+```
+## # A tibble: 4 × 3
+##       y y_pred     n
+##   &lt;dbl&gt; &lt;lgl&gt;  &lt;int&gt;
+## 1     0 FALSE   3537
+## 2     0 TRUE      17
+## 3     1 FALSE    357
+## 4     1 TRUE      10
+```
+
+&gt; The predictive performance can be measured with a _confusion matrix_ of false positives, false negatives, true positives, and true negatives.
+
+
+---
+## Comparing models: confusion matrix 
+--
+
+.pull-left[
+Complex Model
+
+```r
+tibble(y = email$spam,
+       p_y_is_1 = fitted(m2)) %&gt;%
+  mutate(y_pred = p_y_is_1 &gt; .5) %&gt;%
+  count(y, y_pred)
+```
+
+```
+## # A tibble: 4 × 3
+##       y y_pred     n
+##   &lt;dbl&gt; &lt;lgl&gt;  &lt;int&gt;
+## 1     0 FALSE   3537
+## 2     0 TRUE      17
+## 3     1 FALSE    357
+## 4     1 TRUE      10
+```
+]
+--
+.pull-right[
+Simple Model
+
+```r
+tibble(y = email$spam,
+       p_y_is_1 = fitted(m1)) %&gt;%
+  mutate(y_pred = p_y_is_1 &gt; .5) %&gt;%
+  count(y, y_pred)
+```
+
+```
+## # A tibble: 4 × 3
+##       y y_pred     n
+##   &lt;dbl&gt; &lt;lgl&gt;  &lt;int&gt;
+## 1     0 FALSE   3541
+## 2     0 TRUE      13
+## 3     1 FALSE    362
+## 4     1 TRUE       5
+```
+]
+
+---
+## Predictive accuracy
+--
+
+If false positives and false negatives are both equally bad, then one metric of performance is the **misclassification rate**.
+
+$$
+\textrm{misclassification rate:} \frac{FP + FN}{FP + FN + TP + TN}
+$$
+
+.pull-left[
+Complex Model
+
+```
+## [1] 0.09538383
+```
+]
+--
+.pull-right[
+Simple Model
+
+```
+## [1] 0.09563887
+```
+]
+
+---
+## Predictive accuracy in context
+--
+
+Always check that your model outforms that naive model that always predicts the dominant response.
+
+--
+
+
+```
+## # A tibble: 5 × 3
+##   y_pred_1 y_pred_2 y_pred_naive
+##   &lt;lgl&gt;    &lt;lgl&gt;    &lt;lgl&gt;       
+## 1 FALSE    FALSE    FALSE       
+## 2 FALSE    FALSE    FALSE       
+## 3 FALSE    FALSE    FALSE       
+## 4 FALSE    FALSE    FALSE       
+## 5 FALSE    FALSE    FALSE
+```
+
+--
+
+
+
+
+```r
+c(misclass_1, misclass_2, misclass_naive)
+```
+--
+
+```
+## [1] 0.09563887 0.09538383 0.09359857
+```
+
+
+---
+## Model Selection for Prediction
+--
+
+You can generally improve the "predictions" on your observed data by making your model more **complex** (more variables/feature, squigglier lines).-- True prediction on unseen data, however, often rewards a more **parsimonious** model (fewer variables/features, straighter lines).
+--
+
+### Two approaches to selecting the model
+--
+
+.pull-left[
+_Classical Method_
+
+Compute single score / statistic on observed data for each model and compare.
+]
+--
+.pull-right[
+_Computational Method_
+
+Split your data into **training** data (used to fit model) and **testing** data (not used to fit model). Compare testing scores for each model.
+]
+
+---
+## Model Selection for Prediction, Classical
+--
+
+`\(R^2_{adj}\)` was helpful in MLR, but there are no "sums of squares" in the logistic regression setting. It is common to use `\(AIC\)` (Akaike Information Criterion) as an alternative.
+
+--
+
+.pull-left[
+$$R^2_{adj} = 1 - \frac{SSE}{TSS} \cdot \frac{n - 1}{n - p - 1} $$
+]
+--
+.pull-right[
+`$$AIC = 2p - 2 \log(L)$$`
+]
+
+where `\(L\)` is the _total likelihood_ of the data, a measure of goodness of fit, and `\(p\)` is the number of parameters, a measure of complexity. A model with a lower `\(AIC\)` is considered better.
+
+---
+
+
+```r
+summary(m1)
+```
+
+```
+## 
+## Call:
+## glm(formula = spam ~ log_num_char, family = "binomial", data = email)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8149  -0.4674  -0.3347  -0.2545   3.0129  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -1.72435    0.06062  -28.45   &lt;2e-16 ***
+## log_num_char -0.54350    0.03646  -14.91   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2437.2  on 3920  degrees of freedom
+## Residual deviance: 2190.3  on 3919  degrees of freedom
+## AIC: 2194.3
+## 
+## Number of Fisher Scoring iterations: 5
+```
+
+
+---
+
+
+```r
+summary(m2)
+```
+
+```
+## 
+## Call:
+## glm(formula = spam ~ log_num_char + to_multiple + attach + dollar + 
+##     inherit + viagra, family = "binomial", data = email)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.9315  -0.4549  -0.3275  -0.2358   3.0335  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -1.596420   0.064433 -24.777  &lt; 2e-16 ***
+## log_num_char -0.548689   0.038314 -14.321  &lt; 2e-16 ***
+## to_multiple1 -1.928889   0.304931  -6.326 2.52e-10 ***
+## attach        0.199698   0.065522   3.048  0.00231 ** 
+## dollar       -0.004557   0.018978  -0.240  0.81021    
+## inherit       0.400030   0.151663   2.638  0.00835 ** 
+## viagra        1.736070  40.592963   0.043  0.96589    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2437.2  on 3920  degrees of freedom
+## Residual deviance: 2106.3  on 3914  degrees of freedom
+## AIC: 2120.3
+## 
+## Number of Fisher Scoring iterations: 11
+```
+
+
+
+---
+## Taking the big picture
+--
+
+A regression model _can_ be used to...
+
+- **describe** the data at hand,
+--
+
+- **predict** the `\(y\)` for new data,
+--
+
+- to make **inferences** on population parameters, and to
+--
+
+- draw **causal conclusions**
+
+--
+
+... but each use requires careful thought. It is regretfully common to see these models misapplied.
+
+---
+
+class: middle, center
+
+## Parting thoughts on Logistic Regression
+
+--
+
+.adage[Choice of data is more important than choice of model.]
+
+--
+
+.adage[Logistic regression can be the kernel of more complicated models.]
+
+---
+
+&lt;img src="figs/math-madness-1.jpeg" width="1200" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/math-madness-2.jpeg" width="1200" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/math-madness-3.jpeg" width="1200" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/math-madness-4.jpeg" width="1200" style="display: block; margin: auto;" /&gt;
+
+---
+## A more complex prediction task..
+--
+
+Build a model that can take an image of a handwritten digit and predict whether it is a 0 or a 1.
+
+&lt;img src="figs/mnist.png" width="600" style="display: block; margin: auto;" /&gt;
+
+--
+
+Can we use logistic regression?
+
+--
+&gt; Yes
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
