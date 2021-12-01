@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Logistic Regression</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Logistic Regression
+
+---
+
+
+
+
+---
+## Taking the big picture
+--
+
+A regression model _can_ be used to...
+
+- **describe** the data at hand,
+--
+
+- **predict** the `\(y\)` for new data,
+--
+
+- to make **inferences** on population parameters, and to
+--
+
+- draw **causal conclusions**
+
+--
+
+... but each use requires careful thought. It is regretfully common to see these models misapplied.
+
+
+---
+## Using a model for **description**: LA Homes
+--
+
+_A fitted model is a specific answer to a specific question_
+
+--
+
+**Question 1**
+What is the relationship between the number of bedrooms in a house and its price?
+--
+
+$$ \widehat{\textrm{log(price)}} = 11.8 + .53 \textrm{bed}$$
+
+--
+
+**Question 2**
+After controlling for the size of a house, what is the relationship between the number of bedrooms in a house and its price?
+
+$$ \widehat{\textrm{log(price)}} = 11.8 + -0.12 \textrm{bed} + 1.66 \textrm{log(sqft)}$$
+
+---
+## Using a model for **inference**: LA Homes
+--
+
+.pull-left[
+In order for inference to be coherent:
+
+1. There must be a **well-defined population** of interest
+
+2. The **sample must be representative** of that population
+]
+--
+.pull-right[
+For LA Homes:
+
+1. All homes in West LA in March 2011? All homes in the US in 2011? All homes in West LA in future years?
+
+2. Requires domain expertise to determine
+]
+
+---
+## Using a model for **causation**: baseball
+--
+
+.pull-left[
+Causal inference using observational data is challenging.
+
+1. Without an RCT, there may be **omitted confounding variables** (omitted variable bias).
+
+2. **Strong domain expertise** is needed to understand possible causal structures.
+
+3. Social systems are very **complex**
+]
+--
+.pull-right[
+For baseball
+
+1. Nearly all baseball data lacks random assignment.
+
+2. Baseball analysts and managers have some confidence they have all relevant variables.
+]
+
+
+---
+## Using a model for **prediction**: spam
+--
+
+&lt;img src="figs/spam.png" width="530" style="display: block; margin: auto;" /&gt;
+
+&gt; Email spam, also referred to as junk email or simply spam, is unsolicited messages sent in bulk by email (spamming). The name comes from a Monty Python sketch in which the name of the canned pork product Spam is ubiquitous, unavoidable, and repetitive.
+
+.cite[source: freezelight/flickr, Wikipedia]
+---
+## The data
+--
+
+
+```r
+email
+```
+
+```
+## # A tibble: 3,921 × 21
+##    spam  to_multiple from     cc sent_email time                image attach
+##    &lt;fct&gt; &lt;fct&gt;       &lt;fct&gt; &lt;int&gt; &lt;fct&gt;      &lt;dttm&gt;              &lt;dbl&gt;  &lt;dbl&gt;
+##  1 0     0           1         0 0          2011-12-31 22:16:41     0      0
+##  2 0     0           1         0 0          2011-12-31 23:03:59     0      0
+##  3 0     0           1         0 0          2012-01-01 08:00:32     0      0
+##  4 0     0           1         0 0          2012-01-01 01:09:49     0      0
+##  5 0     0           1         0 0          2012-01-01 02:00:01     0      0
+##  6 0     0           1         0 0          2012-01-01 02:04:46     0      0
+##  7 0     1           1         0 1          2012-01-01 09:55:06     0      0
+##  8 0     1           1         1 1          2012-01-01 10:45:21     1      1
+##  9 0     0           1         0 0          2012-01-01 13:08:59     0      0
+## 10 0     0           1         0 0          2012-01-01 10:12:00     0      0
+## # … with 3,911 more rows, and 13 more variables: dollar &lt;dbl&gt;, winner &lt;fct&gt;,
+## #   inherit &lt;dbl&gt;, viagra &lt;dbl&gt;, password &lt;dbl&gt;, num_char &lt;dbl&gt;,
+## #   line_breaks &lt;int&gt;, format &lt;fct&gt;, re_subj &lt;fct&gt;, exclaim_subj &lt;dbl&gt;,
+## #   urgent_subj &lt;fct&gt;, exclaim_mess &lt;dbl&gt;, number &lt;fct&gt;
+```
+
+???
+How was the data collected?
+
+---
+## How was the data collected?
+--
+
+&lt;img src="figs/gmail-emails.png" width="800" style="display: block; margin: auto;" /&gt;
+
+--
+
+1. Choose a single email account
+2. Save each email that comes in during a given time frame
+3. Create dummy variables for each text component of interest
+4. Visually classify each as spam or not
+
+
+---
+## Simple Filter A 
+--
+
+Predicting spam or not using the presence of "winner".
+
+--
+
+&lt;img src="from-linear-to-logistic_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+If "winner" then "spam"?
+
+---
+## Simple Filter B 
+--
+
+Predicting spam or not using number of characters (in K)
+
+&lt;img src="from-linear-to-logistic_files/figure-html/unnamed-chunk-5-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Simple Filter B, cont.
+
+Predicting spam or not using log number of characters (in K)
+
+--
+
+&lt;img src="from-linear-to-logistic_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+If `log(num_char)` &lt; 1, then "spam"?
+
+---
+## Challenges 
+--
+
+Each simple filter can be thought of as a regression model.
+
+#### Filter A
+
+`\(spam \sim winner; \quad X_1 \sim X_2\)`
+
+#### Filter B
+`\(spam \sim log(num\_char); \quad X_1 \sim W_1\)`
+
+--
+
+Each one by itself has poor predictive power, so how can we combine them into a single stronger model?
+
+
+---
+
+&lt;img src="figs/log-1.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/log-2.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/log-3.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/log-4.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/log-5.png" width="800" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
