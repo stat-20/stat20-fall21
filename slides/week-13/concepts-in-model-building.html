@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Practical Concepts in Model Building</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stat 20 UC Berkeley, Fall 2021" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="stat20-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Practical Concepts in Model Building
+### Stat 20 UC Berkeley, Fall 2021
+
+---
+
+
+
+
+
+## Steps in model building:
+
+1. Statistical question
+--
+
+2. Data wrangling
+--
+
+3. Exploratory data analysis (EDA)
+--
+
+4. Modeling
+--
+
+5. Interpretation
+
+--
+### Three topics
+--
+
+1. Data wrangling / processing
+2. Transformations
+3. Dummy variables
+4. `\(R^2\)` and `\(R^2\)` adjusted
+
+
+---
+
+&lt;img src="figs/david-mansion-LA.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Ex: LA Homes
+--
+
+We'd like to build a model to explain prices of homes in LA as a function of the characteristics of those homes.
+
+$$ \widehat{price} = location + size + pool + acreage \ldots $$
+
+--
+
+Steps in model building:
+
+1. Statistical question
+2. Data wrangling
+3. Exploratory data analysis (EDA)
+4. Modeling
+5. Interpretation
+
+---
+## Asking a question
+--
+
+**A vague question**: what explains the price of a house in West LA?
+
+--
+
+**A specific question**: how do location, size, acreage, and the presence of a pool correspond to the price of a home in West LA?
+
+$$ \widehat{price} = location + size + pool + acreage $$
+
+--
+
+&gt; Be clear on if you're doing an _exploratory_ or a _confirmatory_ analysis.
+
+--
+
+.pull-left[
+**Exploratory**: seeks to uncover trends in data to help refine the research question for a subsequent analysis.
+]
+.pull-right[
+**Confirmatory**: starts with a very specific question to confirm an effect found in a previous analysis.
+]
+
+
+---
+
+.pull-left[
+&lt;img src="figs/sig1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+&lt;img src="figs/sig2.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+.cite[source: https://xkcd.com/882/]
+---
+
+&gt; Be clear on if you're doing an _exploratory_ or a _confirmatory_ analysis.
+
+.pull-left[
+**Exploratory**: seeks to uncover trends in data to help refine the research question for a subsequent analysis.
+]
+.pull-right[
+**Confirmatory**: starts with a very specific question to confirm an effect found in a previous analysis.
+]
+
+--
+
+_The Green Jelly Bean Effect_: While you're exploring, you can often find significant effects just due to chance (type I errors).
+
+
+---
+## Data wrangling  
+--
+
+Home price data is available on many websites now, including zillow.com.
+
+
+
+
+```r
+head(LA, 5)
+```
+
+```
+## # A tibble: 5 × 9
+##   city       type    bed  bath garage  sqft pool  spa    price
+##   &lt;chr&gt;      &lt;chr&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;int&gt; &lt;chr&gt; &lt;lgl&gt;  &lt;dbl&gt;
+## 1 Long Beach ""        0     1 ""       513 ""    NA    119000
+## 2 Long Beach ""        0     1 ""       550 ""    NA    153000
+## 3 Long Beach ""        0     1 ""       550 ""    NA    205000
+## 4 Long Beach ""        0     1 "1"     1030 ""    NA    300000
+## 5 Long Beach ""        0     1 "1"     1526 ""    NA    375000
+```
+
+--
+
+**Unit of observation**: a home for sale in west LA.  
+**Population**: all homes in west LA?
+
+
+---
+## Data wrangling, cont.
+--
+
+
+```r
+glimpse(LA)
+```
+
+```
+## Rows: 1,594
+## Columns: 9
+## $ city   &lt;chr&gt; "Long Beach", "Long Beach", "Long Beach", "Long Beach", "Long B…
+## $ type   &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",…
+## $ bed    &lt;int&gt; 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ bath   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ garage &lt;chr&gt; "", "", "", "1", "1", "", "", "", "", "", "", "", "", "1", "1",…
+## $ sqft   &lt;int&gt; 513, 550, 550, 1030, 1526, 552, 558, 596, 744, 750, 750, 791, 7…
+## $ pool   &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",…
+## $ spa    &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+## $ price  &lt;dbl&gt; 119000, 153000, 205000, 300000, 375000, 159900, 135000, 105000,…
+```
+
+---
+## Data wrangling: `city`
+--
+
+
+```r
+LA %&gt;%
+  count(city)
+```
+--
+
+```
+## # A tibble: 4 × 2
+##   city              n
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 Beverly Hills   232
+## 2 Long Beach     1062
+## 3 Santa Monica    204
+## 4 Westwood         96
+```
+
+
+---
+## Data wrangling: `type`
+--
+
+
+```r
+LA %&gt;%
+  count(type)
+```
+--
+
+```
+## # A tibble: 3 × 2
+##   type            n
+##   &lt;chr&gt;       &lt;int&gt;
+## 1 ""             39
+## 2 "Condo/Twh"   639
+## 3 "SFR"         916
+```
+
+--
+
+If you wish to change the _levels_ of a categorical variable, you need to _recode_ it.
+
+---
+## Recoding `type`
+--
+
+
+```r
+LA &lt;- LA %&gt;%
+  mutate(type = fct_recode(type,
+                           "unknown" = "",
+                           "condo"   = "Condo/Twh",
+                           "sfr"     = "SFR"))
+```
+
+--
+
+
+```r
+LA %&gt;%
+  count(type)
+```
+--
+
+```
+## # A tibble: 3 × 2
+##   type        n
+##   &lt;fct&gt;   &lt;int&gt;
+## 1 unknown    39
+## 2 condo     639
+## 3 sfr       916
+```
+
+
+---
+## Data wrangling, cont.
+--
+
+
+```r
+glimpse(LA)
+```
+
+```
+## Rows: 1,594
+## Columns: 9
+## $ city   &lt;chr&gt; "Long Beach", "Long Beach", "Long Beach", "Long Beach", "Long B…
+## $ type   &lt;fct&gt; unknown, unknown, unknown, unknown, unknown, unknown, unknown, …
+## $ bed    &lt;int&gt; 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ bath   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ garage &lt;chr&gt; "", "", "", "1", "1", "", "", "", "", "", "", "", "", "1", "1",…
+## $ sqft   &lt;int&gt; 513, 550, 550, 1030, 1526, 552, 558, 596, 744, 750, 750, 791, 7…
+## $ pool   &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",…
+## $ spa    &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+## $ price  &lt;dbl&gt; 119000, 153000, 205000, 300000, 375000, 159900, 135000, 105000,…
+```
+
+
+---
+## Data wrangling: `garage`
+--
+
+
+```r
+LA %&gt;%
+  count(garage)
+```
+--
+
+```
+## # A tibble: 6 × 2
+##   garage     n
+##   &lt;chr&gt;  &lt;int&gt;
+## 1 ""       388
+## 2 "1"      260
+## 3 "2"      666
+## 4 "3"       37
+## 5 "4+"       6
+## 6  &lt;NA&gt;    237
+```
+
+
+---
+## Recoding `garage`
+--
+
+We can _combine_ levels of a categorical variable using a similar approach.
+
+--
+
+
+```r
+LA &lt;- LA %&gt;%
+  mutate(garage = fct_collapse(garage,
+                           "small" = c("", "1"),
+                           "large" = c("2", "3", "4+")))
+```
+
+--
+
+
+```r
+count(LA, garage)
+```
+
+```
+## # A tibble: 3 × 2
+##   garage     n
+##   &lt;fct&gt;  &lt;int&gt;
+## 1 small    648
+## 2 large    709
+## 3 &lt;NA&gt;     237
+```
+
+
+---
+## Data wrangling, cont.
+--
+
+
+```r
+glimpse(LA)
+```
+
+```
+## Rows: 1,594
+## Columns: 9
+## $ city   &lt;chr&gt; "Long Beach", "Long Beach", "Long Beach", "Long Beach", "Long B…
+## $ type   &lt;fct&gt; unknown, unknown, unknown, unknown, unknown, unknown, unknown, …
+## $ bed    &lt;int&gt; 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ bath   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ garage &lt;fct&gt; small, small, small, small, small, small, small, small, small, …
+## $ sqft   &lt;int&gt; 513, 550, 550, 1030, 1526, 552, 558, 596, 744, 750, 750, 791, 7…
+## $ pool   &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",…
+## $ spa    &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+## $ price  &lt;dbl&gt; 119000, 153000, 205000, 300000, 375000, 159900, 135000, 105000,…
+```
+
+What's going on with `pool` and `spa`?
+
+
+---
+## Dropping columns
+--
+
+.pull-left[
+
+```r
+LA %&gt;%
+  count(pool)
+```
+
+```
+## # A tibble: 2 × 2
+##   pool      n
+##   &lt;chr&gt; &lt;int&gt;
+## 1 ""     1448
+## 2 "Y"     146
+```
+
+
+```r
+LA %&gt;%
+  summarize(nas = sum(is.na(spa)))
+```
+
+```
+## # A tibble: 1 × 1
+##     nas
+##   &lt;int&gt;
+## 1  1594
+```
+]
+
+--
+
+.pull-right[
+Two variables seem mis-coded/uninformative, so they could be dropped.
+
+
+```r
+LA &lt;- LA %&gt;%
+  select(-pool, -spa)
+```
+]
+
+---
+## Fully wrangled data set
+--
+
+
+```r
+head(LA)
+```
+
+```
+## # A tibble: 6 × 7
+##   city       type      bed  bath garage  sqft  price
+##   &lt;chr&gt;      &lt;fct&gt;   &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;  &lt;int&gt;  &lt;dbl&gt;
+## 1 Long Beach unknown     0     1 small    513 119000
+## 2 Long Beach unknown     0     1 small    550 153000
+## 3 Long Beach unknown     0     1 small    550 205000
+## 4 Long Beach unknown     0     1 small   1030 300000
+## 5 Long Beach unknown     0     1 small   1526 375000
+## 6 Long Beach unknown     1     1 small    552 159900
+```
+
+Once the data set is ready to go, save it to a new .csv file.
+
+
+```r
+write_csv(LA, file = "LA.csv")
+```
+
+
+---
+## Exploratory Data Analysis
+--
+
+Our goals are to:
+
+--
+
+1. Develop a sense of the *univariate* distributions in terms of center, shape, spread, unusual observations.
+
+--
+
+2. Develop a sense of the *bivariate* and *multivariate* distributions and what
+they indicate about the relationship between variables.
+
+
+---
+## Your turn
+--
+
+.task[
+Which of the following are *not* good methods to visualize the distribution of a single variable?
+]
+
+1. density plot
+2. scatterplot
+3. histogram
+4. side-by-side boxplots
+
+---
+
+&lt;center&gt;
+&lt;iframe src="https://embed.polleverywhere.com/multiple_choice_polls/rzDd0B2ZnIXSzmxAgT8Ae?controls=none&amp;short_poll=true" width="800px" height="600px"&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+
+---
+**Question**: Which of the following are *not* good methods to visualize the distribution of a single variable?
+
+1. density plot
+2. **scatterplot**
+3. histogram
+4. **side-by-side boxplots**
+
+
+---
+## EDA for `price`  
+--
+
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-18-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+**Question**: How would you visualize the relationship between `price` and `city`?
+
+
+```r
+head(LA)
+```
+
+```
+## # A tibble: 6 × 7
+##   city       type      bed  bath garage  sqft  price
+##   &lt;chr&gt;      &lt;fct&gt;   &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;  &lt;int&gt;  &lt;dbl&gt;
+## 1 Long Beach unknown     0     1 small    513 119000
+## 2 Long Beach unknown     0     1 small    550 153000
+## 3 Long Beach unknown     0     1 small    550 205000
+## 4 Long Beach unknown     0     1 small   1030 300000
+## 5 Long Beach unknown     0     1 small   1526 375000
+## 6 Long Beach unknown     1     1 small    552 159900
+```
+
+
+---
+
+**Question**: How would you visualize the relationship between `price` and `city`?
+
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-20-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+**Question**: How would you visualize the relationship between `price` and `sqft`?
+
+
+```r
+head(LA)
+```
+
+```
+## # A tibble: 6 × 7
+##   city       type      bed  bath garage  sqft  price
+##   &lt;chr&gt;      &lt;fct&gt;   &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;  &lt;int&gt;  &lt;dbl&gt;
+## 1 Long Beach unknown     0     1 small    513 119000
+## 2 Long Beach unknown     0     1 small    550 153000
+## 3 Long Beach unknown     0     1 small    550 205000
+## 4 Long Beach unknown     0     1 small   1030 300000
+## 5 Long Beach unknown     0     1 small   1526 375000
+## 6 Long Beach unknown     1     1 small    552 159900
+```
+
+
+---
+**Question**: How would you visualize the relationship between `price` and `sqft`?
+
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-22-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Transformations  
+--
+
+Highly skewed data (particularly the response) can be very difficult to model using least squares regression. A common solution is to consider a transformation of the variable.
+
+--
+
+$$ \widehat{price} \sim sqft $$
+
+versus
+
+$$\widehat{log(price)} \sim log(sqft) $$
+
+--
+
+In R: `log()` or `log10()`
+
+
+---
+## EDA for `price`  
+--
+
+
+```r
+LA &lt;- LA %&gt;%
+  mutate(logprice = log(price))
+```
+
+--
+
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-24-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## EDA for `logprice` and `logsqft`
+--
+
+
+
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-26-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Comparing residuals
+--
+
+
+```r
+m1 &lt;- lm(price ~ sqft, data = LA)
+m2 &lt;- lm(logprice ~ logsqft, data = LA)
+```
+
+--
+
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-28-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Transformation, cont.
+--
+
+Highly skewed data often leads to invalid models. This can be often be fixed 
+with a transformation, but the interpretations change slightly.
+
+--
+
+
+```
+##             Estimate Std. Error  t value     Pr(&gt;|t|)
+## (Intercept) 2.702788 0.14369289 18.80948 1.972382e-71
+## logsqft     1.441583 0.01953529 73.79375 0.000000e+00
+```
+
+*A one unit increase in the log sqft of a home is associated with a 1.44 unit
+increase in the log price of a home.*
+
+---
+## Dummy Variables
+--
+
+
+```r
+m3 &lt;- lm(logprice ~ logsqft + city, data = LA)
+LA %&gt;%
+  count(city)
+```
+--
+
+```
+## # A tibble: 4 × 2
+##   city              n
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 Beverly Hills   232
+## 2 Long Beach     1062
+## 3 Santa Monica    204
+## 4 Westwood         96
+```
+
+&gt; How can we encode a categorical variable like `city` into a numerical variable so that we can include it in our model?
+
+---
+boardwork
+
+---
+
+
+```r
+summary(m3)
+```
+--
+
+```
+## 
+## Call:
+## lm(formula = logprice ~ logsqft + city, data = LA)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.2449 -0.2526 -0.0141  0.2181  1.3907 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       5.46554    0.15695  34.824   &lt;2e-16 ***
+## logsqft           1.15119    0.01872  61.495   &lt;2e-16 ***
+## cityLong Beach   -0.89345    0.03442 -25.959   &lt;2e-16 ***
+## citySanta Monica -0.09301    0.04028  -2.309   0.0211 *  
+## cityWestwood     -0.45846    0.04880  -9.395   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.3709 on 1589 degrees of freedom
+## Multiple R-squared:  0.8737,	Adjusted R-squared:  0.8734 
+## F-statistic:  2749 on 4 and 1589 DF,  p-value: &lt; 2.2e-16
+```
+
+
+---
+## Dummy Variables, cont.
+--
+
+- Categorical variables with `\(k\)` levels can be recoded as `\(k - 1\)` dummy variables (also called indicator variables or one-hot encoding).
+
+--
+
+- The level that is left out of the dummy variables is called the **reference level** and by default is the first alphabetically. The `intercept` estimate refers to this level.
+
+--
+
+- The levels encoded by dummies have a coefficient that captures the deviation of their intercept to the reference level.
+
+---
+## Assessing model fit
+--
+
+Our existing statistic to measure how well the model captures the variability in the data is `\(R^2\)`.
+
+`$$R^2 = \frac{SSR}{TSS}$$`
+
+--
+
+.pull-left[
+**Model 2**
+
+$$ \widehat{log(price)} \sim log(sqft) $$
+
+
+```r
+summary(m2)$r.squared
+```
+
+```
+## [1] 0.7737839
+```
+]
+--
+.pull-right[
+**Model 3**
+
+$$ \widehat{log(price)} \sim log(sqft) + city $$
+
+
+```r
+summary(m3)$r.squared
+```
+
+```
+## [1] 0.8737357
+```
+]
+
+---
+
+boardwork
+
+---
+## Assessing model fit, cont.
+
+Our existing statistic to measure how well the model captures the variability in the data is `\(R^2\)`.
+
+`$$R^2 = \frac{SSR}{TSS}$$`
+
+--
+
+**Note**: `\(R^2\)` can never decrease when additional variables are added to the model.
+
+A more useful statistic when comparing MLR models of difference complexities is adjusted `\(R^2\)`, which balances the ability of the model to explain the data with its simplicity.
+
+$$R^2_{adj} = 1 - \frac{SSE}{TSS} \cdot \frac{n - 1}{n - p - 1} $$
+
+---
+.pull-left[
+**Model 2**
+
+$$ \widehat{log(price)} \sim log(sqft) $$
+
+
+```r
+summary(m2)$r.squared
+```
+
+```
+## [1] 0.7737839
+```
+]
+.pull-right[
+**Model 3**
+
+$$ \widehat{log(price)} \sim log(sqft) + city $$
+
+
+```r
+summary(m3)$r.squared
+```
+
+```
+## [1] 0.8737357
+```
+]
+--
+.pull-left[
+
+```r
+summary(m2)$adj.r.squared
+```
+
+```
+## [1] 0.7736418
+```
+]
+--
+.pull-right[
+
+```r
+summary(m3)$adj.r.squared
+```
+
+```
+## [1] 0.8734179
+```
+]
+
+
+---
+## Where we've been
+
+1. Statistical question
+2. Data wrangling
+3. Exploratory Data Analysis
+4. Modeling
+5. Interpretation
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
